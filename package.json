@@ -20,6 +20,9 @@
     ],
     "*.{json,css,md,yml,yaml}": [
       "prettier --write"
+    ],
+    ".prettierrc": [
+      "prettier --write"
     ]
   },
   "dependencies": {
