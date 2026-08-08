@@ -17,13 +17,13 @@ the app fails fast at startup on a missing or malformed required variable.
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | Dev server |
-| `npm run build` | Production build (includes the TypeScript check) |
-| `npm run start` | Serve the production build |
-| `npm run typecheck` | `tsc --noEmit` |
-| `npm run lint` | ESLint |
+| Command             | What it does                                     |
+| ------------------- | ------------------------------------------------ |
+| `npm run dev`       | Dev server                                       |
+| `npm run build`     | Production build (includes the TypeScript check) |
+| `npm run start`     | Serve the production build                       |
+| `npm run typecheck` | `tsc --noEmit`                                   |
+| `npm run lint`      | ESLint                                           |
 
 ## Stack
 

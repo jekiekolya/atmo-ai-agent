@@ -33,15 +33,15 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
 
 Fixed by the constitution — changing this layer is an amendment, not a feature decision.
 
-| | |
-|---|---|
-| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript `strict` |
-| Styling | Tailwind CSS v4 |
-| UI | shadcn/ui — *not yet installed* |
-| Database | PostgreSQL via Prisma, committed migrations only — *not yet installed* |
-| AI | OpenAI Agents SDK — *not yet installed* |
-| i18n | next-intl — *not yet installed* |
-| Testing | Vitest (unit/integration), Playwright (e2e) — *not yet installed* |
+|           |                                                                        |
+| --------- | ---------------------------------------------------------------------- |
+| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript `strict`      |
+| Styling   | Tailwind CSS v4                                                        |
+| UI        | shadcn/ui — _not yet installed_                                        |
+| Database  | PostgreSQL via Prisma, committed migrations only — _not yet installed_ |
+| AI        | OpenAI Agents SDK — _not yet installed_                                |
+| i18n      | next-intl — _not yet installed_                                        |
+| Testing   | Vitest (unit/integration), Playwright (e2e) — _not yet installed_      |
 
 Adding any other runtime dependency requires a stated reason in the feature plan: what it
 does, why the existing stack cannot, what it costs. Pulling a shadcn/ui component through its
