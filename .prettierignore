@@ -1,0 +1,20 @@
+# Build output and dependencies
+.next/
+out/
+build/
+node_modules/
+
+# Generated files
+next-env.d.ts
+*.tsbuildinfo
+package-lock.json
+
+# Binary and vendored assets
+public/*.svg
+src/app/favicon.ico
+
+# Vendored, upstream-owned content: spec-kit templates and hash-locked skills
+# (see skills-lock.json). Reformatting these invalidates their checksums.
+.specify/
+.claude/skills/
+.agents/skills/
