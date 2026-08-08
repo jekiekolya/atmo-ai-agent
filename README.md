@@ -1,36 +1,44 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Atmo AI Agent
 
-## Getting Started
+Customer-support platform for the end customers of solar-energy partner companies, with an AI
+chat agent as the primary support channel.
 
-First, run the development server:
+## Getting started
 
 ```bash
+npm ci
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Configuration comes from environment variables. Copy `.env.example` to `.env` and fill it in —
+the app fails fast at startup on a missing or malformed required variable.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Command | What it does |
+|---|---|
+| `npm run dev` | Dev server |
+| `npm run build` | Production build (includes the TypeScript check) |
+| `npm run start` | Serve the production build |
+| `npm run typecheck` | `tsc --noEmit` |
+| `npm run lint` | ESLint |
 
-To learn more about Next.js, take a look at the following resources:
+## Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Next.js 16 (App Router) · React 19 · TypeScript strict · Tailwind CSS v4
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Planned per the project constitution: Prisma + PostgreSQL, OpenAI Agents SDK, shadcn/ui,
+next-intl, Vitest, Playwright.
 
-## Deploy on Vercel
+## How we work
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`.specify/memory/constitution.md` governs this project — stack, testing regimes, localization,
+config handling, and agent accountability. Read it before starting a feature.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Features follow specification → plan → tasks → implementation using the `/speckit-*` skills.
+Work happens on a branch and lands through a reviewed pull request; the review checks
+constitution compliance.
+
+Agent-facing guidance lives in `CLAUDE.md`.
