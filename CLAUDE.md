@@ -28,6 +28,8 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
   those primitives in place; preserve their Base UI accessibility semantics. No second
   component library.
 - **`any` needs an inline reason** and stays at the boundary. Same for any suppression.
+- **Comments explain _why_, in a line or two.** If the reasoning needs a paragraph, it belongs
+  in the spec or the commit message — not above the code.
 
 ## Stack
 
