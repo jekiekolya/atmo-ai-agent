@@ -59,7 +59,7 @@ UI is composed, not reinvented. New interface elements are built from the projec
 primitives in `src/components/ui` and composed into feature components; hand-rolling a control that
 an existing primitive already covers requires a stated reason in the feature plan. Those primitives
 are owned code — customize them in place instead of wrapping them in adapter layers, preserve the
-Radix accessibility semantics (roles, ARIA attributes, keyboard and focus behavior) when editing
+Base UI accessibility semantics (roles, ARIA attributes, keyboard and focus behavior) when editing
 them, and route any user-facing string inside them through next-intl like all other copy.
 
 Readability is a review criterion: intention-revealing names, early returns over deep nesting, and
@@ -174,16 +174,16 @@ amendment, not a feature decision:
   migrations — never `db push` against a shared environment, never hand-edited SQL out of band.
 - **AI**: OpenAI Agents SDK for agent orchestration and tool calling.
 - **Styling**: Tailwind CSS. No parallel styling system (CSS-in-JS, ad-hoc global stylesheets).
-- **UI components**: shadcn/ui (Radix primitives, vendored into the repo under `src/components/ui`
-  via its CLI) is the single component baseline. No second component library — no MUI, Chakra, Ant
-  Design, or equivalent. Design tokens live in the Tailwind config and the shadcn theme, never as
-  hardcoded colors, spacings, or radii inside components.
+- **UI components**: shadcn/ui (Base UI primitives, vendored into the repo under
+  `src/components/ui` via its CLI) is the single component baseline. No second component library —
+  no MUI, Chakra, Ant Design, or equivalent. Design tokens live in the Tailwind config and the
+  shadcn theme, never as hardcoded colors, spacings, or radii inside components.
 - **i18n**: next-intl.
 - **Testing**: Vitest for unit/integration, Playwright for end-to-end.
 
 Adding a runtime dependency requires a stated reason in the feature plan: what it does, why the
 existing stack cannot, and what it costs. Prefer the platform and existing dependencies first.
-Pulling in a shadcn/ui component through its CLI is expected and exempt from this rule — the Radix
+Pulling in a shadcn/ui component through its CLI is expected and exempt from this rule — the Base UI
 packages it brings along are part of the baseline above.
 
 ## Development Workflow & Quality Gates
@@ -219,4 +219,4 @@ blocks merge. The constitution is re-read at the start of each feature's plannin
 resulting plan records its constitution check. Runtime development guidance for agents lives in
 `CLAUDE.md` and the `.specify/templates/` templates, which must not contradict this file.
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-08-02
+**Version**: 1.1.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-08-17

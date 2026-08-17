@@ -25,7 +25,7 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
 - **Tenant scoping lives in the data layer**, never in a prompt instruction. Agent tools are
   typed, least-privilege, and single-tenant.
 - **UI is composed from `src/components/ui`** (shadcn/ui, vendored via its CLI). Customize
-  those primitives in place; preserve their Radix accessibility semantics. No second
+  those primitives in place; preserve their Base UI accessibility semantics. No second
   component library.
 - **`any` needs an inline reason** and stays at the boundary. Same for any suppression.
 
