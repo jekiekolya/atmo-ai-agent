@@ -127,4 +127,10 @@
   html {
     @apply font-sans;
   }
+  /* The web convention over Tailwind v4's browser default — its documented
+     opt-in, plus aria-disabled for a non-button carrying role="button". */
+  button:not(:disabled),
+  [role="button"]:not(:disabled):not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
 }
