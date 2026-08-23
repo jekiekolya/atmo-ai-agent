@@ -117,9 +117,16 @@ data in the repository, in fixtures, or in test snapshots. `.env` and `.env.*` s
 
 All configuration comes from environment variables, read in exactly one place. A single Config
 module (`src/config/index.ts` or equivalent) reads `process.env`, validates and coerces every
-value at startup, and exports one typed frozen config object. Every other file — including tests,
-scripts, and instrumentation — imports that object. `process.env` access outside the Config module
-is a review-blocking violation.
+value at startup, and exports one typed frozen config object. Every other file — including tests
+and instrumentation — imports that object. `process.env` access outside the Config module is a
+review-blocking violation.
+
+This principle governs application configuration. Tooling files that never reach the application
+bundle — configuration at the repository root (`next.config.ts`, `playwright.config.ts`,
+`vitest.config.mts`), build scripts, and CI scripts — MAY read `process.env` directly: they run
+before and outside the application, and cannot depend on a Config module that fails fast on
+application variables. Application code, including the tests that exercise it, still receives its
+configuration only from the Config module.
 
 Every variable the Config module reads MUST be documented in `.env.example` with a non-secret
 placeholder and a one-line description. Missing or malformed required variables MUST fail fast at
@@ -219,4 +226,4 @@ blocks merge. The constitution is re-read at the start of each feature's plannin
 resulting plan records its constitution check. Runtime development guidance for agents lives in
 `CLAUDE.md` and the `.specify/templates/` templates, which must not contradict this file.
 
-**Version**: 1.1.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-08-17
+**Version**: 1.2.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-08-23
