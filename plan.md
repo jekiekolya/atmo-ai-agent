@@ -6,3 +6,4 @@
 6. AI chat - before we need to check if covered base setup
 7. Setup Prettier
 8. Setup CI
+9. Setup tests - Vitest + Playwright
