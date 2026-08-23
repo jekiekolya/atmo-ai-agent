@@ -40,11 +40,11 @@ Fixed by the constitution — changing this layer is an amendment, not a feature
 | --------- | ---------------------------------------------------------------------- |
 | Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript `strict`      |
 | Styling   | Tailwind CSS v4                                                        |
-| UI        | shadcn/ui — _not yet installed_                                        |
+| UI        | shadcn/ui on Base UI, vendored via its CLI                             |
 | Database  | PostgreSQL via Prisma, committed migrations only — _not yet installed_ |
 | AI        | OpenAI Agents SDK — _not yet installed_                                |
 | i18n      | next-intl — _not yet installed_                                        |
-| Testing   | Vitest (unit/integration), Playwright (e2e) — _not yet installed_      |
+| Testing   | Vitest (unit/integration), Playwright (e2e)                            |
 
 Adding any other runtime dependency requires a stated reason in the feature plan: what it
 does, why the existing stack cannot, what it costs. Pulling a shadcn/ui component through its
@@ -57,7 +57,14 @@ npm run dev        # dev server
 npm run build      # production build (runs the TypeScript check)
 npm run typecheck  # tsc --noEmit
 npm run lint       # eslint
+npm test           # Vitest, watch mode
+npm run test:run   # Vitest, single run — what CI runs
+npm run e2e        # Playwright; builds and serves the app itself
+npm run e2e:ui     # Playwright UI mode — step through a failing e2e test
 ```
+
+`E2E_PORT=<port> npm run e2e` points the suite at a server that is already running (your dev
+server) instead of building one — Next allows only one dev server per directory.
 
 ## Layout
 
