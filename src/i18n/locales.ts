@@ -1,6 +1,5 @@
-// The supported-locale set is application code, not configuration: a locale
-// cannot exist without its catalog committed alongside it, so adding one is a
-// reviewed code change rather than an environment variable (FR-002, FR-003).
+// Application code, not configuration: a locale cannot exist without its
+// catalog committed alongside it (FR-002, FR-003).
 export const SUPPORTED_LOCALES = ["en", "uk"] as const;
 
 export type Locale = (typeof SUPPORTED_LOCALES)[number];

@@ -2,21 +2,19 @@ import { defineRouting } from "next-intl/routing";
 
 import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "./locales";
 
-// One year. The preference is a functional choice the visitor made, so it
-// should outlive a browser restart (FR-014).
+// The preference should outlive a browser restart (FR-014).
 const ONE_YEAR_IN_SECONDS = 60 * 60 * 24 * 365;
 
 export const routing = defineRouting({
   locales: SUPPORTED_LOCALES,
   defaultLocale: DEFAULT_LOCALE,
 
-  // Every locale is prefixed, the default included: one address shape, no
-  // special case to reason about (FR-005, MC-003).
+  // The default locale is prefixed too: one address shape, no special case to
+  // reason about (FR-005, MC-003).
   localePrefix: "always",
 
-  // Priority 2 of the resolution order. Note this flag also gates *reading*
-  // the cookie in next-intl, which is why the write is suppressed on the
-  // response instead of disabled here — see i18n/proxy-handler.ts (FR-006).
+  // Priority 2 of the resolution order. This flag also gates *reading* the
+  // cookie, which is why the write is stripped in proxy-handler.ts (FR-006, R2).
   localeDetection: true,
 
   localeCookie: {
@@ -24,17 +22,12 @@ export const routing = defineRouting({
     maxAge: ONE_YEAR_IN_SECONDS,
     path: "/",
     sameSite: "lax",
-    // Static, not derived from the environment. This config is imported by the
-    // navigation helpers, which a client component uses, so anything read here
-    // is bundled for the browser — importing the Config module would ship it
-    // (and its process.env read) to the client, where it throws. Browsers treat
-    // http://localhost as a trustworthy origin, so `true` holds in development
-    // as well as production.
+    // Static, not from Config: this module reaches the client bundle through
+    // the switcher, and localhost is a trustworthy origin anyway (R10).
     secure: true,
   },
 
-  // Emits `Link` headers announcing each page's other-locale versions. The
-  // switcher is a dropdown and therefore not crawlable, so these headers are
-  // the only cross-locale signal search engines get.
+  // The switcher is a dropdown and therefore not crawlable, so these Link
+  // headers are the only cross-locale signal search engines get.
   alternateLinks: true,
 });

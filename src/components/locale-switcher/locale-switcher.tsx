@@ -17,27 +17,20 @@ export function LocaleSwitcher() {
   const t = useTranslations("switcher");
   const locale = useLocale();
   const router = useRouter();
-  // Locale-aware: returns the current path with the locale segment stripped
-  // and every other segment resolved, so /uk/demo/42 yields /demo/42.
   const pathname = usePathname();
   const [isPending, startTransition] = useTransition();
 
   function onChange(next: Locale | null) {
-    // Base UI models "nothing selected"; this control always has a value, so
-    // a null here is not a locale change.
+    // Base UI models "nothing selected"; this control always has a value.
     if (next === null || next === locale) return;
 
-    // usePathname drops the query string, so it is re-attached here: a switch
-    // must preserve the whole address, not just the path (FR-013). Read from
-    // the live URL rather than useSearchParams, which would opt every page
-    // that renders this switcher out of static rendering. This runs only in
-    // the browser, on click, so the value is current by construction.
+    // usePathname drops the query, and useSearchParams would opt every page
+    // rendering this switcher out of static rendering (FR-013, R13).
     const query = window.location.search;
     const target = `${pathname}${query}`;
 
     startTransition(() => {
-      // next-intl writes NEXT_LOCALE here, in the browser. That is the only
-      // place the preference is ever written (FR-030).
+      // The one place NEXT_LOCALE is ever written (FR-030).
       router.replace(target, { locale: next });
     });
   }
@@ -45,8 +38,6 @@ export function LocaleSwitcher() {
   return (
     <Select value={locale} onValueChange={onChange} disabled={isPending}>
       <SelectTrigger aria-label={t("label")} size="sm">
-        {/* The trigger must show the language's own name, not its code: a
-            visitor looking for Ukrainian looks for "Українська", not "uk". */}
         <SelectValue>
           {(value: Locale | null) => (value ? LOCALE_LABELS[value] : null)}
         </SelectValue>

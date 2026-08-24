@@ -19,9 +19,8 @@ const geistMono = Geist_Mono({
   subsets: ["latin", "cyrillic"],
 });
 
-// This is the root layout: `app/layout.tsx` is deliberately absent so that
-// `<html lang>` can be rendered by a layout that knows the locale. That makes
-// `locale` a Next 16 root parameter (FR-010).
+// The root layout: `app/layout.tsx` is deliberately absent so `<html lang>`
+// is rendered by a layout that knows the locale (FR-010).
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
