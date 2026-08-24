@@ -38,6 +38,17 @@ Given a request, the served locale is the first source that yields a supported l
 | `/uk/…` while cookie is `en`                         | 200    | —                                                                  | **none** — the shared-link case; the cookie is _not_ overwritten (FR-030) | route default       |
 | `/de/dashboard`                                      | 307    | `/{negotiated}/de/dashboard`, then the localized 404 renders there | **none**                                                                  | `no-store`          |
 
+## Unmatched paths
+
+| Request                                     | Result                                                                              |
+| ------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `/uk/demo` (no case number), `/uk/whatever` | 404 **rendered as a localized page**: `lang="uk"`, Ukrainian copy, switcher present |
+| the same under `/en/...`                    | the same in English                                                                 |
+
+A path inside a locale that matches no route does not fall through to the framework's own error
+screen. Switching language from one of these lands on the same path under the other locale, where its
+not-found page renders.
+
 ## Exclusions
 
 The proxy matcher must not run on non-page addresses (FR-011): `/api/*`, `/_next/static/*`,

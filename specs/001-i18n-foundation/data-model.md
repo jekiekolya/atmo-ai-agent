@@ -94,15 +94,15 @@ it exists as a type derived from the English catalog and as a string in the JSON
 
 **Spec entity**: Language Preference · **Lives in**: the visitor's browser · **Requirements**: FR-014, FR-015, FR-030
 
-| Attribute  | Value                             | Why                                                                                                                      |
-| ---------- | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Name       | `NEXT_LOCALE`                     | MC-002; also next-intl's default                                                                                         |
-| Value      | a `Locale` code                   | Any other value is ignored and resolution continues (FR-008)                                                             |
-| `maxAge`   | 31 536 000 (one year)             | Spec assumption: long-lived                                                                                              |
-| `path`     | `/`                               | FR-014: scoped to the whole site                                                                                         |
-| `sameSite` | `lax`                             | Survives following an external link to the site; the value is not sensitive                                              |
-| `secure`   | `config.appEnv !== "development"` | Read from the existing Config module, not `process.env` (Principle V, FR-004)                                            |
-| `httpOnly` | **no**                            | The explicit switch writes it from the browser via `document.cookie`; making it httpOnly would break FR-030's write path |
+| Attribute  | Value                 | Why                                                                                                                                                                                                                                                |
+| ---------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Name       | `NEXT_LOCALE`         | MC-002; also next-intl's default                                                                                                                                                                                                                   |
+| Value      | a `Locale` code       | Any other value is ignored and resolution continues (FR-008)                                                                                                                                                                                       |
+| `maxAge`   | 31 536 000 (one year) | Spec assumption: long-lived                                                                                                                                                                                                                        |
+| `path`     | `/`                   | FR-014: scoped to the whole site                                                                                                                                                                                                                   |
+| `sameSite` | `lax`                 | Survives following an external link to the site; the value is not sensitive                                                                                                                                                                        |
+| `secure`   | `true`                | Static, not env-derived. This config reaches the client bundle through the switcher, so importing Config would ship its `process.env` read to the browser (research R10). `http://localhost` is a trustworthy origin, so development is unaffected |
+| `httpOnly` | **no**                | The explicit switch writes it from the browser via `document.cookie`; making it httpOnly would break FR-030's write path                                                                                                                           |
 
 **Lifecycle** — the whole of FR-030 in three lines:
 

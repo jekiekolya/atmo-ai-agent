@@ -163,12 +163,66 @@ brace expansion is the whole fix.
 
 ## R10. Cookie attributes
 
-**Decision**: `{ name: 'NEXT_LOCALE', maxAge: 31_536_000, sameSite: 'lax', path: '/', secure: config.appEnv !== 'development' }`.
+**Decision**: `{ name: 'NEXT_LOCALE', maxAge: 31_536_000, sameSite: 'lax', path: '/', secure: true }`.
 
 **Rationale**: The name is fixed by MC-002 and happens to be next-intl's default (verified in
 `routing/config.js`, which also defaults `sameSite: 'lax'` and `localePrefix: 'always'` — both what we
 want). One year satisfies the spec's "long-lived" assumption; `path: '/'` satisfies FR-014's
-site-wide scope. `secure` is derived from the existing Config module's `appEnv` rather than
-`process.env`, honouring Principle V and adding no new variable (FR-004). The cookie holds a language
-code and no personal data; because it is written only as the direct result of a user action (FR-030),
-it is a functional preference rather than something requiring consent machinery.
+site-wide scope. The cookie holds a language code and no personal data; because it is written only
+as the direct result of a user action (FR-030), it is a functional preference rather than something
+requiring consent machinery.
+
+**Amended during implementation.** This section originally specified
+`secure: config.appEnv !== 'development'`, reading the Config module so the flag could relax on a
+plain-HTTP dev server. That is not implementable: `routing.ts` is imported by `navigation.ts`, which
+the client-side switcher imports, so **everything this config touches is bundled for the browser**.
+Importing Config shipped its `process.env` read to the client, where it threw
+`Invalid environment configuration` on every page — confirmed by finding the message in
+`.next/static/chunks/`. The cookie is written client-side by next-intl, so the attribute has to be a
+static value in a browser-safe module. `secure: true` unconditionally is correct in production and
+works in development too, because browsers treat `http://localhost` as a trustworthy origin. Verified
+by the Playwright run: the preference persists on `http://localhost:3100`.
+
+## R11. `setRequestLocale` and `requestLocale` are deprecated in this version
+
+**Decision**: Read the locale from `next/root-params`; do not call `setRequestLocale`.
+
+**Rationale**: Discovered during implementation, from an editor warning. next-intl 4.13.7 marks both
+`getRequestConfig`'s `requestLocale` parameter and `setCachedRequestLocale` as
+`@deprecated Please migrate to next/root-params`. Next 16 exposes every dynamic segment above the
+root layout as a root parameter, so `src/app/[locale]/` makes `locale` importable from
+`next/root-params` in any Server Component — which is what R7 already noted. `request.ts` reads it
+directly and the `setRequestLocale(locale)` call disappears from every page.
+
+The getter can resolve to `undefined` when something renders outside the `[locale]` segment, so the
+narrowing in `request.ts` is load-bearing, not defensive.
+
+**Not usable in Client Components** (also Server Actions and Route Handlers), so the switcher still
+takes its locale from next-intl's `useLocale()`.
+
+## R12. An unmatched path escapes the localized not-found page
+
+**Decision**: Add `src/app/[locale]/[...rest]/page.tsx` that calls `notFound()`.
+
+**Rationale**: Found by manual testing after the suite was green — the automated coverage had a hole.
+`/uk/demo` (the demonstration route without its `[id]`) and `/uk/whatever` match no route inside
+`[locale]`, so Next fell through to its own built-in 404: no `lang` attribute, no switcher, English
+text only. That breaks FR-010 and contradicts both the spec's "not-found and error pages are
+localized" assumption and its "switching from a not-found page" edge case.
+
+`not-found.tsx` inside `[locale]` only handles `notFound()` raised _within_ that segment; an
+unmatched URL never enters it. A catch-all route that immediately calls `notFound()` puts those URLs
+back inside the segment, where the localized page and the layout (and therefore the switcher) apply.
+Covered now by three Playwright cases, including switching locale from a 404.
+
+## R13. `useSearchParams` in the switcher opts every page out of static rendering
+
+**Decision**: Read `window.location.search` inside the click handler instead.
+
+**Rationale**: The switcher renders in the root layout, so it is on every page. Calling
+`useSearchParams()` in it failed the build outright:
+`useSearchParams() should be wrapped in a suspense boundary at page "/[locale]"`. Wrapping it in
+`<Suspense>` would work but degrades every page to client-side rendering for a value needed only at
+the moment of a click. The handler runs exclusively in the browser, so reading the live URL there is
+both simpler and more accurate. `/en` and `/uk` remain statically prerendered — confirmed in the
+build output.

@@ -43,7 +43,7 @@ Fixed by the constitution — changing this layer is an amendment, not a feature
 | UI        | shadcn/ui on Base UI, vendored via its CLI                             |
 | Database  | PostgreSQL via Prisma, committed migrations only — _not yet installed_ |
 | AI        | OpenAI Agents SDK — _not yet installed_                                |
-| i18n      | next-intl — _not yet installed_                                        |
+| i18n      | next-intl (locale-prefixed routing, catalogs in `src/messages/`)       |
 | Testing   | Vitest (unit/integration), Playwright (e2e)                            |
 
 Adding any other runtime dependency requires a stated reason in the feature plan: what it
