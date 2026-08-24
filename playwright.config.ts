@@ -17,7 +17,9 @@ export default defineConfig({
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
     command: "npm run build && npm run start",
-    env: { PORT: String(port) },
+    // APP_ENV has no default and CI has no .env file. Never staging or
+    // production: the suite must not resolve to real infrastructure.
+    env: { PORT: String(port), APP_ENV: "development" },
     url: baseURL,
     // A cold production build runs well past Playwright's 60s default.
     timeout: 180_000,
