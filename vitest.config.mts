@@ -17,8 +17,18 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: ["src/{config,lib,services}/**/*.test.ts"],
+          include: ["src/{config,i18n,lib,services}/**/*.test.ts"],
           exclude,
+          // APP_ENV has no default and CI has no .env file, so the Config
+          // module would fail fast the moment a test imports it. Same reason
+          // and same value as playwright.config.ts. Tooling configs may read
+          // and set process.env (Constitution, Principle V).
+          env: { APP_ENV: "development" },
+          // next-intl ships ESM that imports `next/server` extensionless, and
+          // `next` publishes no exports map, so Node's strict ESM resolver
+          // cannot find it. Letting Vite transform the package instead of
+          // externalising it resolves the specifier the way the bundler does.
+          server: { deps: { inline: ["next-intl"] } },
         },
       },
       {

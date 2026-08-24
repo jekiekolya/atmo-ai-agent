@@ -1,3 +1,4 @@
+import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -8,4 +9,8 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Points next-intl at the request config so `getRequestConfig` is picked up and
+// server components can resolve messages without threading the locale through.
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
+export default withNextIntl(nextConfig);
