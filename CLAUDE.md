@@ -70,12 +70,30 @@ server) instead of building one — Next allows only one dev server per director
 
 ```
 src/app/            App Router routes and layouts
+src/components/     one folder per component (see below)
 src/components/ui/  shadcn/ui primitives (owned code — edit in place)
 src/config/         the single Config module
 .specify/           constitution, spec templates, spec-kit scripts
 ```
 
 Import alias: `@/*` → `./src/*`.
+
+**One folder per component.** Every component we author lives in its own directory holding the
+component and its colocated test, even when that is only two files — uniform structure beats a
+per-component judgement call:
+
+```
+src/components/locale-switcher/
+├── locale-switcher.tsx
+└── locale-switcher.test.tsx
+```
+
+Name the file in full rather than `index.tsx`: it stays greppable and the editor does not fill with
+identical tabs. Import from the file, not through a barrel — barrel re-exports cost compile time and
+defeat tree-shaking. Group folders by domain (`chat/`, `tickets/`) once a directory gets crowded.
+
+`src/components/ui/` is the one exception and stays flat: the shadcn CLI writes those paths, and
+rearranging them after every `shadcn add` would cost more than the consistency is worth.
 
 ## Merge gates
 
