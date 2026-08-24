@@ -1,0 +1,27 @@
+{
+  "common": {
+    "appName": "Atmo",
+    "metaTitle": "Atmo — solar support",
+    "metaDescription": "Support for the customers of our solar-energy partners."
+  },
+  "home": {
+    "title": "How can we help?",
+    "intro": "Ask about your solar system, your contract, or a recent visit. We answer in your language.",
+    "demoLink": "See a sample case"
+  },
+  "switcher": {
+    "label": "Language"
+  },
+  "demo": {
+    "title": "Case {id}",
+    "openedAt": "Opened {date}",
+    "output": "Produced {value} kWh last month",
+    "credit": "Credited {amount}",
+    "visits": "{count, plural, one {# site visit} other {# site visits}}"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "That page does not exist. The link may be out of date.",
+    "backHome": "Back to the start"
+  }
+}
