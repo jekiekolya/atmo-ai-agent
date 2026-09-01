@@ -25,10 +25,14 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+// An unlisted segment 404s at the routing layer, so no page needs its own guard.
+export const dynamicParams = false;
+
 export async function generateMetadata({
   params,
 }: LayoutProps<"/[locale]">): Promise<Metadata> {
   const { locale } = await params;
+  // Narrowing for getTranslations, not a runtime guard — dynamicParams does that.
   if (!hasLocale(routing.locales, locale)) notFound();
 
   const t = await getTranslations({ locale, namespace: "common" });
@@ -41,10 +45,6 @@ export default async function LocaleLayout({
   params,
 }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
-
-  // The segment is untrusted: /de/... must render the localized not-found page
-  // rather than a half-resolved layout.
-  if (!hasLocale(routing.locales, locale)) notFound();
 
   return (
     <html

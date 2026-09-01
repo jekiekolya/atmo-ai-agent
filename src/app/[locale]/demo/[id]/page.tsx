@@ -1,8 +1,4 @@
-import { hasLocale } from "next-intl";
 import { getFormatter, getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
-
-import { routing } from "@/i18n/routing";
 
 // Stand-in for data a real case would carry. Fixed values so the rendering is
 // deterministic: this route exists to prove locale-aware formatting and that a
@@ -17,9 +13,7 @@ const SAMPLE = {
 export default async function DemoCase({
   params,
 }: PageProps<"/[locale]/demo/[id]">) {
-  const { locale, id } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-
+  const { id } = await params;
   const t = await getTranslations("demo");
   const format = await getFormatter();
 

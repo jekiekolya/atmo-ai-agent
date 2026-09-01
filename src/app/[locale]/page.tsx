@@ -1,14 +1,8 @@
-import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
 
 import { Link } from "@/i18n/navigation";
-import { routing } from "@/i18n/routing";
 
-export default async function Home({ params }: PageProps<"/[locale]">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-
+export default async function Home() {
   const t = await getTranslations("home");
 
   return (
