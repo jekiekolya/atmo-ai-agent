@@ -215,6 +215,15 @@ unmatched URL never enters it. A catch-all route that immediately calls `notFoun
 back inside the segment, where the localized page and the layout (and therefore the switcher) apply.
 Covered now by three Playwright cases, including switching locale from a 404.
 
+`[...rest]` cannot be dropped in favour of `not-found.tsx` alone: that file is a boundary, not a
+route, so it only catches `notFound()` raised _inside_ the segment. Verified by removing it —
+`/uk/demo` then serves Next's built-in English 404.
+
+The 404 body is client-rendered: `notFound()` returns an error shell plus an RSC payload, so the
+server HTML carries no `lang`. This is inherent to a root layout under a dynamic segment, which the
+Next docs call out as the hard case. Rendering the UI directly instead would return 200 — a soft
+404, worse for indexing than a missing `lang`. Accepted as-is.
+
 ## R13. `useSearchParams` in the switcher opts every page out of static rendering
 
 **Decision**: Read `window.location.search` inside the click handler instead.

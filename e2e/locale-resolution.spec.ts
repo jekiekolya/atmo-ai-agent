@@ -95,6 +95,7 @@ test("the negotiation redirect is never cached", async ({ request }) => {
 // A path that matches no route still has to be a localized page: the spec
 // treats not-found as a page like any other, and the switcher has to work from
 // it (FR-010, spec Edge Cases).
+// Browser-only: the 404 body is client-rendered, so `lang` appears on hydration.
 test.describe("an unmatched path inside a locale", () => {
   for (const [locale, heading] of [
     ["uk", "Сторінку не знайдено"],
