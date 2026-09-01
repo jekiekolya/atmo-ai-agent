@@ -52,6 +52,16 @@ describe("request config", () => {
     expect(locale).toBe(DEFAULT_LOCALE);
   });
 
+  it("pins the time zone so the same instant renders identically everywhere", async () => {
+    // Without this, Intl falls back to the server's zone: the same stored
+    // moment renders as a different day depending on where the container runs.
+    const { timeZone } = (await resolve("uk")) as unknown as {
+      timeZone: string;
+    };
+
+    expect(timeZone).toBe("UTC");
+  });
+
   it("reports the locale it actually resolved, not the one requested", async () => {
     // next-intl needs the effective locale back, or formatters would bind to a
     // locale whose catalog was never loaded.
