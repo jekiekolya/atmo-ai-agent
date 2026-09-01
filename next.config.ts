@@ -11,6 +11,6 @@ const nextConfig: NextConfig = {
 
 // Points next-intl at the request config so `getRequestConfig` is picked up and
 // server components can resolve messages without threading the locale through.
-const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+const withNextIntl = createNextIntlPlugin();
 
 export default withNextIntl(nextConfig);

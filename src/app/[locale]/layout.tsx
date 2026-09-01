@@ -1,6 +1,5 @@
-import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 
@@ -28,14 +27,8 @@ export function generateStaticParams() {
 // An unlisted segment 404s at the routing layer, so no page needs its own guard.
 export const dynamicParams = false;
 
-export async function generateMetadata({
-  params,
-}: LayoutProps<"/[locale]">): Promise<Metadata> {
-  const { locale } = await params;
-  // Narrowing for getTranslations, not a runtime guard — dynamicParams does that.
-  if (!hasLocale(routing.locales, locale)) notFound();
-
-  const t = await getTranslations({ locale, namespace: "common" });
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("common");
 
   return { title: t("metaTitle"), description: t("metaDescription") };
 }
