@@ -2,11 +2,8 @@ import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { defineConfig } from "vitest/config";
 
-// Tests live next to the code they cover, so the environment cannot be split by
-// directory alone: domain code must run in node, where process.env and Node-only
-// failures behave for real, while component tests need a DOM.
-// e2e/ is excluded because Playwright owns those files — run under Vitest they
-// collide on `expect`.
+// Tests live next to the code they cover, so the environment is split by file
+// suffix, not directory. e2e/ is excluded — Playwright owns those files.
 const exclude = ["e2e/**", "node_modules/**", ".next/**"];
 
 export default defineConfig({
@@ -17,8 +14,14 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: ["src/{config,lib,services}/**/*.test.ts"],
+          include: ["src/{config,i18n,lib,services}/**/*.test.ts"],
           exclude,
+          // APP_ENV has no default and CI has no .env file, so Config would
+          // fail fast on import. Same value as playwright.config.ts.
+          env: { APP_ENV: "development" },
+          // next-intl imports `next/server` extensionless and `next` has no
+          // exports map, so Node's ESM resolver needs Vite to transform it.
+          server: { deps: { inline: ["next-intl"] } },
         },
       },
       {
