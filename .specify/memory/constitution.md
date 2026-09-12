@@ -1,5 +1,4 @@
 <!--
-SYNC IMPACT REPORT
 Version change: template (unversioned) → 1.0.0
 Rationale: First ratification. The file previously contained only placeholder tokens, so this is
 the initial adoption of concrete governance rather than an amendment.
@@ -188,10 +187,10 @@ amendment, not a feature decision:
 - **i18n**: next-intl.
 - **Testing**: Vitest for unit/integration, Playwright for end-to-end.
 
-Adding a runtime dependency requires a stated reason in the feature plan: what it does, why the
-existing stack cannot, and what it costs. Prefer the platform and existing dependencies first.
-Pulling in a shadcn/ui component through its CLI is expected and exempt from this rule — the Base UI
-packages it brings along are part of the baseline above.
+Adding a runtime dependency requires a stated reason in the feature plan: what it does, what
+building it ourselves would cost, and what the dependency costs. Prefer the platform and existing
+dependencies first. Pulling in a shadcn/ui component through its CLI is expected and exempt from
+this rule — the Base UI packages it brings along are part of the baseline above.
 
 ## Development Workflow & Quality Gates
 
@@ -226,4 +225,4 @@ blocks merge. The constitution is re-read at the start of each feature's plannin
 resulting plan records its constitution check. Runtime development guidance for agents lives in
 `CLAUDE.md` and the `.specify/templates/` templates, which must not contradict this file.
 
-**Version**: 1.2.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-08-23
+**Version**: 1.3.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-09-12

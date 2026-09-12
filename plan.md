@@ -7,3 +7,12 @@
 7. Setup Prettier
 8. Setup CI
 9. Setup tests - Vitest + Playwright
+
+Тобто мінімальний реальний прогін:
+/grill-me → загострити (ти)
+/speckit-specify "..." → читаєш spec.md, правиш ← гейт
+/speckit-clarify → добиває дірки
+/speckit-plan → читаєш plan.md + constitution check ← гейт
+/speckit-tasks
+/speckit-analyze → одна перевірка узгодженості
+/speckit-implement → тут можна автомод

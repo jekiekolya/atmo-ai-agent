@@ -47,8 +47,8 @@ Fixed by the constitution — changing this layer is an amendment, not a feature
 | Testing   | Vitest (unit/integration), Playwright (e2e)                            |
 
 Adding any other runtime dependency requires a stated reason in the feature plan: what it
-does, why the existing stack cannot, what it costs. Pulling a shadcn/ui component through its
-CLI is exempt.
+does, what building it ourselves would cost, what the dependency costs. Pulling a shadcn/ui
+component through its CLI is exempt.
 
 ## Commands
 
