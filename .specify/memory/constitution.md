@@ -1,5 +1,19 @@
 <!--
-Version change: template (unversioned) → 1.0.0
+SYNC IMPACT REPORT — latest first.
+
+## 1.2.0 → 1.3.0 (2026-09-12)
+
+Technology Constraints: a new runtime dependency is justified by cost ("what building it ourselves
+would cost, and what the dependency costs") instead of impossibility ("why the existing stack
+cannot"). MINOR — it changes what the plan must establish, not just how the rule reads. Mirrored in
+CLAUDE.md. No principle touched.
+
+## 1.1.0 → 1.2.0 and 1.0.0 → 1.1.0
+
+Not recorded here at the time — see commits `eab9491` and `45e28a3`.
+
+## template (unversioned) → 1.0.0 (2026-08-02)
+
 Rationale: First ratification. The file previously contained only placeholder tokens, so this is
 the initial adoption of concrete governance rather than an amendment.
 
