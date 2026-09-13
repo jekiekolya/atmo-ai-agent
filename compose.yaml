@@ -1,0 +1,22 @@
+# Local development only. These credentials are deliberately trivial and must
+# never be reused anywhere a real deployment can reach.
+services:
+  postgres:
+    image: postgres:18-alpine
+    ports: ["5432:5432"]
+    environment:
+      POSTGRES_USER: atmo
+      POSTGRES_PASSWORD: atmo
+      POSTGRES_DB: atmo_dev
+    volumes:
+      # Postgres 18 stores data in a major-version subdirectory and refuses
+      # to start when the mount sits at the old /data path.
+      - atmo-pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atmo -d atmo_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  atmo-pgdata:
