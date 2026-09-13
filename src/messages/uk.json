@@ -12,6 +12,9 @@
   "switcher": {
     "label": "Мова"
   },
+  "theme": {
+    "label": "Перемкнути світлу й темну тему"
+  },
   "demo": {
     "title": "Звернення {id}",
     "openedAt": "Відкрито {date}",

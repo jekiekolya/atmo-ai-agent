@@ -29,8 +29,12 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
   those primitives in place; preserve their Base UI accessibility semantics. No second
   component library.
 - **`any` needs an inline reason** and stays at the boundary. Same for any suppression.
-- **Comments explain _why_, in a line or two.** If the reasoning needs a paragraph, it belongs
-  in the spec or the commit message — not above the code.
+- **Comments are rare, and one line.** Write one only where the code would mislead without it —
+  an ordering constraint nothing tests, a workaround, a trap someone will "fix". Never restate what
+  the code says, never re-justify a decision the spec or plan already records, never explain a
+  documented library idiom. Prose in the repo ages faster than the code it sits above, so a comment
+  that duplicates a document is a future lie. If the reasoning needs a paragraph, it belongs in the
+  spec or the commit message.
 
 ## Stack
 
