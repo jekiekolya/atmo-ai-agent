@@ -16,9 +16,13 @@ export default defineConfig({
           environment: "node",
           include: ["src/{config,i18n,lib,services}/**/*.test.ts"],
           exclude,
-          // APP_ENV has no default and CI has no .env file, so Config would
-          // fail fast on import. Same value as playwright.config.ts.
-          env: { APP_ENV: "development" },
+          // Neither has a default and CI has no .env file, so Config would
+          // fail fast on import. Same values as playwright.config.ts; the URL
+          // is a placeholder, no unit test connects.
+          env: {
+            APP_ENV: "development",
+            DATABASE_URL: "postgresql://user:password@localhost:5432/atmo_dev",
+          },
           // next-intl imports `next/server` extensionless and `next` has no
           // exports map, so Node's ESM resolver needs Vite to transform it.
           server: { deps: { inline: ["next-intl"] } },
