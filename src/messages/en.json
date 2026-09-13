@@ -12,6 +12,9 @@
   "switcher": {
     "label": "Language"
   },
+  "theme": {
+    "label": "Switch between light and dark"
+  },
   "demo": {
     "title": "Case {id}",
     "openedAt": "Opened {date}",
