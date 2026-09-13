@@ -9,6 +9,7 @@ blob-report/
 playwright/.cache/
 
 # Generated files
+prisma/generated/
 next-env.d.ts
 *.tsbuildinfo
 package-lock.json
