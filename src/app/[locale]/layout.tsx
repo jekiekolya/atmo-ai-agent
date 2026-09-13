@@ -1,10 +1,13 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
+import { ThemeProvider } from "next-themes";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 
 import { LocaleSwitcher } from "@/components/locale-switcher/locale-switcher";
+import { ThemeToggle } from "@/components/theme-toggle/theme-toggle";
 import { routing } from "@/i18n/routing";
+import { DEFAULT_THEME_PREFERENCE, THEME_STORAGE_KEY } from "@/lib/theme";
 
 import "../globals.css";
 
@@ -43,14 +46,23 @@ export default async function LocaleLayout({
     <html
       lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">
-        <NextIntlClientProvider>
-          <header className="flex justify-end p-4">
-            <LocaleSwitcher />
-          </header>
-          <main className="flex-1">{children}</main>
-        </NextIntlClientProvider>
+        {/* Outermost inside <body>: its pre-paint script must precede anything that paints. */}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme={DEFAULT_THEME_PREFERENCE}
+          storageKey={THEME_STORAGE_KEY}
+        >
+          <NextIntlClientProvider>
+            <header className="flex items-center justify-end gap-2 p-4">
+              <ThemeToggle />
+              <LocaleSwitcher />
+            </header>
+            <main className="flex-1">{children}</main>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
