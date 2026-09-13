@@ -7,6 +7,7 @@
 7. Setup Prettier
 8. Setup CI
 9. Setup tests - Vitest + Playwright
+10. State manager (Redux or just investigate if we need to have this in next project)
 
 Тобто мінімальний реальний прогін:
 /grill-me → загострити (ти)
