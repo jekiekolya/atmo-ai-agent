@@ -28,6 +28,10 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
 - **UI is composed from `src/components/ui`** (shadcn/ui, vendored via its CLI). Customize
   those primitives in place; preserve their Base UI accessibility semantics. No second
   component library.
+- **Check the installed library before writing against it.** Its types and source in
+  `node_modules` are the truth; your memory is older than this repo's `package.json`. Apply a
+  documented example as is, adapt only what a rule here forces, and complete what the example left
+  out rather than redesigning what it showed.
 - **`any` needs an inline reason** and stays at the boundary. Same for any suppression.
 - **Comments are rare, and one line.** Write one only where the code would mislead without it —
   an ordering constraint nothing tests, a workaround, a trap someone will "fix". Never restate what

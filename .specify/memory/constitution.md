@@ -1,6 +1,14 @@
 <!--
 SYNC IMPACT REPORT — latest first.
 
+## 1.3.0 → 1.4.0 (2026-09-17)
+
+Technology Constraints: added a library-fidelity requirement — the version installed in this
+repository wins over memory, an article, or another major version, and patching a package or
+depending on its undocumented internals now needs a stated reason in the feature plan. MINOR — it
+expands an existing section without changing what any principle requires. The matching guidance on
+applying documented examples lives in CLAUDE.md. No principle touched.
+
 ## 1.2.0 → 1.3.0 (2026-09-12)
 
 Technology Constraints: a new runtime dependency is justified by cost ("what building it ourselves
@@ -206,6 +214,10 @@ building it ourselves would cost, and what the dependency costs. Prefer the plat
 dependencies first. Pulling in a shadcn/ui component through its CLI is expected and exempt from
 this rule — the Base UI packages it brings along are part of the baseline above.
 
+**Libraries are used the way they are built.** Where memory, an article, or another major version
+disagrees with the version installed in this repository, the installed version wins. Patching a
+package or depending on its undocumented internals requires a stated reason in the feature plan.
+
 ## Development Workflow & Quality Gates
 
 - **Branching**: feature work happens on a branch, never directly on `main` or `dev`.
@@ -239,4 +251,4 @@ blocks merge. The constitution is re-read at the start of each feature's plannin
 resulting plan records its constitution check. Runtime development guidance for agents lives in
 `CLAUDE.md` and the `.specify/templates/` templates, which must not contradict this file.
 
-**Version**: 1.3.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-09-12
+**Version**: 1.4.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-09-17
