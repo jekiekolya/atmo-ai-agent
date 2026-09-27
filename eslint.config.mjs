@@ -23,6 +23,19 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // src/server is the portable core (MC-008): nothing framework-specific may enter it.
+  {
+    files: ["src/server/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: ["next", "next-auth", "react", "react-dom", "server-only"],
+          patterns: ["next/*", "next-auth/*"],
+        },
+      ],
+    },
+  },
   // Last, so it wins: turns off every rule Prettier already owns.
   prettier,
   // Override default ignores of eslint-config-next.
