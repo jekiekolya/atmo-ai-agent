@@ -2,7 +2,8 @@
   "common": {
     "appName": "Atmo",
     "metaTitle": "Atmo — solar support",
-    "metaDescription": "Support for the customers of our solar-energy partners."
+    "metaDescription": "Support for the customers of our solar-energy partners.",
+    "fullName": "{firstName} {lastName}"
   },
   "home": {
     "title": "How can we help?",
@@ -26,5 +27,196 @@
     "title": "Page not found",
     "description": "That page does not exist. The link may be out of date.",
     "backHome": "Back to the start"
+  },
+  "errors": {
+    "unexpected": "Something went wrong on our side. Please try again.",
+    "notPermitted": "You don't have permission to do this.",
+    "codes": {
+      "validation_failed": "Some fields need your attention.",
+      "unauthenticated": "Your session has ended. Please sign in again.",
+      "forbidden_origin": "This request was blocked for your security. Reload the page and try again.",
+      "forbidden": "You don't have permission to do this.",
+      "not_found": "That account no longer exists.",
+      "email_in_use": "This email address already belongs to an account.",
+      "cannot_deactivate_super_admin": "The super admin account cannot be deactivated.",
+      "invite_not_allowed": "A new invitation link can't be issued for this account.",
+      "invite_issued_concurrently": "Another invitation link for this account was issued at the same moment. Try again if you still need a new one.",
+      "no_outstanding_invite": "This account has no pending invitation link.",
+      "invite_invalid": "This invitation link is not valid. Ask your administrator for a new one.",
+      "invite_used": "This invitation link has already been used. You can sign in instead.",
+      "invite_expired": "This invitation link has expired. Ask your administrator for a new one.",
+      "account_locked": "Too many failed attempts. Please try again in a few minutes."
+    },
+    "details": {
+      "email_in_use_deactivated": "This email address belongs to a deactivated account. Reactivate it from the user list instead.",
+      "invite_not_allowed_super_admin": "The super admin changes their own password from the account page.",
+      "invite_not_allowed_deactivated": "Reactivate this account before issuing a new link."
+    }
+  },
+  "validation": {
+    "body": {
+      "unparseable": "The request could not be read. Please try again."
+    },
+    "email": {
+      "invalid": "Enter a valid email address."
+    },
+    "password": {
+      "required": "Enter your password.",
+      "tooShort": "Use at least 12 characters.",
+      "tooLong": "This password is too long. Use a shorter one."
+    },
+    "firstName": {
+      "required": "Enter a first name.",
+      "tooLong": "Use at most 100 characters."
+    },
+    "lastName": {
+      "required": "Enter a last name.",
+      "tooLong": "Use at most 100 characters."
+    },
+    "role": {
+      "notAssignable": "Choose a role that can be assigned."
+    },
+    "confirmPassword": {
+      "mismatch": "The passwords don't match."
+    },
+    "token": {
+      "invalid": "This invitation link is not valid."
+    },
+    "newPassword": {
+      "sameAsCurrent": "Choose a password different from your current one."
+    }
+  },
+  "auth": {
+    "signIn": {
+      "metaTitle": "Sign in — Atmo",
+      "title": "Sign in",
+      "description": "Use the email address and password for your Atmo account.",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "pending": "Signing in…",
+      "failed": "The email or password is incorrect, or this account can't sign in right now."
+    },
+    "notice": {
+      "passwordSet": "Your password is set. You can sign in now.",
+      "passwordChanged": "Your password was changed. Sign in with the new one."
+    }
+  },
+  "shell": {
+    "navLabel": "Main",
+    "accountMenu": "Account menu: {name}",
+    "signedInAs": "Signed in as {name}",
+    "signOut": "Sign out",
+    "signingOut": "Signing out…",
+    "home": "Home",
+    "account": "Account",
+    "users": "Users"
+  },
+  "dashboard": {
+    "metaTitle": "Home — Atmo",
+    "title": "Welcome, {firstName}",
+    "intro": "This is the staff area. More tools will appear here as they are added."
+  },
+  "notifications": {
+    "region": "Notifications",
+    "close": "Dismiss notification"
+  },
+  "dialog": {
+    "close": "Close"
+  },
+  "invite": {
+    "metaTitle": "Set your password — Atmo",
+    "title": "Set your password",
+    "account": "This link sets the password for {email}.",
+    "password": "New password",
+    "passwordHint": "At least 12 characters.",
+    "confirmPassword": "Repeat the password",
+    "submit": "Set password",
+    "pending": "Setting password…",
+    "expired": "This invitation link has expired. Ask your administrator for a new one.",
+    "used": "This invitation link has already been used.",
+    "invalid": "This invitation link is not valid. Ask your administrator for a new one.",
+    "toSignIn": "Go to sign in"
+  },
+  "notPermitted": {
+    "title": "Not permitted",
+    "description": "Your account doesn't have access to this page."
+  },
+  "users": {
+    "metaTitle": "Users — Atmo",
+    "title": "Users",
+    "create": {
+      "open": "Create user",
+      "title": "Create user",
+      "description": "They get an invitation link to set their own password.",
+      "email": "Email",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "role": "Role",
+      "submit": "Create user",
+      "pending": "Creating…",
+      "cancel": "Cancel"
+    },
+    "roles": {
+      "ADMIN": "Admin",
+      "SUPER_ADMIN": "Super admin"
+    },
+    "invite": {
+      "title": "Invitation link",
+      "description": "Send this link to {name} yourself. It works once and expires {expiresAt}.",
+      "shownOnce": "This link is shown only now. Once you close this window it cannot be displayed again — you would need to issue a new one.",
+      "linkLabel": "Invitation link",
+      "copy": "Copy link",
+      "copied": "Link copied.",
+      "copyFailed": "Could not copy the link. Select it and copy it manually.",
+      "done": "Done"
+    },
+    "list": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "created": "Created",
+      "invite": "Invitation",
+      "pendingUntil": "Pending until {expiresAt}",
+      "none": "—",
+      "actions": "Actions",
+      "actionsFor": "Actions for {name}"
+    },
+    "status": {
+      "invited": "Invited",
+      "active": "Active",
+      "deactivated": "Deactivated"
+    },
+    "actions": {
+      "deactivate": "Deactivate",
+      "reactivate": "Reactivate",
+      "issueLink": "Issue new link",
+      "revokeLink": "Revoke link",
+      "cancel": "Cancel",
+      "confirmDeactivateTitle": "Deactivate {name}?",
+      "confirmDeactivate": "They will lose access immediately, on their next click. You can reactivate them later.",
+      "confirmRevokeTitle": "Revoke the link for {name}?",
+      "confirmRevoke": "The pending invitation link will stop working. Their password, if any, is not affected."
+    },
+    "notify": {
+      "deactivated": "{name} was deactivated.",
+      "reactivated": "{name} was reactivated.",
+      "revoked": "The invitation link for {name} was revoked."
+    }
+  },
+  "account": {
+    "metaTitle": "Account — Atmo",
+    "title": "Account",
+    "changePassword": "Change password",
+    "changePasswordHint": "You'll be signed out everywhere and asked to sign in with the new password.",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "newPasswordHint": "At least 12 characters.",
+    "confirmPassword": "Repeat the new password",
+    "submit": "Change password",
+    "pending": "Changing…",
+    "currentPasswordWrong": "The current password is incorrect.",
+    "locked": "Too many failed attempts. Please try again in a few minutes."
   }
 }
