@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import {
   errorMessageKey,
+  routeFailure,
   toFormErrors,
   validateWith,
 } from "@/lib/http/form-errors";
@@ -59,6 +60,45 @@ describe("errorMessageKey", () => {
       expect(errorMessageKey(code)).toBe("errors.unexpected");
     },
   );
+});
+
+describe("routeFailure (contracts/ui.md, form behavior 3–5)", () => {
+  it("puts field errors under their fields", () => {
+    const fields = { email: ["validation.email.invalid"] };
+    expect(routeFailure({ code: "validation_failed", fields })).toEqual({
+      kind: "fields",
+      fields,
+    });
+  });
+
+  it.each(["network", "unexpected"])(
+    "reports %s as a toast, never in the form",
+    (code) => {
+      expect(routeFailure({ code })).toEqual({ kind: "toast" });
+    },
+  );
+
+  it("shows any other code in the form's alert, with its detail", () => {
+    expect(routeFailure({ code: "invite_used" })).toEqual({
+      kind: "alert",
+      key: "errors.codes.invite_used",
+    });
+    expect(
+      routeFailure({ code: "email_in_use", detail: "deactivated" }),
+    ).toEqual({
+      kind: "alert",
+      key: "errors.details.email_in_use_deactivated",
+    });
+  });
+
+  it("lets a form name its own key for a code", () => {
+    expect(
+      routeFailure(
+        { code: "account_locked" },
+        { account_locked: "account.locked" },
+      ),
+    ).toEqual({ kind: "alert", key: "account.locked" });
+  });
 });
 
 describe("validateWith", () => {
