@@ -44,15 +44,15 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
 
 Fixed by the constitution — changing this layer is an amendment, not a feature decision.
 
-|           |                                                                        |
-| --------- | ---------------------------------------------------------------------- |
-| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript `strict`      |
-| Styling   | Tailwind CSS v4                                                        |
-| UI        | shadcn/ui on Base UI, vendored via its CLI                             |
-| Database  | PostgreSQL via Prisma, committed migrations only — _not yet installed_ |
-| AI        | OpenAI Agents SDK — _not yet installed_                                |
-| i18n      | next-intl (locale-prefixed routing, catalogs in `src/messages/`)       |
-| Testing   | Vitest (unit/integration), Playwright (e2e)                            |
+|           |                                                                   |
+| --------- | ----------------------------------------------------------------- |
+| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript `strict` |
+| Styling   | Tailwind CSS v4                                                   |
+| UI        | shadcn/ui on Base UI, vendored via its CLI                        |
+| Database  | PostgreSQL via Prisma, committed migrations only                  |
+| AI        | OpenAI Agents SDK — _not yet installed_                           |
+| i18n      | next-intl (locale-prefixed routing, catalogs in `src/messages/`)  |
+| Testing   | Vitest (unit/integration), Playwright (e2e)                       |
 
 Adding any other runtime dependency requires a stated reason in the feature plan: what it
 does, what building it ourselves would cost, what the dependency costs. Pulling a shadcn/ui
@@ -71,8 +71,10 @@ npm run e2e        # Playwright; builds and serves the app itself
 npm run e2e:ui     # Playwright UI mode — step through a failing e2e test
 ```
 
-`E2E_PORT=<port> npm run e2e` points the suite at a server that is already running (your dev
-server) instead of building one — Next allows only one dev server per directory.
+`E2E_PORT=<port> npm run e2e` points the suite at a server that is already running instead of
+building one. That server must use the `atmo_e2e` database — the suite checks and stops if it cannot
+sign in there — and must be a production server (`next start`): the dev server's cache headers fail
+the Back-after-sign-out test.
 
 ## Layout
 
