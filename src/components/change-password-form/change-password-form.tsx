@@ -16,7 +16,11 @@ import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/api-client";
-import { toFormErrors, validateWith } from "@/lib/http/form-errors";
+import {
+  routeFailure,
+  toFormErrors,
+  validateWith,
+} from "@/lib/http/form-errors";
 import { hardNavigate } from "@/lib/http/hard-navigate";
 import { changePasswordSchema } from "@/lib/schemas/change-password";
 import { password as passwordRule } from "@/lib/schemas/fields";
@@ -27,13 +31,13 @@ export function ChangePasswordForm() {
   const locale = useLocale();
   const [pending, setPending] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [locked, setLocked] = useState(false);
+  const [alert, setAlert] = useState<string | null>(null);
   // Password fields are cleared after any failure by remounting them.
   const [attempt, setAttempt] = useState(0);
 
   async function submit(values: Record<string, unknown>) {
     setPending(true);
-    setLocked(false);
+    setAlert(null);
 
     const result = await apiRequest("PUT", "/api/account/password", {
       currentPassword: values.currentPassword,
@@ -49,10 +53,11 @@ export function ChangePasswordForm() {
 
     setPending(false);
     setAttempt((n) => n + 1);
-    if (result.fields) {
-      setErrors(toFormErrors(result.fields, translateKey));
-    } else if (result.code === "account_locked") {
-      setLocked(true);
+    const route = routeFailure(result, { account_locked: "account.locked" });
+    if (route.kind === "fields") {
+      setErrors(toFormErrors(route.fields, translateKey));
+    } else if (route.kind === "alert") {
+      setAlert(translateKey(route.key));
     } else {
       toast.add({ title: translateKey("errors.unexpected"), type: "error" });
     }
@@ -68,9 +73,9 @@ export function ChangePasswordForm() {
       errors={errors}
       onFormSubmit={submit}
     >
-      {locked && (
+      {alert && (
         <Alert variant="destructive">
-          <AlertDescription>{t("locked")}</AlertDescription>
+          <AlertDescription>{alert}</AlertDescription>
         </Alert>
       )}
 

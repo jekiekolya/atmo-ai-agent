@@ -17,14 +17,12 @@ import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/api-client";
 import {
-  errorMessageKey,
+  routeFailure,
   toFormErrors,
   validateWith,
 } from "@/lib/http/form-errors";
 import { hardNavigate } from "@/lib/http/hard-navigate";
 import { password as passwordRule } from "@/lib/schemas/fields";
-
-const FORM_LEVEL = new Set(["invite_invalid", "invite_used", "invite_expired"]);
 
 export function SetPasswordForm({ token }: { token: string }) {
   const t = useTranslations("invite");
@@ -52,10 +50,11 @@ export function SetPasswordForm({ token }: { token: string }) {
 
     setPending(false);
     setAttempt((n) => n + 1);
-    if (result.fields) {
-      setErrors(toFormErrors(result.fields, translateKey));
-    } else if (FORM_LEVEL.has(result.code)) {
-      setAlert(translateKey(errorMessageKey(result.code)));
+    const route = routeFailure(result);
+    if (route.kind === "fields") {
+      setErrors(toFormErrors(route.fields, translateKey));
+    } else if (route.kind === "alert") {
+      setAlert(translateKey(route.key));
     } else {
       toast.add({ title: translateKey("errors.unexpected"), type: "error" });
     }

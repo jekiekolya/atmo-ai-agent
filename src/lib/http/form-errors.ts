@@ -35,6 +35,25 @@ export function errorMessageKey(code: string, detail?: string): string {
   return `errors.codes.${code}`;
 }
 
+export type FailureRoute =
+  | { kind: "fields"; fields: FieldErrors }
+  | { kind: "alert"; key: string }
+  | { kind: "toast" };
+
+/** Where a failed request's message belongs; `messages` overrides the key for a code. */
+export function routeFailure(
+  failure: { code: string; detail?: string; fields?: FieldErrors },
+  messages: Partial<Record<string, string>> = {},
+): FailureRoute {
+  if (failure.fields) return { kind: "fields", fields: failure.fields };
+  if (CLIENT_ONLY_CODES.has(failure.code)) return { kind: "toast" };
+  return {
+    kind: "alert",
+    key:
+      messages[failure.code] ?? errorMessageKey(failure.code, failure.detail),
+  };
+}
+
 /** A Base UI `Field.Root validate` that runs one zod rule and translates it. */
 export function validateWith(schema: z.ZodType, t: Translate) {
   return (value: unknown): string | null => {

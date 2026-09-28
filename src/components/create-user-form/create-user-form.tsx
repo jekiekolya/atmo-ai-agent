@@ -33,7 +33,7 @@ import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/api-client";
 import {
-  errorMessageKey,
+  routeFailure,
   toFormErrors,
   validateWith,
 } from "@/lib/http/form-errors";
@@ -78,12 +78,13 @@ export function CreateUserForm() {
       return;
     }
 
-    if (result.fields) {
-      setErrors(toFormErrors(result.fields, translateKey));
-    } else if (result.code === "network" || result.code === "unexpected") {
-      toast.add({ title: translateKey("errors.unexpected"), type: "error" });
+    const route = routeFailure(result);
+    if (route.kind === "fields") {
+      setErrors(toFormErrors(route.fields, translateKey));
+    } else if (route.kind === "alert") {
+      setAlert(translateKey(route.key));
     } else {
-      setAlert(translateKey(errorMessageKey(result.code, result.detail)));
+      toast.add({ title: translateKey("errors.unexpected"), type: "error" });
     }
   }
 
