@@ -4,8 +4,8 @@ import { Form } from "@base-ui/react/form";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { SubmitButton } from "@/components/submit-button/submit-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import {
   Field,
   FieldDescription,
@@ -13,7 +13,6 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/api-client";
@@ -100,10 +99,9 @@ export function SetPasswordForm({ token }: { token: string }) {
         <FieldError />
       </Field>
 
-      <Button type="submit" disabled={pending}>
-        {pending && <Spinner data-icon="inline-start" aria-hidden />}
-        {pending ? t("pending") : t("submit")}
-      </Button>
+      <SubmitButton pending={pending} pendingLabel={t("pending")}>
+        {t("submit")}
+      </SubmitButton>
     </Form>
   );
 }

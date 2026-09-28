@@ -9,6 +9,7 @@ import {
   InviteLinkDialog,
   type ShownInvite,
 } from "@/components/invite-link-dialog/invite-link-dialog";
+import { SubmitButton } from "@/components/submit-button/submit-button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/api-client";
@@ -172,10 +172,12 @@ export function CreateUserForm() {
               </Select>
               <FieldError />
             </Field>
-            <Button type="submit" disabled={pending}>
-              {pending && <Spinner data-icon="inline-start" aria-hidden />}
-              {pending ? t("users.create.pending") : t("users.create.submit")}
-            </Button>
+            <SubmitButton
+              pending={pending}
+              pendingLabel={t("users.create.pending")}
+            >
+              {t("users.create.submit")}
+            </SubmitButton>
           </Form>
         </DialogContent>
       </Dialog>
