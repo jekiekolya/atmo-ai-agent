@@ -191,8 +191,7 @@ function ToastList({ closeLabel }: { closeLabel: string }) {
   ));
 }
 
-// Customized: the labels are required props so they arrive translated
-// (Constitution VII); the registry hardcoded English ones.
+// Customized: labels are required props so they arrive translated (Constitution VII).
 function Toaster({
   children,
   toastManager = toast,

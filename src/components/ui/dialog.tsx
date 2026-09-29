@@ -39,8 +39,7 @@ function DialogOverlay({
   );
 }
 
-// Customized: the close buttons render only when given a translated label
-// (Constitution VII); the registry hardcoded "Close".
+// Customized: close buttons render only with a translated label (Constitution VII).
 function DialogContent({
   className,
   children,

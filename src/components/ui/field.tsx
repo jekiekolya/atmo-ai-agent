@@ -68,8 +68,7 @@ const fieldVariants = cva(
   },
 );
 
-// Customized: wraps Base UI's Field parts so Form's `errors` and each field's
-// `validate` reach them (research R14). The registry version renders plain divs.
+// Customized: wraps Base UI Field parts so Form errors and validate reach them.
 function Field({
   className,
   orientation = "vertical",
@@ -172,8 +171,6 @@ function FieldSeparator({
   );
 }
 
-// Shows the field's server error (Form `errors`) or its `validate` result.
-// Base UI links it to the control through aria-describedby.
 function FieldError({ className, ...props }: FieldPrimitive.Error.Props) {
   return (
     <FieldPrimitive.Error
