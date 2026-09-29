@@ -652,7 +652,8 @@ recorded here, as in feature 001, because they constrain the plan and are delibe
   the cookie is re-written — renewed or cleared — only on paths that forward `Set-Cookie` (the
   `/api/auth/session` endpoint, the wrapper form of `auth`); a Server Component's `auth()` does neither.
   Rolling renewal (FR-026) is therefore driven by the protected area's client asking the session endpoint
-  on navigation and on window focus, not by server rendering alone.
+  on every page load, navigation and return to the tab, and after every request to our own API, not by
+  server rendering alone.
 - **MC-002 — Configuration.** The auth secret, the session maximum age (default 28 800 seconds), and the
   absolute session lifetime (default 86 400 seconds) are read through the Config module and documented in
   `.env.example`. Where next-auth would read an environment variable itself, the value is passed

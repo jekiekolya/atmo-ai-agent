@@ -112,11 +112,11 @@ A hook is extracted when a fourth form repeats the same success handling (Princi
 
 `src/app/api/auth/[...nextauth]/route.ts` re-exports next-auth's `GET`/`POST` handlers. Used for:
 
-| Path                                  | Used by                           | Notes                                                                                                   |
-| ------------------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `GET /api/auth/csrf`                  | the client `signIn()`             | double-submit CSRF token                                                                                |
-| `POST /api/auth/callback/credentials` | the client `signIn()`             | calls `authorize` → `authenticate()`. Failure = HTTP 200 with `error` set; check `error`, not `ok` (R7) |
-| `GET /api/auth/session`               | `SessionProvider`, the keep-alive | runs the `jwt` callback (full re-check), renews or clears the cookie (R3)                               |
+| Path                                  | Used by                          | Notes                                                                                                   |
+| ------------------------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `GET /api/auth/csrf`                  | the client `signIn()`            | double-submit CSRF token                                                                                |
+| `POST /api/auth/callback/credentials` | the client `signIn()`            | calls `authorize` → `authenticate()`. Failure = HTTP 200 with `error` set; check `error`, not `ok` (R7) |
+| `GET /api/auth/session`               | `SessionKeepAlive`, `apiRequest` | runs the `jwt` callback (full re-check), renews or clears the cookie (R3)                               |
 
 next-auth's own sign-out endpoint is not used (R5).
 

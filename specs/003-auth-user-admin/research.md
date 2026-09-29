@@ -80,17 +80,29 @@ So a user who only moves between server-rendered pages is never renewed, and aft
 their cookie expires even though they were active — violating FR-026 and SC-010. `session.updateAge`
 does not help: it is read only by the database strategy (`session.js` l.77–92).
 
-**Decision**: The protected area wraps its client tree in next-auth's `SessionProvider` (seeded with
-the server-resolved session, so no initial fetch) with `refetchOnWindowFocus` on and **no**
-`refetchInterval`, plus a small client component that calls `getSession()` whenever the pathname
-changes. Each such call hits `/api/auth/session`, which runs the `jwt` callback (full FR-022 re-check)
-and re-sets the cookie with a fresh expiry, or clears it. When it comes back empty, the component sends
-the user to sign-in with a full-document navigation (FR-071).
+**Decision**: The client drives renewal by asking `GET /api/auth/session`, which runs the `jwt` callback
+(full FR-022 re-check) and re-sets the cookie with a fresh expiry, or clears it. Two places ask, with a
+plain `fetch`:
 
-**Rationale**: Uses the library's documented client (`next-auth/react` l.222–360), no library
-internals, no DB access in the proxy. Renewal is tied to real activity (navigation, returning to the
-tab), so the idle timeout still means idle. The `SessionProvider` doubles as the rendering-only
-current-user provider MC-006 allows.
+- `SessionKeepAlive`, a small client component in the protected layout, on every page load, every
+  pathname change, and every return to the tab (`visibilitychange` to visible). It reads the answer
+  itself: only a `200` with a `null` body is a refusal, and sends the user to sign-in with a
+  full-document navigation (FR-071). No connection, a 5xx, or an unreadable body decides nothing; the
+  next event asks again.
+- `apiRequest`, after every response from our own API except a 401. A route handler's `auth()`
+  discards `Set-Cookie` too, so without it work on one page would never renew the window.
+
+No timer and no polling.
+
+_Amended after implementation review:_ the first design wrapped the protected tree in next-auth's
+`SessionProvider` (`refetchOnWindowFocus`) and called `getSession()` on pathname changes only. Actions
+and reloads on one page never renewed; `getSession()` reports a failed request as `null`, so a dropped
+connection read as a sign-out; and its default broadcast made `SessionProvider` answer every call with a
+second request. Nothing reads `useSession` any more, so the provider was removed.
+
+**Rationale**: Uses Auth.js's own session endpoint, no library internals, no DB access in the proxy.
+Renewal is tied to real activity (loading, navigating, returning to the tab, acting), so the idle
+timeout still means idle. One request per event.
 
 **Alternatives considered**:
 
@@ -100,6 +112,13 @@ current-user provider MC-006 allows.
   would extend revoked sessions, and it re-implements cookie chunking and options. Rejected.
 - Using the wrapper form of `auth` in the private layout — layouts cannot set cookies in Server
   Component rendering (`next/dist/docs/01-app/03-api-reference/04-functions/cookies.md` l.70–81).
+- Using the wrapper form of `auth` in `defineRoute`, which renews in the same response with no extra
+  request — it resolves the session before the handler runs and appends the renewed cookie after it, so
+  on sign-out and password change it overwrites the cookie `signOut` clears. It would need a per-route
+  opt-out. Rejected.
+- `useSession({ required: true, onUnauthenticated })` to react to a refusal — after one failed
+  refetch `SessionProvider` stays at "no session", so a later real refusal changes nothing and is never
+  acted on. Rejected.
 
 ## R4. No redirect loop: the proxy never sends anyone away from sign-in
 

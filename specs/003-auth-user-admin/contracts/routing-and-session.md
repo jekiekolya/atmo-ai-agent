@@ -24,7 +24,8 @@ the invitee's resolved language, with the token path intact (FR-043).
 | 2. Page       | `(private)/layout.tsx` **and every page under it** | `verifySession()` → `auth()` → `jwt` callback → DB                                         | rejected session → redirect to `/{l}/sign-in` (a layout cannot see its own path; see plan A4) | relies on the layout alone (layouts don't re-render on navigation) |
 | 3. Data       | every route handler and service entry              | `getSessionUser()` in handlers; `actor` argument checked by `assertSuperAdmin` in services | 401 / 403; domain `ForbiddenError`                                                            | trusts the client or layer 1                                       |
 
-The client-side `SessionProvider` is a rendering aid and grants nothing (FR-036).
+The client holds no session state: `SessionKeepAlive` only asks the session endpoint, and the name in the
+header is rendered on the server. Nothing on the client grants anything (FR-036).
 
 ## Proxy decision table
 

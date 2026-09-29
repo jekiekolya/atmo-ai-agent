@@ -281,6 +281,8 @@ Every user story needs all of it; none of it is user-visible on its own.
   - render the minimal bar: the full name via `t("common.fullName", …)`, links to Home and Account, Users only when `role === "SUPER_ADMIN"`, and `SignOutButton` (later replaced by `AccountMenu`, see T066);
   - wrap children in next-auth's `SessionProvider` (seeded with the server session, `refetchOnWindowFocus`, no `refetchInterval`) and the vendored `toast` provider and viewport, with translated labels.
 
+  _Superseded:_ the `Toaster` lives in the root `[locale]` layout, and `SessionProvider` was removed after review (research R3, amended). The layout renders `SessionKeepAlive` and the app shell.
+
   Add **no** `loading.tsx` and no Suspense boundary in this group (research R8). Depends on T047, T057
 
 - [x] T062 [US1] Create `src/app/[locale]/(private)/dashboard/page.tsx`, the protected home. It calls `verifySession()` again, because layouts do not re-render on navigation (research R17), and renders the `dashboard.*` copy. Depends on T061
@@ -322,6 +324,9 @@ Every user story needs all of it; none of it is user-visible on its own.
   - when it resolves `null`, `window.location.assign` is called with `/{l}/sign-in?callbackUrl=<current path+query>` (FR-071);
   - no timer is ever scheduled.
 - [x] T070 [US2] Create `src/components/session-keep-alive/session-keep-alive.tsx`, a client component that watches `usePathname()`, and render it inside the `SessionProvider` in `src/app/[locale]/(private)/layout.tsx` (research R3). Depends on T061, T069
+
+  _Superseded (T069, T070):_ after review the component asks `GET /api/auth/session` with a plain `fetch` on mount too, and on every return to the tab; it leaves for sign-in only on a `200` with a `null` body, never on a failed check; it renders without `SessionProvider`. `apiRequest` also renews after every response (research R3, amended).
+
 - [x] T071 [US2] Write `e2e/session.spec.ts`, using `e2e/support/db.ts` to change state behind a signed-in admin (create the admin with a password via the helper):
   - after `isActive = false`, the next navigation lands on sign-in;
   - after `passwordChangedAt = now`, the next navigation lands on sign-in in both of two signed-in contexts;
