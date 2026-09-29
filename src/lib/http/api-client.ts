@@ -1,3 +1,5 @@
+import { getSession } from "next-auth/react";
+
 import { signInUrlFor } from "@/lib/http/callback-url";
 import { hardNavigate } from "@/lib/http/hard-navigate";
 import type { FieldErrors } from "@/server/errors";
@@ -32,6 +34,9 @@ export async function apiRequest<T = undefined>(
   }
 
   if (response.status === 401) return redirectToSignIn();
+  // A route handler's auth() cannot write the renewed cookie, so the client asks for it (research R3).
+  // Not broadcast: SessionProvider would refetch and could race a form's own sign-in redirect.
+  void getSession({ broadcast: false });
   if (response.status >= 500) return { ok: false, code: "unexpected" };
   if (response.status === 204) return { ok: true, data: undefined as T };
 
