@@ -71,12 +71,13 @@ describe("routeFailure (contracts/ui.md, form behavior 3–5)", () => {
     });
   });
 
-  it.each(["network", "unexpected"])(
-    "reports %s as a toast, never in the form",
-    (code) => {
-      expect(routeFailure({ code })).toEqual({ kind: "toast" });
-    },
-  );
+  it.each([
+    ["network", "errors.unexpected"],
+    ["unexpected", "errors.unexpected"],
+    ["forbidden_origin", "errors.codes.forbidden_origin"],
+  ])("reports %s as a toast, never in the form", (code, key) => {
+    expect(routeFailure({ code })).toEqual({ kind: "toast", key });
+  });
 
   it("shows any other code in the form's alert, with its detail", () => {
     expect(routeFailure({ code: "invite_used" })).toEqual({
