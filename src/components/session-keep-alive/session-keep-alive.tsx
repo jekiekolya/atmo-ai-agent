@@ -1,28 +1,40 @@
 "use client";
 
-import { getSession, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { signInUrlFor } from "@/lib/http/callback-url";
 import { hardNavigate } from "@/lib/http/hard-navigate";
 
-function toSignIn() {
-  hardNavigate(signInUrlFor(window.location));
+// Not getSession(): it reports a failed request as no session, and a dropped connection is not a sign-out.
+async function isRefused(): Promise<boolean> {
+  try {
+    const response = await fetch("/api/auth/session", { cache: "no-store" });
+    return response.ok && (await response.json()) === null;
+  } catch {
+    return false;
+  }
 }
 
-/** Server rendering never renews the session cookie, so each page load and navigation asks the endpoint. */
+async function leaveIfRefused() {
+  if (await isRefused()) hardNavigate(signInUrlFor(window.location));
+}
+
+/** Server rendering never renews the session cookie, so each page load, navigation and return to the tab asks the endpoint. */
 export function SessionKeepAlive() {
   const pathname = usePathname();
-  // Also fires when SessionProvider's refetch on a refocused tab finds the session refused (FR-071).
-  useSession({ required: true, onUnauthenticated: toSignIn });
 
   useEffect(() => {
-    // Not broadcast: SessionProvider would answer with a second request for the same result.
-    void getSession({ broadcast: false }).then((session) => {
-      if (!session) toSignIn();
-    });
+    void leaveIfRefused();
   }, [pathname]);
+
+  useEffect(() => {
+    const onReturn = () => {
+      if (document.visibilityState === "visible") void leaveIfRefused();
+    };
+    document.addEventListener("visibilitychange", onReturn);
+    return () => document.removeEventListener("visibilitychange", onReturn);
+  }, []);
 
   return null;
 }

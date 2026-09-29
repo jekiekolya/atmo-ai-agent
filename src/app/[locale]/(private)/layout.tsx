@@ -20,8 +20,12 @@ export default async function PrivateLayout({
   });
 
   return (
-    // No refetch interval: polling would keep an idle session alive (R3).
-    <SessionProvider session={session} refetchOnWindowFocus refetchInterval={0}>
+    // No polling, which would keep an idle session alive (R3); SessionKeepAlive does the checking.
+    <SessionProvider
+      session={session}
+      refetchOnWindowFocus={false}
+      refetchInterval={0}
+    >
       <SessionKeepAlive />
       <AppShell
         nav={
