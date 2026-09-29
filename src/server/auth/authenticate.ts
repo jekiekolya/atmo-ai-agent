@@ -4,35 +4,30 @@ import { email as emailSchema } from "@/lib/schemas/fields";
 import { DUMMY_HASH, verifyPassword } from "@/server/auth/password";
 import {
   clearFailedSignIns,
+  countSignInAttempt,
   findUserByEmail,
-  incrementFailedSignIns,
   lockAccount,
 } from "@/server/users/user-repository";
 
 export const LOCK_THRESHOLD = 5;
 export const LOCK_DURATION_MS = 15 * 60 * 1000;
 
-export function isLocked(user: Pick<User, "lockedUntil">, now: Date): boolean {
-  return user.lockedUntil !== null && user.lockedUntil > now;
-}
-
-/** The fifth failure in a row locks; lockAccount resets the count, so expiry starts fresh. */
-export async function registerFailedAttempt(
+/**
+ * Takes one of the five tries before the password is compared, so simultaneous
+ * attempts cannot all see an unlocked account. false while locked (FR-018, FR-019).
+ */
+export async function claimAttempt(
   userId: string,
   now: Date,
-): Promise<void> {
-  const count = await incrementFailedSignIns(userId);
+): Promise<boolean> {
+  const count = await countSignInAttempt(userId, now);
+  if (count === null) return false;
+
+  // Every claim past the threshold locks, so a lock lost to a crash is restored by the next try.
   if (count >= LOCK_THRESHOLD) {
     await lockAccount(userId, new Date(now.getTime() + LOCK_DURATION_MS));
   }
-}
-
-export async function registerSuccessfulAttempt(
-  user: Pick<User, "id" | "failedSignInCount" | "lockedUntil">,
-): Promise<void> {
-  if (user.failedSignInCount > 0 || user.lockedUntil !== null) {
-    await clearFailedSignIns(user.id);
-  }
+  return count <= LOCK_THRESHOLD;
 }
 
 /** The same null, after the same single comparison, whatever the reason (FR-015). */
@@ -44,20 +39,19 @@ export async function authenticate(
   const parsed = emailSchema.safeParse(email);
   const user = parsed.success ? await findUserByEmail(parsed.data) : null;
 
+  // Locked: refused even with the right password, and not counted (FR-019).
+  const claimed =
+    user !== null &&
+    user.isActive &&
+    user.passwordHash !== null &&
+    (await claimAttempt(user.id, now));
+
   const matches = await verifyPassword(
     password,
-    user?.passwordHash ?? DUMMY_HASH,
+    claimed && user.passwordHash !== null ? user.passwordHash : DUMMY_HASH,
   );
+  if (!claimed || !matches) return null;
 
-  if (!user || !user.isActive || user.passwordHash === null) return null;
-  // Locked: refused even with the right password, and not counted (FR-019).
-  if (isLocked(user, now)) return null;
-
-  if (!matches) {
-    await registerFailedAttempt(user.id, now);
-    return null;
-  }
-
-  await registerSuccessfulAttempt(user);
+  await clearFailedSignIns(user.id);
   return user;
 }

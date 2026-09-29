@@ -103,14 +103,17 @@ export function setActive(
   return client.user.update({ where: { id }, data: { isActive } });
 }
 
-/** Atomic, so concurrent failures are all counted. Returns the new count. */
-export async function incrementFailedSignIns(id: string): Promise<number> {
-  const { failedSignInCount } = await db.user.update({
-    where: { id },
+/** Counts an attempt unless the account is locked at `now`. Returns the new count, or null while locked. */
+export async function countSignInAttempt(
+  id: string,
+  now: Date,
+): Promise<number | null> {
+  const [row] = await db.user.updateManyAndReturn({
+    where: { id, OR: [{ lockedUntil: null }, { lockedUntil: { lte: now } }] },
     data: { failedSignInCount: { increment: 1 } },
     select: { failedSignInCount: true },
   });
-  return failedSignInCount;
+  return row?.failedSignInCount ?? null;
 }
 
 export async function lockAccount(id: string, until: Date): Promise<void> {

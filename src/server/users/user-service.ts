@@ -1,4 +1,4 @@
-import { isLocked, registerFailedAttempt } from "@/server/auth/authenticate";
+import { claimAttempt } from "@/server/auth/authenticate";
 import { type Actor, assertSuperAdmin } from "@/server/auth/authorization";
 import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { db } from "@/server/db";
@@ -161,14 +161,14 @@ export async function changeOwnPassword(
 ): Promise<void> {
   const now = new Date();
   const user = await existingUser(actor.id);
-  if (isLocked(user, now)) throw new LockedError();
+  // Claimed before the comparison, as for sign-in, so a burst gets five tries at most.
+  if (!(await claimAttempt(user.id, now))) throw new LockedError();
 
   const matches =
     user.passwordHash !== null &&
     (await verifyPassword(input.currentPassword, user.passwordHash));
 
   if (!matches) {
-    await registerFailedAttempt(user.id, now);
     throw new ValidationError({
       currentPassword: ["account.currentPasswordWrong"],
     });
