@@ -125,6 +125,22 @@ describe("CreateUserForm", () => {
     );
   });
 
+  it("reports a blocked request as a notification with its own message", async () => {
+    apiRequest.mockResolvedValue({ ok: false, code: "forbidden_origin" });
+    const user = userEvent.setup();
+    render(<CreateUserForm />);
+
+    await openAndFill(user);
+
+    await waitFor(() =>
+      expect(toastAdd).toHaveBeenCalledWith({
+        title: "errors.codes.forbidden_origin",
+        type: "error",
+      }),
+    );
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   it("cannot be submitted twice while pending (FR-059)", async () => {
     apiRequest.mockReturnValue(new Promise(() => {}));
     const user = userEvent.setup();

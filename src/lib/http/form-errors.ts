@@ -35,10 +35,12 @@ export function errorMessageKey(code: string, detail?: string): string {
   return `errors.codes.${code}`;
 }
 
+const TOAST_CODES = new Set([...CLIENT_ONLY_CODES, "forbidden_origin"]);
+
 export type FailureRoute =
   | { kind: "fields"; fields: FieldErrors }
   | { kind: "alert"; key: string }
-  | { kind: "toast" };
+  | { kind: "toast"; key: string };
 
 /** Where a failed request's message belongs; `messages` overrides the key for a code. */
 export function routeFailure(
@@ -46,12 +48,9 @@ export function routeFailure(
   messages: Partial<Record<string, string>> = {},
 ): FailureRoute {
   if (failure.fields) return { kind: "fields", fields: failure.fields };
-  if (CLIENT_ONLY_CODES.has(failure.code)) return { kind: "toast" };
-  return {
-    kind: "alert",
-    key:
-      messages[failure.code] ?? errorMessageKey(failure.code, failure.detail),
-  };
+  const key =
+    messages[failure.code] ?? errorMessageKey(failure.code, failure.detail);
+  return { kind: TOAST_CODES.has(failure.code) ? "toast" : "alert", key };
 }
 
 /** A Base UI `Field.Root validate` that runs one zod rule and translates it. */

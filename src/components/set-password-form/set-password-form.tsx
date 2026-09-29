@@ -56,7 +56,7 @@ export function SetPasswordForm({ token }: { token: string }) {
     } else if (route.kind === "alert") {
       setAlert(translateKey(route.key));
     } else {
-      toast.add({ title: translateKey("errors.unexpected"), type: "error" });
+      toast.add({ title: translateKey(route.key), type: "error" });
     }
   }
 

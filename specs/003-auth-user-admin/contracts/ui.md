@@ -69,6 +69,7 @@ causes, never mentions a lock, and never shows password rules (FR-015).
 | Deactivated, reactivated, invite revoked   | toast                                       | `users.notify.*`                                          |
 | Password set, password changed             | notice on the sign-in page                  | `auth.notice.passwordSet` · `auth.notice.passwordChanged` |
 | No connection or server error              | toast                                       | `errors.unexpected`                                       |
+| Request refused by the same-origin check   | toast                                       | `errors.codes.forbidden_origin`                           |
 
 ## Link shown once (FR-042)
 
