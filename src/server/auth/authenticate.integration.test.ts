@@ -192,6 +192,51 @@ describe("lockout (FR-018 – FR-020)", () => {
     );
   });
 
+  it("gives a burst of simultaneous guesses no more than five comparisons (FR-018)", async () => {
+    const user = await createUser();
+    vi.mocked(verifyPassword).mockClear();
+
+    await Promise.all(
+      Array.from({ length: 20 }, () =>
+        authenticate("olena@example.com", WRONG),
+      ),
+    );
+
+    const againstStoredHash = vi
+      .mocked(verifyPassword)
+      .mock.calls.filter(([, hash]) => hash !== DUMMY_HASH);
+    expect(againstStoredHash).toHaveLength(5);
+    const after = await stored(user.id);
+    expect(after.failedSignInCount).toBe(0);
+    expect(after.lockedUntil!.getTime()).toBeGreaterThan(Date.now());
+  });
+
+  it("never counts an attempt that finishes after the lock, so the next run starts at one (FR-020)", async () => {
+    const user = await createUser();
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => (release = resolve));
+    vi.mocked(verifyPassword).mockImplementationOnce(async () => {
+      await held;
+      return false;
+    });
+
+    // Read the account before the lock, then stall in the comparison.
+    const late = authenticate("olena@example.com", WRONG);
+    await vi.waitFor(() => expect(verifyPassword).toHaveBeenCalledTimes(1));
+    await fail(5);
+    release();
+    await late;
+    expect((await stored(user.id)).failedSignInCount).toBe(0);
+
+    await db.user.update({
+      where: { id: user.id },
+      data: { lockedUntil: new Date(Date.now() - 1_000) },
+    });
+    await fail(1);
+
+    expect((await stored(user.id)).failedSignInCount).toBe(1);
+  });
+
   it("writes nothing for an unknown email", async () => {
     const user = await createUser();
     await Promise.all(

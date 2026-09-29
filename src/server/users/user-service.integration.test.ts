@@ -294,6 +294,33 @@ describe("changeOwnPassword (FR-056, FR-021)", () => {
     expect(stored.lockedUntil!.getTime()).toBeGreaterThan(Date.now());
   });
 
+  it("gives simultaneous wrong current passwords no more than five tries (FR-021)", async () => {
+    const user = await signedIn();
+
+    const results = await Promise.allSettled(
+      Array.from({ length: 20 }, () =>
+        changeOwnPassword(actorOf(user), {
+          currentPassword: "not it at all",
+          newPassword: NEXT,
+        }),
+      ),
+    );
+
+    const codes = results.map((result) =>
+      result.status === "rejected"
+        ? (result.reason as { code: string }).code
+        : "changed",
+    );
+    expect(codes.filter((code) => code === "validation_failed")).toHaveLength(
+      5,
+    );
+    expect(codes.filter((code) => code === "account_locked")).toHaveLength(15);
+    expect(
+      (await db.user.findUniqueOrThrow({ where: { id: user.id } }))
+        .failedSignInCount,
+    ).toBe(0);
+  });
+
   it("refuses any change while locked, even with the right password", async () => {
     const user = await signedIn();
     await db.user.update({
