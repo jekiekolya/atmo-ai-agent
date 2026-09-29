@@ -192,14 +192,14 @@ describe("lockout (FR-018 – FR-020)", () => {
     );
   });
 
+  // Real cost-12 comparisons: CI's two-core runner needs more than the 5 s default.
   it("gives a burst of simultaneous guesses no more than five comparisons (FR-018)", async () => {
     const user = await createUser();
     vi.mocked(verifyPassword).mockClear();
 
+    // More than five is all it takes: every one of them reads the account before any comparison ends.
     await Promise.all(
-      Array.from({ length: 20 }, () =>
-        authenticate("olena@example.com", WRONG),
-      ),
+      Array.from({ length: 8 }, () => authenticate("olena@example.com", WRONG)),
     );
 
     const againstStoredHash = vi
@@ -209,7 +209,7 @@ describe("lockout (FR-018 – FR-020)", () => {
     const after = await stored(user.id);
     expect(after.failedSignInCount).toBe(0);
     expect(after.lockedUntil!.getTime()).toBeGreaterThan(Date.now());
-  });
+  }, 15_000);
 
   it("never counts an attempt that finishes after the lock, so the next run starts at one (FR-020)", async () => {
     const user = await createUser();
