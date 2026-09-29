@@ -161,7 +161,12 @@ test.describe("a check that cannot reach the server decides nothing (FR-071 is f
     const page = await onAccountPage(browser);
 
     await page.context().setOffline(true);
+    // Wait for the check to fail, so the test proves it ran and was ignored.
+    const failed = page.waitForEvent("requestfailed", (r) =>
+      r.url().includes("/api/auth/session"),
+    );
     await returnToTab(page);
+    await failed;
     await page.waitForTimeout(1_000);
 
     await expect(page).toHaveURL(/\/en\/dashboard\/account$/);
