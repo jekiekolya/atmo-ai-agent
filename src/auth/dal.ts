@@ -15,7 +15,7 @@ export type SessionUser = {
 };
 
 /** Runs the jwt callback's database re-check (FR-022), once per request. */
-export const getSession = cache(() => auth());
+const getSession = cache(() => auth());
 
 export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   const session = await getSession();

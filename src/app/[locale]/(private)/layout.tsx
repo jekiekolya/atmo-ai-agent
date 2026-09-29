@@ -1,7 +1,6 @@
-import { SessionProvider } from "next-auth/react";
 import { getTranslations } from "next-intl/server";
 
-import { getSession, verifySession } from "@/auth/dal";
+import { verifySession } from "@/auth/dal";
 import { AccountMenu } from "@/components/account-menu/account-menu";
 import { AppShell } from "@/components/app-shell/app-shell";
 import { SessionKeepAlive } from "@/components/session-keep-alive/session-keep-alive";
@@ -12,7 +11,6 @@ export default async function PrivateLayout({
   children,
 }: LayoutProps<"/[locale]">) {
   const user = await verifySession();
-  const session = await getSession();
   const t = await getTranslations();
   const fullName = t("common.fullName", {
     firstName: user.firstName,
@@ -20,12 +18,7 @@ export default async function PrivateLayout({
   });
 
   return (
-    // No polling, which would keep an idle session alive (R3); SessionKeepAlive does the checking.
-    <SessionProvider
-      session={session}
-      refetchOnWindowFocus={false}
-      refetchInterval={0}
-    >
+    <>
       <SessionKeepAlive />
       <AppShell
         nav={
@@ -44,6 +37,6 @@ export default async function PrivateLayout({
       >
         {children}
       </AppShell>
-    </SessionProvider>
+    </>
   );
 }
