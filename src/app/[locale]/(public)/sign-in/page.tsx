@@ -42,7 +42,11 @@ export default async function SignInPage({
     typeof value === "string" ? value : undefined;
 
   const callbackUrl = safeCallbackUrl(single(query.callbackUrl), locale);
-  const notice = NOTICES[single(query.notice) as keyof typeof NOTICES];
+  const requestedNotice = single(query.notice);
+  const notice =
+    requestedNotice !== undefined && Object.hasOwn(NOTICES, requestedNotice)
+      ? NOTICES[requestedNotice as keyof typeof NOTICES]
+      : undefined;
 
   const t = await getTranslations("auth");
 

@@ -103,6 +103,21 @@ test("a signed-in visitor opening sign-in is sent to the protected home (FR-031)
   await expect(page).toHaveURL(/\/en\/dashboard$/);
 });
 
+test("sign-in shows only the notices it knows, whatever the address says", async ({
+  page,
+}) => {
+  const alert = page.locator('[data-slot="alert"]');
+
+  for (const notice of ["constructor", "__proto__", "toString"]) {
+    await page.goto(`/en/sign-in?notice=${notice}`);
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    await expect(alert).toHaveCount(0);
+  }
+
+  await page.goto("/en/sign-in?notice=password-set");
+  await expect(alert).toBeVisible();
+});
+
 test("signing out on one device ends the session on the other (FR-066)", async ({
   browser,
 }) => {
