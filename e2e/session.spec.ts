@@ -1,7 +1,13 @@
 import { expect, type Page, test } from "@playwright/test";
 
 import { createAdmin, sql } from "./support/db";
-import { signedInPage } from "./support/sign-in";
+import { SUPER_ADMIN } from "./support/env";
+import { signedInPage, signOut } from "./support/sign-in";
+
+const sessionCookie = async (page: Page) =>
+  (await page.context().cookies()).find((c) =>
+    c.name.includes("session-token"),
+  );
 
 const expectSignIn = async (page: Page) => {
   await expect(page).toHaveURL(/\/en\/sign-in/);
@@ -57,10 +63,12 @@ test("a revoked session opening sign-in sees the form, not a redirect loop (FR-0
   const page = await signedInPage(browser, admin.email, admin.password);
 
   await sql(`UPDATE users SET "isActive" = false WHERE id = $1`, [admin.id]);
-  const response = await page.goto("/en/sign-in");
+  // A fresh tab with the same cookie: the open one may already be leaving for sign-in on its own.
+  const fresh = await page.context().newPage();
+  const response = await fresh.goto("/en/sign-in");
 
   expect(response?.status()).toBe(200);
-  await expectSignIn(page);
+  await expectSignIn(fresh);
 });
 
 test("activity renews the rolling window (FR-026)", async ({ browser }) => {
@@ -84,4 +92,61 @@ test("activity renews the rolling window (FR-026)", async ({ browser }) => {
   await renewed;
 
   expect((await sessionCookie())!.expires).toBeGreaterThan(before);
+});
+
+test("work on one page renews the rolling window, without navigating (FR-026)", async ({
+  browser,
+}) => {
+  const target = await createAdmin();
+  const owner = await signedInPage(
+    browser,
+    SUPER_ADMIN.email,
+    SUPER_ADMIN.password,
+  );
+  await owner.goto("/en/dashboard/users");
+
+  const loaded = (await sessionCookie(owner))!.expires;
+  // Cookie expiry has one-second resolution.
+  await owner.waitForTimeout(1_500);
+  const row = owner.getByRole("row").filter({ hasText: target.email });
+  await row.getByRole("button", { name: /^Actions for/ }).click();
+  const issued = owner.waitForResponse((r) =>
+    r.url().endsWith(`/api/users/${target.id}/invite`),
+  );
+  await owner.getByRole("menuitem", { name: "Issue new link" }).click();
+  await issued;
+  const afterAction = (await sessionCookie(owner))!.expires;
+  expect(afterAction).toBeGreaterThan(loaded);
+
+  await owner.waitForTimeout(1_500);
+  const renewed = owner.waitForResponse((r) =>
+    r.url().includes("/api/auth/session"),
+  );
+  await owner.reload();
+  await renewed;
+  expect((await sessionCookie(owner))!.expires).toBeGreaterThan(afterAction);
+});
+
+test("a session refused when the tab returns sends the visitor to sign-in at once (FR-071)", async ({
+  browser,
+}) => {
+  const admin = await createAdmin();
+  const page = await signedInPage(browser, admin.email, admin.password);
+
+  await sql(`UPDATE users SET "isActive" = false WHERE id = $1`, [admin.id]);
+  await page.evaluate(() =>
+    document.dispatchEvent(new Event("visibilitychange")),
+  );
+
+  await expect(page).toHaveURL(/\/en\/sign-in\?callbackUrl=%2Fen%2Fdashboard$/);
+});
+
+test("signing out leaves no session cookie behind", async ({ browser }) => {
+  const admin = await createAdmin();
+  const page = await signedInPage(browser, admin.email, admin.password);
+
+  await signOut(page);
+  await expect(page).toHaveURL(/\/en\/sign-in$/);
+
+  expect(await sessionCookie(page)).toBeUndefined();
 });

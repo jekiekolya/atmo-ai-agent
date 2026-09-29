@@ -1,5 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+const getSession = vi.hoisted(() => vi.fn());
+vi.mock("next-auth/react", () => ({ getSession }));
+
 import { apiRequest } from "@/lib/http/api-client";
 
 const assign = vi.fn();
@@ -16,6 +19,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   assign.mockReset();
   fetchMock.mockReset();
+  getSession.mockReset();
 });
 
 const json = (status: number, body: unknown) =>
@@ -109,5 +113,33 @@ describe("apiRequest", () => {
       ok: false,
       code: "unexpected",
     });
+  });
+
+  it.each([
+    ["a success", () => json(200, { ok: true })],
+    ["a 4xx", () => json(409, { error: { code: "email_in_use" } })],
+  ])(
+    "renews the session after %s, as a route handler cannot write the renewed cookie (FR-026)",
+    async (_, response) => {
+      fetchMock.mockResolvedValue(response());
+
+      await apiRequest("POST", "/api/users", {});
+
+      expect(getSession).toHaveBeenCalledTimes(1);
+      expect(getSession).toHaveBeenCalledWith({ broadcast: false });
+    },
+  );
+
+  it("does not renew after a 401 or when nothing reached the server", async () => {
+    fetchMock.mockResolvedValueOnce(
+      json(401, { error: { code: "unauthenticated" } }),
+    );
+    void apiRequest("POST", "/api/users", {});
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    fetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    await apiRequest("POST", "/api/users", {});
+
+    expect(getSession).not.toHaveBeenCalled();
   });
 });
