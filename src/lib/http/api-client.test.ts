@@ -1,8 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const getSession = vi.hoisted(() => vi.fn());
-vi.mock("next-auth/react", () => ({ getSession }));
-
 import { apiRequest } from "@/lib/http/api-client";
 
 const assign = vi.fn();
@@ -19,8 +16,10 @@ afterEach(() => {
   vi.unstubAllGlobals();
   assign.mockReset();
   fetchMock.mockReset();
-  getSession.mockReset();
 });
+
+const renewals = () =>
+  fetchMock.mock.calls.filter(([url]) => url === "/api/auth/session");
 
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), {
@@ -125,8 +124,9 @@ describe("apiRequest", () => {
 
       await apiRequest("POST", "/api/users", {});
 
-      expect(getSession).toHaveBeenCalledTimes(1);
-      expect(getSession).toHaveBeenCalledWith({ broadcast: false });
+      expect(renewals()).toEqual([
+        ["/api/auth/session", { cache: "no-store" }],
+      ]);
     },
   );
 
@@ -140,6 +140,6 @@ describe("apiRequest", () => {
     fetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
     await apiRequest("POST", "/api/users", {});
 
-    expect(getSession).not.toHaveBeenCalled();
+    expect(renewals()).toHaveLength(0);
   });
 });
