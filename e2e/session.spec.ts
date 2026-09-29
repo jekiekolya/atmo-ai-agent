@@ -1,4 +1,4 @@
-import { expect, type Page, test } from "@playwright/test";
+import { type Browser, expect, type Page, test } from "@playwright/test";
 
 import { createAdmin, sql } from "./support/db";
 import { SUPER_ADMIN } from "./support/env";
@@ -139,6 +139,51 @@ test("a session refused when the tab returns sends the visitor to sign-in at onc
   );
 
   await expect(page).toHaveURL(/\/en\/sign-in\?callbackUrl=%2Fen%2Fdashboard$/);
+});
+
+test.describe("a check that cannot reach the server decides nothing (FR-071 is for refusals)", () => {
+  const onAccountPage = async (browser: Browser) => {
+    const admin = await createAdmin();
+    const page = await signedInPage(browser, admin.email, admin.password);
+    const checked = page.waitForResponse((r) =>
+      r.url().includes("/api/auth/session"),
+    );
+    await page.goto("/en/dashboard/account");
+    await checked;
+    return page;
+  };
+  const returnToTab = (page: Page) =>
+    page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+
+  test("a tab that returns while offline stays where it is", async ({
+    browser,
+  }) => {
+    const page = await onAccountPage(browser);
+
+    await page.context().setOffline(true);
+    await returnToTab(page);
+    await page.waitForTimeout(1_000);
+
+    await expect(page).toHaveURL(/\/en\/dashboard\/account$/);
+  });
+
+  test("a tab that returns to a failing session endpoint stays where it is", async ({
+    browser,
+  }) => {
+    const page = await onAccountPage(browser);
+    await page.route("**/api/auth/session", (route) =>
+      route.fulfill({ status: 500, body: "" }),
+    );
+
+    const failed = page.waitForResponse((r) =>
+      r.url().includes("/api/auth/session"),
+    );
+    await returnToTab(page);
+    await failed;
+    await page.waitForTimeout(1_000);
+
+    await expect(page).toHaveURL(/\/en\/dashboard\/account$/);
+  });
 });
 
 test("signing out leaves no session cookie behind", async ({ browser }) => {
