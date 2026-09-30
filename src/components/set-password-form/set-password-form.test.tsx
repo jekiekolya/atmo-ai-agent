@@ -103,6 +103,23 @@ describe("SetPasswordForm", () => {
     ).toBeInTheDocument();
   });
 
+  it("shows a server error for the whole form in the form's alert, not nowhere (FR-068)", async () => {
+    apiRequest.mockResolvedValue({
+      ok: false,
+      code: "validation_failed",
+      fields: { _form: ["validation.body.unparseable"] },
+    });
+    const user = userEvent.setup();
+    render(<SetPasswordForm token="tok" />);
+
+    await fill(user);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "validation.body.unparseable",
+    );
+    expect(screen.getByRole("button", { name: "invite.submit" })).toBeEnabled();
+  });
+
   it("reports an unexpected failure as a notification and clears the passwords (FR-070)", async () => {
     apiRequest.mockResolvedValue({ ok: false, code: "network" });
     const user = userEvent.setup();

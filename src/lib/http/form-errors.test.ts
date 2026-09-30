@@ -71,6 +71,35 @@ describe("routeFailure (contracts/ui.md, form behavior 3–5)", () => {
     });
   });
 
+  it("shows an error for the whole form in the alert, not nowhere (FR-068)", () => {
+    expect(
+      routeFailure({
+        code: "validation_failed",
+        fields: { _form: ["validation.body.unparseable"] },
+      }),
+    ).toEqual({
+      kind: "fields",
+      fields: {},
+      alertKey: "validation.body.unparseable",
+    });
+  });
+
+  it("keeps field errors under their fields next to one for the whole form", () => {
+    expect(
+      routeFailure({
+        code: "validation_failed",
+        fields: {
+          password: ["validation.password.tooShort"],
+          _form: ["validation.body.unparseable"],
+        },
+      }),
+    ).toEqual({
+      kind: "fields",
+      fields: { password: ["validation.password.tooShort"] },
+      alertKey: "validation.body.unparseable",
+    });
+  });
+
   it.each([
     ["network", "errors.unexpected"],
     ["unexpected", "errors.unexpected"],

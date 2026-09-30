@@ -142,4 +142,22 @@ describe("apiRequest", () => {
 
     expect(renewals()).toHaveLength(0);
   });
+
+  it("resolves normally, with nothing left unhandled, when the renewal itself fails", async () => {
+    // A plain stub: a vi.fn result is observed by the mock itself, which would mark the rejection handled.
+    vi.stubGlobal("fetch", (url: string) =>
+      url === "/api/auth/session"
+        ? Promise.reject(new TypeError("Failed to fetch"))
+        : Promise.resolve(json(200, { id: "u-1" })),
+    );
+    const unhandled = vi.fn();
+    process.on("unhandledRejection", unhandled);
+
+    const result = await apiRequest("POST", "/api/users", {});
+    await new Promise((resolve) => setTimeout(resolve, 10));
+    process.off("unhandledRejection", unhandled);
+
+    expect(result).toEqual({ ok: true, data: { id: "u-1" } });
+    expect(unhandled).not.toHaveBeenCalled();
+  });
 });
