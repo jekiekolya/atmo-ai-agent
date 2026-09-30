@@ -53,6 +53,7 @@ export function SetPasswordForm({ token }: { token: string }) {
     const route = routeFailure(result);
     if (route.kind === "fields") {
       setErrors(toFormErrors(route.fields, translateKey));
+      if (route.alertKey) setAlert(translateKey(route.alertKey));
     } else if (route.kind === "alert") {
       setAlert(translateKey(route.key));
     } else {

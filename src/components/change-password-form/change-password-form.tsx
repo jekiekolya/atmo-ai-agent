@@ -56,6 +56,7 @@ export function ChangePasswordForm() {
     const route = routeFailure(result, { account_locked: "account.locked" });
     if (route.kind === "fields") {
       setErrors(toFormErrors(route.fields, translateKey));
+      if (route.alertKey) setAlert(translateKey(route.alertKey));
     } else if (route.kind === "alert") {
       setAlert(translateKey(route.key));
     } else {

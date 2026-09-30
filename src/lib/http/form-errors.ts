@@ -38,7 +38,7 @@ export function errorMessageKey(code: string, detail?: string): string {
 const TOAST_CODES = new Set([...CLIENT_ONLY_CODES, "forbidden_origin"]);
 
 export type FailureRoute =
-  | { kind: "fields"; fields: FieldErrors }
+  | { kind: "fields"; fields: FieldErrors; alertKey?: string }
   | { kind: "alert"; key: string }
   | { kind: "toast"; key: string };
 
@@ -47,7 +47,11 @@ export function routeFailure(
   failure: { code: string; detail?: string; fields?: FieldErrors },
   messages: Partial<Record<string, string>> = {},
 ): FailureRoute {
-  if (failure.fields) return { kind: "fields", fields: failure.fields };
+  if (failure.fields) {
+    // `_form` is the whole form's error, which no field renders (FR-068).
+    const { _form, ...fields } = failure.fields;
+    return { kind: "fields", fields, alertKey: _form?.[0] };
+  }
   const key =
     messages[failure.code] ?? errorMessageKey(failure.code, failure.detail);
   return { kind: TOAST_CODES.has(failure.code) ? "toast" : "alert", key };
