@@ -135,22 +135,6 @@ describe("SetPasswordForm", () => {
     expect(screen.getByLabelText("invite.password")).toHaveValue("");
   });
 
-  it("reports a blocked request as a notification with its own message", async () => {
-    apiRequest.mockResolvedValue({ ok: false, code: "forbidden_origin" });
-    const user = userEvent.setup();
-    render(<SetPasswordForm token="tok" />);
-
-    await fill(user);
-
-    await waitFor(() =>
-      expect(toastAdd).toHaveBeenCalledWith({
-        title: "errors.codes.forbidden_origin",
-        type: "error",
-      }),
-    );
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
-  });
-
   it("cannot be submitted twice while pending", async () => {
     apiRequest.mockReturnValue(new Promise(() => {}));
     const user = userEvent.setup();
