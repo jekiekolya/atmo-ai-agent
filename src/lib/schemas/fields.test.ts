@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { email, firstName, lastName, password } from "@/lib/schemas/fields";
+import {
+  confirmsPassword,
+  differsFromCurrent,
+  email,
+  firstName,
+  lastName,
+  password,
+} from "@/lib/schemas/fields";
 
 function messages(result: {
   success: boolean;
@@ -85,5 +92,23 @@ describe.each([
     expect(messages(schema.safeParse("a".repeat(101)))).toEqual([
       `validation.${key}.tooLong`,
     ]);
+  });
+});
+
+describe("confirmsPassword", () => {
+  it("holds only when the confirmation repeats the password exactly", () => {
+    expect(confirmsPassword.holds("a password", "a password")).toBe(true);
+    expect(confirmsPassword.holds("a password", "A password")).toBe(false);
+    expect(confirmsPassword.error).toBe("validation.confirmPassword.mismatch");
+  });
+});
+
+describe("differsFromCurrent", () => {
+  it("holds only when the new password is not the current one", () => {
+    expect(differsFromCurrent.holds("new one", "old one")).toBe(true);
+    expect(differsFromCurrent.holds("same", "same")).toBe(false);
+    expect(differsFromCurrent.error).toBe(
+      "validation.newPassword.sameAsCurrent",
+    );
   });
 });

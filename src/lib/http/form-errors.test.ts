@@ -6,8 +6,10 @@ import {
   errorMessageKey,
   routeFailure,
   toFormErrors,
+  validatePair,
   validateWith,
 } from "@/lib/http/form-errors";
+import { confirmsPassword } from "@/lib/schemas/fields";
 
 const t = (key: string) => `T(${key})`;
 
@@ -143,5 +145,19 @@ describe("validateWith", () => {
 
   it("returns the translated first message otherwise", () => {
     expect(validate("")).toBe("T(validation.email.invalid)");
+  });
+});
+
+describe("validatePair", () => {
+  const validate = validatePair(confirmsPassword, "password", t);
+
+  it("returns null when the rule holds against the other field", () => {
+    expect(validate("same", { password: "same" })).toBeNull();
+  });
+
+  it("returns the rule's translated message otherwise", () => {
+    expect(validate("other", { password: "same" })).toBe(
+      "T(validation.confirmPassword.mismatch)",
+    );
   });
 });
