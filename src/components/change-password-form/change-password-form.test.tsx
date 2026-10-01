@@ -9,11 +9,7 @@ const toastAdd = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/http/api-client", () => ({ apiRequest }));
 vi.mock("@/lib/http/hard-navigate", () => ({ hardNavigate }));
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
-vi.mock("next-intl", () => ({
-  useLocale: () => "en",
-  useTranslations: (namespace?: string) => (key: string) =>
-    namespace ? `${namespace}.${key}` : key,
-}));
+vi.mock("next-intl", () => import("@/testing/next-intl-mock"));
 
 import { ChangePasswordForm } from "./change-password-form";
 
