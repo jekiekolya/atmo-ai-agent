@@ -1,6 +1,5 @@
 import type { Page } from "@playwright/test";
 
-/** Creates a user through the dialog and returns the field showing their link. */
 export async function createUserViaUi(
   owner: Page,
   user: { email: string; firstName: string; lastName: string },

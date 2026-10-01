@@ -8,7 +8,6 @@ import { routeFailure, toFormErrors } from "@/lib/http/form-errors";
 
 type Failure = Parameters<typeof routeFailure>[0];
 
-/** Puts a failed request's message under its field, in the form's alert, or in a notification. */
 export function useFormFailure() {
   const translateKey = useTranslateKey();
   const [errors, setErrors] = useState<Record<string, string>>({});

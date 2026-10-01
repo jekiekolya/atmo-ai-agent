@@ -32,7 +32,6 @@ function personName(key: "firstName" | "lastName") {
 export const firstName = personName("firstName");
 export const lastName = personName("lastName");
 
-/** A rule between two fields: the schemas refine with it and the forms validate with it. */
 export type PairRule = {
   holds: (value: unknown, other: unknown) => boolean;
   error: string;
