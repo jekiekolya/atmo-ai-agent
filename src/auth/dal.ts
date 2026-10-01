@@ -2,7 +2,7 @@ import { locale as localeParam } from "next/root-params";
 import { cache } from "react";
 
 import { auth } from "@/auth/auth";
-import { DEFAULT_LOCALE, isSupportedLocale } from "@/i18n/locales";
+import { resolveLocale } from "@/i18n/locales";
 import { redirect } from "@/i18n/navigation";
 import type { Role } from "@generated/client";
 
@@ -30,13 +30,10 @@ export async function verifySession(): Promise<SessionUser> {
   const user = await getSessionUser();
   if (user) return user;
 
-  const requested = await localeParam();
-  const locale =
-    requested !== undefined && isSupportedLocale(requested)
-      ? requested
-      : DEFAULT_LOCALE;
-
-  return redirect({ href: "/sign-in", locale });
+  return redirect({
+    href: "/sign-in",
+    locale: resolveLocale(await localeParam()),
+  });
 }
 
 /** An admin gets `permitted: false` and the page renders NotPermitted (FR-037). */

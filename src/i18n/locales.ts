@@ -16,3 +16,9 @@ export const LOCALE_LABELS: Record<Locale, string> = {
 export function isSupportedLocale(value: string): value is Locale {
   return SUPPORTED_LOCALES.includes(value as Locale);
 }
+
+export function resolveLocale(value: string | undefined): Locale {
+  return value !== undefined && isSupportedLocale(value)
+    ? value
+    : DEFAULT_LOCALE;
+}
