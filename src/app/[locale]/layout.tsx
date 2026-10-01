@@ -4,8 +4,7 @@ import { ThemeProvider } from "next-themes";
 import { Geist, Geist_Mono } from "next/font/google";
 import type { Metadata } from "next";
 
-import { LocaleSwitcher } from "@/components/locale-switcher/locale-switcher";
-import { ThemeToggle } from "@/components/theme-toggle/theme-toggle";
+import { Toaster } from "@/components/ui/toast";
 import { routing } from "@/i18n/routing";
 import { DEFAULT_THEME_PREFERENCE, THEME_STORAGE_KEY } from "@/lib/theme";
 
@@ -41,6 +40,7 @@ export default async function LocaleLayout({
   params,
 }: LayoutProps<"/[locale]">) {
   const { locale } = await params;
+  const t = await getTranslations("notifications");
 
   return (
     <html
@@ -56,11 +56,9 @@ export default async function LocaleLayout({
           storageKey={THEME_STORAGE_KEY}
         >
           <NextIntlClientProvider>
-            <header className="flex items-center justify-end gap-2 p-4">
-              <ThemeToggle />
-              <LocaleSwitcher />
-            </header>
-            <main className="flex-1">{children}</main>
+            <Toaster regionLabel={t("region")} closeLabel={t("close")}>
+              {children}
+            </Toaster>
           </NextIntlClientProvider>
         </ThemeProvider>
       </body>

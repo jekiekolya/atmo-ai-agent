@@ -1,8 +1,57 @@
 generator client {
-  provider = "prisma-client"
-  output   = "./generated"
+  provider        = "prisma-client"
+  output          = "./generated"
+  // Business invariants below are partial unique indexes. Declared here, not
+  // hand-added to a migration, or the next `migrate dev` drops them as drift.
+  previewFeatures = ["partialIndexes"]
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+}
+
+model User {
+  id                String    @id @default(uuid(7)) @db.Uuid
+  // Stored normalized (trimmed, lowercased); never changed, never released.
+  email             String    @unique
+  firstName         String
+  lastName          String
+  role              Role
+  isActive          Boolean   @default(true)
+  passwordHash      String?
+  passwordChangedAt DateTime? @db.Timestamptz(3)
+  signedOutAt       DateTime? @db.Timestamptz(3)
+  failedSignInCount Int       @default(0)
+  lockedUntil       DateTime? @db.Timestamptz(3)
+  createdAt         DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt         DateTime  @updatedAt @db.Timestamptz(3)
+
+  invites       Invite[] @relation("InviteUser")
+  issuedInvites Invite[] @relation("InviteIssuer")
+
+  @@unique([role], map: "users_one_super_admin", where: { role: "SUPER_ADMIN" })
+  @@map("users")
+}
+
+model Invite {
+  id         String    @id @default(uuid(7)) @db.Uuid
+  userId     String    @db.Uuid
+  user       User      @relation("InviteUser", fields: [userId], references: [id], onDelete: Restrict)
+  // sha256 of the token; the token itself is never stored.
+  tokenHash  String    @unique
+  expiresAt  DateTime  @db.Timestamptz(3)
+  consumedAt DateTime? @db.Timestamptz(3)
+  revokedAt  DateTime? @db.Timestamptz(3)
+  issuedById String    @db.Uuid
+  issuedBy   User      @relation("InviteIssuer", fields: [issuedById], references: [id], onDelete: Restrict)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+
+  @@unique([userId], map: "invites_one_outstanding_per_user", where: raw("\"consumedAt\" IS NULL AND \"revokedAt\" IS NULL"))
+  @@index([userId])
+  @@map("invites")
 }
