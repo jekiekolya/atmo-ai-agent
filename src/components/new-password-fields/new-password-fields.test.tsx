@@ -1,5 +1,5 @@
 import { Form } from "@base-ui/react/form";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
@@ -65,6 +65,38 @@ describe("NewPasswordFields", () => {
       screen.getByText("validation.confirmPassword.mismatch"),
     ).toBeInTheDocument();
     expect(onSubmit).not.toHaveBeenCalled();
+  });
+
+  it("drops a mismatch once the new password is changed to match the confirmation", async () => {
+    const user = userEvent.setup();
+    renderFields();
+
+    await user.type(screen.getByLabelText("New"), PASSWORD);
+    await user.type(screen.getByLabelText("Confirm"), `${PASSWORD}!`);
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    expect(
+      await screen.findByText("validation.confirmPassword.mismatch"),
+    ).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("New"), "!");
+
+    await waitFor(() =>
+      expect(
+        screen.queryByText("validation.confirmPassword.mismatch"),
+      ).not.toBeInTheDocument(),
+    );
+  });
+
+  it("does not check the confirmation while the new password is first typed", async () => {
+    const user = userEvent.setup();
+    renderFields();
+
+    await user.type(screen.getByLabelText("Confirm"), PASSWORD);
+    await user.type(screen.getByLabelText("New"), "a");
+
+    expect(
+      screen.queryByText("validation.confirmPassword.mismatch"),
+    ).not.toBeInTheDocument();
   });
 
   it("refuses the current password as the new one when told which field holds it", async () => {

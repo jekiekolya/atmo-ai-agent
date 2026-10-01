@@ -1,6 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { Field as FieldPrimitive } from "@base-ui/react/field";
+import { type ReactNode, useRef } from "react";
 
 import {
   Field,
@@ -32,6 +33,10 @@ export function NewPasswordFields({
   currentPasswordName?: string;
 }) {
   const translateKey = useTranslateKey();
+  const confirm = useRef<FieldPrimitive.Root.Actions>(null);
+  // Base UI re-checks a field only on its own change; once the confirmation has been checked, keep it current.
+  const confirmChecked = useRef(false);
+  const matches = validatePair(confirmsPassword, name, translateKey);
   const passwordRule = validateWith(password, translateKey);
   const differs =
     currentPasswordName === undefined
@@ -47,14 +52,24 @@ export function NewPasswordFields({
         }
       >
         <FieldLabel>{label}</FieldLabel>
-        <Input type="password" autoComplete="new-password" />
+        <Input
+          type="password"
+          autoComplete="new-password"
+          onChange={() => {
+            if (confirmChecked.current) confirm.current?.validate();
+          }}
+        />
         <FieldDescription>{hint}</FieldDescription>
         <FieldError />
       </Field>
 
       <Field
         name="confirmPassword"
-        validate={validatePair(confirmsPassword, name, translateKey)}
+        actionsRef={confirm}
+        validate={(value, values) => {
+          confirmChecked.current = true;
+          return matches(value, values);
+        }}
       >
         <FieldLabel>{confirmLabel}</FieldLabel>
         <Input type="password" autoComplete="new-password" />
