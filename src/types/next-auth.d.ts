@@ -1,5 +1,6 @@
 import type { DefaultSession } from "next-auth";
 
+import type { SessionUser } from "@/auth/dal";
 import type { Role } from "@generated/client";
 
 declare module "next-auth" {
@@ -10,13 +11,7 @@ declare module "next-auth" {
   }
 
   interface Session {
-    user: {
-      id: string;
-      email: string;
-      role: Role;
-      firstName: string;
-      lastName: string;
-    } & DefaultSession["user"];
+    user: SessionUser & DefaultSession["user"];
   }
 }
 
