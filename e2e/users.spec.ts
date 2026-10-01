@@ -2,7 +2,8 @@ import { expect, type Page, test } from "@playwright/test";
 
 import { createAdmin } from "./support/db";
 import { SUPER_ADMIN } from "./support/env";
-import { signedInPage, submitSignIn } from "./support/sign-in";
+import { signedInAsOwner, signedInPage, submitSignIn } from "./support/sign-in";
+import { createUserViaUi } from "./support/users";
 
 // US4: the super admin manages who has access.
 
@@ -13,22 +14,22 @@ async function rowAction(owner: Page, email: string, action: string) {
   await owner.getByRole("menuitem", { name: action }).click();
 }
 
+async function deactivate(owner: Page, email: string) {
+  await rowAction(owner, email, "Deactivate");
+  await owner
+    .getByRole("alertdialog")
+    .getByRole("button", { name: "Deactivate" })
+    .click();
+}
+
 test("deactivating a signed-in admin ends their access on the very next request (FR-064)", async ({
   browser,
 }) => {
   const admin = await createAdmin();
   const adminPage = await signedInPage(browser, admin.email, admin.password);
-  const owner = await signedInPage(
-    browser,
-    SUPER_ADMIN.email,
-    SUPER_ADMIN.password,
-  );
+  const owner = await signedInAsOwner(browser);
 
-  await rowAction(owner, admin.email, "Deactivate");
-  await owner
-    .getByRole("alertdialog")
-    .getByRole("button", { name: "Deactivate" })
-    .click();
+  await deactivate(owner, admin.email);
   await expect(
     owner.getByText("Taras Shevchenko was deactivated."),
   ).toBeVisible();
@@ -45,17 +46,9 @@ test("a deactivated admin cannot sign in, and can again once reactivated", async
   page,
 }) => {
   const admin = await createAdmin();
-  const owner = await signedInPage(
-    browser,
-    SUPER_ADMIN.email,
-    SUPER_ADMIN.password,
-  );
+  const owner = await signedInAsOwner(browser);
 
-  await rowAction(owner, admin.email, "Deactivate");
-  await owner
-    .getByRole("alertdialog")
-    .getByRole("button", { name: "Deactivate" })
-    .click();
+  await deactivate(owner, admin.email);
   await expect(
     owner.getByRole("row").filter({ hasText: admin.email }),
   ).toContainText("Deactivated");
@@ -77,11 +70,7 @@ test("row actions are on screen without scrolling the table, on desktop and phon
   browser,
 }) => {
   await createAdmin();
-  const owner = await signedInPage(
-    browser,
-    SUPER_ADMIN.email,
-    SUPER_ADMIN.password,
-  );
+  const owner = await signedInAsOwner(browser);
   await owner.goto("/en/dashboard/users");
   const actions = owner.getByRole("button", { name: /^Actions for/ }).first();
 
@@ -110,24 +99,14 @@ test("a revoked link is no longer valid (FR-052)", async ({
   page,
 }) => {
   const email = `revoked-${Date.now()}@e2e.test`;
-  const owner = await signedInPage(
-    browser,
-    SUPER_ADMIN.email,
-    SUPER_ADMIN.password,
-  );
+  const owner = await signedInAsOwner(browser);
 
-  await owner.goto("/en/dashboard/users");
-  await owner.getByRole("button", { name: "Create user" }).click();
-  await owner.getByLabel("Email").fill(email);
-  await owner.getByLabel("First name").fill("Ivan");
-  await owner.getByLabel("Last name").fill("Franko");
-  await owner
-    .getByRole("dialog")
-    .getByRole("button", { name: "Create user" })
-    .click();
-  const link = new URL(
-    await owner.getByRole("textbox", { name: "Invitation link" }).inputValue(),
-  );
+  const linkField = await createUserViaUi(owner, {
+    email,
+    firstName: "Ivan",
+    lastName: "Franko",
+  });
+  const link = new URL(await linkField.inputValue());
   await owner.getByRole("button", { name: "Done" }).click();
 
   await rowAction(owner, email, "Revoke link");

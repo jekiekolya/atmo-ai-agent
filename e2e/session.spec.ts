@@ -1,13 +1,18 @@
 import { type Browser, expect, type Page, test } from "@playwright/test";
 
 import { createAdmin, sql } from "./support/db";
-import { SUPER_ADMIN } from "./support/env";
-import { signedInPage, signOut } from "./support/sign-in";
+import { signedInAsOwner, signedInPage, signOut } from "./support/sign-in";
 
 const sessionCookie = async (page: Page) =>
   (await page.context().cookies()).find((c) =>
     c.name.includes("session-token"),
   );
+
+const sessionCheck = (page: Page) =>
+  page.waitForResponse((r) => r.url().includes("/api/auth/session"));
+
+const returnToTab = (page: Page) =>
+  page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
 
 const expectSignIn = async (page: Page) => {
   await expect(page).toHaveURL(/\/en\/sign-in/);
@@ -74,35 +79,23 @@ test("a revoked session opening sign-in sees the form, not a redirect loop (FR-0
 test("activity renews the rolling window (FR-026)", async ({ browser }) => {
   const admin = await createAdmin();
   const page = await signedInPage(browser, admin.email, admin.password);
-  const sessionCookie = async () =>
-    (await page.context().cookies()).find((c) =>
-      c.name.includes("session-token"),
-    );
 
-  const before = (await sessionCookie())!.expires;
+  const before = (await sessionCookie(page))!.expires;
   // Cookie expiry has one-second resolution.
   await page.waitForTimeout(1_500);
 
-  const renewed = page.waitForResponse((r) =>
-    r.url().includes("/api/auth/session"),
-  );
-  await page.evaluate(() =>
-    document.dispatchEvent(new Event("visibilitychange")),
-  );
+  const renewed = sessionCheck(page);
+  await returnToTab(page);
   await renewed;
 
-  expect((await sessionCookie())!.expires).toBeGreaterThan(before);
+  expect((await sessionCookie(page))!.expires).toBeGreaterThan(before);
 });
 
 test("work on one page renews the rolling window, without navigating (FR-026)", async ({
   browser,
 }) => {
   const target = await createAdmin();
-  const owner = await signedInPage(
-    browser,
-    SUPER_ADMIN.email,
-    SUPER_ADMIN.password,
-  );
+  const owner = await signedInAsOwner(browser);
   await owner.goto("/en/dashboard/users");
 
   const loaded = (await sessionCookie(owner))!.expires;
@@ -119,9 +112,7 @@ test("work on one page renews the rolling window, without navigating (FR-026)", 
   expect(afterAction).toBeGreaterThan(loaded);
 
   await owner.waitForTimeout(1_500);
-  const renewed = owner.waitForResponse((r) =>
-    r.url().includes("/api/auth/session"),
-  );
+  const renewed = sessionCheck(owner);
   await owner.reload();
   await renewed;
   expect((await sessionCookie(owner))!.expires).toBeGreaterThan(afterAction);
@@ -134,9 +125,7 @@ test("a session refused when the tab returns sends the visitor to sign-in at onc
   const page = await signedInPage(browser, admin.email, admin.password);
 
   await sql(`UPDATE users SET "isActive" = false WHERE id = $1`, [admin.id]);
-  await page.evaluate(() =>
-    document.dispatchEvent(new Event("visibilitychange")),
-  );
+  await returnToTab(page);
 
   await expect(page).toHaveURL(/\/en\/sign-in\?callbackUrl=%2Fen%2Fdashboard$/);
 });
@@ -145,15 +134,11 @@ test.describe("a check that cannot reach the server decides nothing (FR-071 is f
   const onAccountPage = async (browser: Browser) => {
     const admin = await createAdmin();
     const page = await signedInPage(browser, admin.email, admin.password);
-    const checked = page.waitForResponse((r) =>
-      r.url().includes("/api/auth/session"),
-    );
+    const checked = sessionCheck(page);
     await page.goto("/en/dashboard/account");
     await checked;
     return page;
   };
-  const returnToTab = (page: Page) =>
-    page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
 
   test("a tab that returns while offline stays where it is", async ({
     browser,
@@ -180,9 +165,7 @@ test.describe("a check that cannot reach the server decides nothing (FR-071 is f
       route.fulfill({ status: 500, body: "" }),
     );
 
-    const failed = page.waitForResponse((r) =>
-      r.url().includes("/api/auth/session"),
-    );
+    const failed = sessionCheck(page);
     await returnToTab(page);
     await failed;
     await page.waitForTimeout(1_000);
