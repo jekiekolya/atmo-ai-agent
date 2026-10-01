@@ -8,6 +8,7 @@ const valid = {
   NODE_ENV: "test",
   APP_ENV: "development",
   DATABASE_URL: "postgresql://user:password@localhost:5432/atmo_dev",
+  AUTH_SECRET: "a".repeat(32),
 };
 
 describe("loadConfig", () => {
@@ -60,7 +61,7 @@ describe("loadConfig", () => {
     ).toThrow(/DATABASE_URL/);
   });
 
-  it.each(["NODE_ENV", "APP_ENV", "DATABASE_URL"])(
+  it.each(["NODE_ENV", "APP_ENV", "DATABASE_URL", "AUTH_SECRET"])(
     "fails naming %s when it is missing",
     (key) => {
       const source: Record<string, string | undefined> = { ...valid };
@@ -110,8 +111,79 @@ describe("loadConfig", () => {
 
     expect(Object.keys(config).sort()).toEqual([
       "appEnv",
+      "authSecret",
       "databaseUrl",
       "nodeEnv",
+      "sessionAbsoluteLifetimeSeconds",
+      "sessionMaxAgeSeconds",
     ]);
+  });
+
+  describe("sessions", () => {
+    it("fails naming AUTH_SECRET when it is shorter than 32 characters", () => {
+      expect(() =>
+        loadConfig({ ...valid, AUTH_SECRET: "a".repeat(31) }),
+      ).toThrow(/AUTH_SECRET/);
+    });
+
+    it("exposes the secret", () => {
+      expect(loadConfig(valid).authSecret).toBe("a".repeat(32));
+    });
+
+    it("defaults to an eight-hour rolling window and a 24-hour absolute lifetime", () => {
+      const config = loadConfig(valid);
+
+      expect(config.sessionMaxAgeSeconds).toBe(28_800);
+      expect(config.sessionAbsoluteLifetimeSeconds).toBe(86_400);
+    });
+
+    it("coerces both lifetimes from strings", () => {
+      const config = loadConfig({
+        ...valid,
+        SESSION_MAX_AGE_SECONDS: "3600",
+        SESSION_ABSOLUTE_LIFETIME_SECONDS: "7200",
+      });
+
+      expect(config.sessionMaxAgeSeconds).toBe(3600);
+      expect(config.sessionAbsoluteLifetimeSeconds).toBe(7200);
+    });
+
+    it.each(["0", "-1", "1.5", "soon"])(
+      "rejects SESSION_MAX_AGE_SECONDS=%s",
+      (value) => {
+        expect(() =>
+          loadConfig({ ...valid, SESSION_MAX_AGE_SECONDS: value }),
+        ).toThrow(/SESSION_MAX_AGE_SECONDS/);
+      },
+    );
+
+    it.each(["0", "-1", "1.5", "soon"])(
+      "rejects SESSION_ABSOLUTE_LIFETIME_SECONDS=%s",
+      (value) => {
+        expect(() =>
+          loadConfig({ ...valid, SESSION_ABSOLUTE_LIFETIME_SECONDS: value }),
+        ).toThrow(/SESSION_ABSOLUTE_LIFETIME_SECONDS/);
+      },
+    );
+
+    it("fails naming both lifetimes when the absolute one is shorter", () => {
+      expect(() =>
+        loadConfig({
+          ...valid,
+          SESSION_MAX_AGE_SECONDS: "7200",
+          SESSION_ABSOLUTE_LIFETIME_SECONDS: "3600",
+        }),
+      ).toThrow(/SESSION_ABSOLUTE_LIFETIME_SECONDS[^]*SESSION_MAX_AGE_SECONDS/);
+    });
+
+    it("accepts equal lifetimes", () => {
+      expect(() =>
+        loadConfig({
+          ...valid,
+          SESSION_MAX_AGE_SECONDS: "3600",
+          SESSION_ABSOLUTE_LIFETIME_SECONDS: "3600",
+        }),
+      ).not.toThrow();
+    });
   });
 });

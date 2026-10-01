@@ -1,15 +1,14 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// E2E_PORT points the suite at a server that is already running — typically the
-// dev server you have open, which is the fast local loop: Next allows only one
-// dev server per directory, so the suite cannot start a second one. Without it
-// the suite builds and serves the production bundle itself, the way CI does.
-// Tooling configs may read process.env directly (Constitution, Principle V).
+import { E2E_AUTH_SECRET, E2E_DATABASE_URL } from "./e2e/support/env";
+
+// Tooling config, so it reads process.env. E2E_PORT reuses a running server (see global setup).
 const port = Number(process.env.E2E_PORT ?? 3100);
 const baseURL = `http://localhost:${port}`;
 
 export default defineConfig({
   testDir: "e2e",
+  globalSetup: "./e2e/global-setup.ts",
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   reporter: process.env.CI ? [["github"], ["html", { open: "never" }]] : "list",
@@ -23,7 +22,8 @@ export default defineConfig({
     env: {
       PORT: String(port),
       APP_ENV: "development",
-      DATABASE_URL: "postgresql://user:password@localhost:5432/atmo_dev",
+      DATABASE_URL: E2E_DATABASE_URL,
+      AUTH_SECRET: E2E_AUTH_SECRET,
     },
     url: baseURL,
     // A cold production build runs well past Playwright's 60s default.
