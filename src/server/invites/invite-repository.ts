@@ -1,7 +1,13 @@
 import { type Db, db } from "@/server/db";
-import type { Invite, User } from "@generated/client";
+import type { Invite, Prisma, User } from "@generated/client";
 
 export type InviteWithUser = Invite & { user: User };
+
+/** Neither used nor revoked; an expired invite still counts. */
+export const OUTSTANDING_INVITE = {
+  consumedAt: null,
+  revokedAt: null,
+} satisfies Prisma.InviteWhereInput;
 
 export function insertInvite(
   data: {
@@ -30,7 +36,7 @@ export function findOutstandingInvite(
   client: Db = db,
 ): Promise<Invite | null> {
   return client.invite.findFirst({
-    where: { userId, consumedAt: null, revokedAt: null },
+    where: { userId, ...OUTSTANDING_INVITE },
   });
 }
 
@@ -40,7 +46,7 @@ export async function revokeOutstandingInvites(
   client: Db = db,
 ): Promise<number> {
   const { count } = await client.invite.updateMany({
-    where: { userId, consumedAt: null, revokedAt: null },
+    where: { userId, ...OUTSTANDING_INVITE },
     data: { revokedAt: at },
   });
   return count;
@@ -53,7 +59,7 @@ export async function consumeInvite(
   client: Db = db,
 ): Promise<boolean> {
   const { count } = await client.invite.updateMany({
-    where: { id, consumedAt: null, revokedAt: null, expiresAt: { gt: at } },
+    where: { id, ...OUTSTANDING_INVITE, expiresAt: { gt: at } },
     data: { consumedAt: at },
   });
   return count === 1;

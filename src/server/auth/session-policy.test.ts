@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { evaluateSession } from "@/server/auth/session-policy";
+import { evaluateSession, identityOf } from "@/server/auth/session-policy";
 
 const HOUR = 3_600_000;
 const signedInAt = Date.UTC(2026, 8, 26, 9, 0, 0);
@@ -72,5 +72,18 @@ describe("evaluateSession", () => {
 
   it("rejects a session one millisecond past the absolute lifetime", () => {
     expect(evaluateSession(claims, user, at(24 * HOUR + 1), policy)).toBeNull();
+  });
+});
+
+describe("identityOf", () => {
+  it("keeps the identity fields and nothing else", () => {
+    const stored = { ...user, id: "u-1", passwordHash: "secret" };
+
+    expect(identityOf(stored)).toEqual({
+      role: "ADMIN",
+      firstName: "Olena",
+      lastName: "Kovalenko",
+      email: "olena@example.com",
+    });
   });
 });

@@ -1,4 +1,5 @@
 import { type Db, db } from "@/server/db";
+import { OUTSTANDING_INVITE } from "@/server/invites/invite-repository";
 import type { Role, User } from "@generated/client";
 
 export type { Role, User };
@@ -82,7 +83,7 @@ export async function listUsersWithPendingInvite(): Promise<UserListItem[]> {
     orderBy: [{ createdAt: "desc" }, { id: "desc" }],
     include: {
       invites: {
-        where: { consumedAt: null, revokedAt: null },
+        where: OUTSTANDING_INVITE,
         select: { expiresAt: true },
         take: 1,
       },

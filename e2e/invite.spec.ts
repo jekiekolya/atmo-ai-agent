@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-import { SUPER_ADMIN } from "./support/env";
-import { signedInPage, submitSignIn } from "./support/sign-in";
+import { signedInAsOwner, submitSignIn } from "./support/sign-in";
+import { createUserViaUi } from "./support/users";
 
 // US3 / FR-064: create a user, accept the invite, sign in with the new password.
 
@@ -11,23 +11,13 @@ test("an invited person sets their own password and signs in with it", async ({
   browser,
 }) => {
   const email = `invitee-${Date.now()}@e2e.test`;
-  const owner = await signedInPage(
-    browser,
-    SUPER_ADMIN.email,
-    SUPER_ADMIN.password,
-  );
+  const owner = await signedInAsOwner(browser);
 
-  await owner.goto("/en/dashboard/users");
-  await owner.getByRole("button", { name: "Create user" }).click();
-  await owner.getByLabel("Email").fill(email);
-  await owner.getByLabel("First name").fill("Lesya");
-  await owner.getByLabel("Last name").fill("Ukrainka");
-  await owner
-    .getByRole("dialog")
-    .getByRole("button", { name: "Create user" })
-    .click();
-
-  const linkField = owner.getByRole("textbox", { name: "Invitation link" });
+  const linkField = await createUserViaUi(owner, {
+    email,
+    firstName: "Lesya",
+    lastName: "Ukrainka",
+  });
   await expect(linkField).toBeVisible();
   const link = new URL(await linkField.inputValue());
   // No language segment: the invitee's own browser decides (FR-043).

@@ -31,3 +31,18 @@ function personName(key: "firstName" | "lastName") {
 
 export const firstName = personName("firstName");
 export const lastName = personName("lastName");
+
+export type PairRule = {
+  holds: (value: unknown, other: unknown) => boolean;
+  error: string;
+};
+
+export const confirmsPassword: PairRule = {
+  holds: (confirm, password) => confirm === password,
+  error: "validation.confirmPassword.mismatch",
+};
+
+export const differsFromCurrent: PairRule = {
+  holds: (next, current) => next !== current,
+  error: "validation.newPassword.sameAsCurrent",
+};

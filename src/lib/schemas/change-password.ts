@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { password } from "@/lib/schemas/fields";
+import {
+  confirmsPassword,
+  differsFromCurrent,
+  password,
+} from "@/lib/schemas/fields";
 
 export const changePasswordSchema = z
   .object({
@@ -8,13 +12,14 @@ export const changePasswordSchema = z
     newPassword: password,
     confirmPassword: z.string(),
   })
-  .refine((value) => value.confirmPassword === value.newPassword, {
-    path: ["confirmPassword"],
-    error: "validation.confirmPassword.mismatch",
-  })
-  .refine((value) => value.newPassword !== value.currentPassword, {
-    path: ["newPassword"],
-    error: "validation.newPassword.sameAsCurrent",
-  });
+  .refine(
+    (value) => confirmsPassword.holds(value.confirmPassword, value.newPassword),
+    { path: ["confirmPassword"], error: confirmsPassword.error },
+  )
+  .refine(
+    (value) =>
+      differsFromCurrent.holds(value.newPassword, value.currentPassword),
+    { path: ["newPassword"], error: differsFromCurrent.error },
+  );
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;

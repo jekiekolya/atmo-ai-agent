@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { DEFAULT_LOCALE, isSupportedLocale } from "@/i18n/locales";
+import { resolveLocale } from "@/i18n/locales";
 import { redirect } from "@/i18n/navigation";
 import { safeCallbackUrl } from "@/lib/http/callback-url";
 
@@ -29,8 +29,7 @@ export default async function SignInPage({
   params,
   searchParams,
 }: PageProps<"/[locale]/sign-in">) {
-  const requested = (await params).locale;
-  const locale = isSupportedLocale(requested) ? requested : DEFAULT_LOCALE;
+  const locale = resolveLocale((await params).locale);
 
   // The full check, not the proxy's: a revoked session must see the form, not loop (R4).
   if (await getSessionUser()) {

@@ -8,6 +8,7 @@ import {
   ForbiddenError,
   GoneError,
   InvalidInviteError,
+  NotFoundError,
 } from "@/server/errors";
 import {
   acceptInvite,
@@ -24,6 +25,7 @@ import {
 } from "@/server/testing/fixtures";
 
 const PASSWORD = "a brand new password";
+const UNKNOWN_ID = "00000000-0000-7000-8000-000000000000";
 
 async function invited() {
   const owner = await createSuperAdminRow();
@@ -230,6 +232,14 @@ describe("issueInvite (FR-050, FR-051)", () => {
     );
   });
 
+  it("reports an unknown account", async () => {
+    const owner = await createSuperAdminRow();
+
+    await expect(issueInvite(actorOf(owner), UNKNOWN_ID)).rejects.toThrow(
+      NotFoundError,
+    );
+  });
+
   it("is a conflict when a simultaneous request issues one first", async () => {
     const owner = await createSuperAdminRow();
     const user = await createUserRow();
@@ -279,6 +289,14 @@ describe("revokeInvite (FR-052)", () => {
       isActive: true,
       passwordHash: null,
     });
+  });
+
+  it("reports an unknown account", async () => {
+    const owner = await createSuperAdminRow();
+
+    await expect(revokeInvite(actorOf(owner), UNKNOWN_ID)).rejects.toThrow(
+      NotFoundError,
+    );
   });
 
   it("reports when there is nothing to revoke", async () => {

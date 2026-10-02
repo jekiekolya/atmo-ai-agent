@@ -1,12 +1,7 @@
 import { type Actor, assertSuperAdmin } from "@/server/auth/authorization";
 import { hashPassword } from "@/server/auth/password";
 import { type Db, db } from "@/server/db";
-import {
-  ConflictError,
-  GoneError,
-  InvalidInviteError,
-  NotFoundError,
-} from "@/server/errors";
+import { ConflictError, GoneError, InvalidInviteError } from "@/server/errors";
 import {
   consumeInvite,
   findInviteByTokenHash,
@@ -20,7 +15,8 @@ import {
   isWellFormedToken,
 } from "@/server/invites/invite-token";
 import { isUniqueViolation } from "@/server/prisma-errors";
-import { findUserById, setPassword } from "@/server/users/user-repository";
+import { existingUser } from "@/server/users/existing-user";
+import { setPassword } from "@/server/users/user-repository";
 
 export const INVITE_LIFETIME_MS = 72 * 60 * 60 * 1000;
 
@@ -103,8 +99,7 @@ export async function issueInvite(
   userId: string,
 ): Promise<IssuedInvite> {
   assertSuperAdmin(actor);
-  const target = await findUserById(userId);
-  if (!target) throw new NotFoundError();
+  const target = await existingUser(userId);
   if (target.role === "SUPER_ADMIN") {
     throw new ConflictError("invite_not_allowed", "super_admin");
   }
@@ -128,8 +123,7 @@ export async function revokeInvite(
   userId: string,
 ): Promise<void> {
   assertSuperAdmin(actor);
-  const target = await findUserById(userId);
-  if (!target) throw new NotFoundError();
+  await existingUser(userId);
 
   if ((await revokeOutstandingInvites(userId, new Date())) === 0) {
     throw new ConflictError("no_outstanding_invite");

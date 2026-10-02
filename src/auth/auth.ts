@@ -6,6 +6,7 @@ import { jwtCallback } from "@/auth/jwt-callback";
 import { config } from "@/config";
 import { signInSchema } from "@/lib/schemas/sign-in";
 import { authenticate } from "@/server/auth/authenticate";
+import { identityOf } from "@/server/auth/session-policy";
 import { findUserById } from "@/server/users/user-repository";
 
 // next-auth still reads AUTH_URL / NEXTAUTH_URL itself when set, so they must stay unset (R9).
@@ -28,13 +29,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         );
         if (!user) return null;
 
-        return {
-          id: user.id,
-          email: user.email,
-          role: user.role,
-          firstName: user.firstName,
-          lastName: user.lastName,
-        };
+        return { id: user.id, ...identityOf(user) };
       },
     }),
   ],

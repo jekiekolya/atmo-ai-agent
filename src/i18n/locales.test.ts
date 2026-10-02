@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_LOCALE, LOCALE_LABELS, SUPPORTED_LOCALES } from "./locales";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_LABELS,
+  resolveLocale,
+  SUPPORTED_LOCALES,
+} from "./locales";
 
 describe("supported locales", () => {
   it("offers exactly the locales this feature supports", () => {
@@ -25,5 +30,17 @@ describe("supported locales", () => {
       expect(LOCALE_LABELS[locale]).toBeTruthy();
     }
     expect(LOCALE_LABELS.uk).toBe("Українська");
+  });
+});
+
+describe("resolveLocale", () => {
+  it("keeps a supported locale", () => {
+    expect(resolveLocale("uk")).toBe("uk");
+  });
+
+  it("falls back to the default for anything unrecognized or absent", () => {
+    for (const value of ["de", "UK", "", "__proto__", undefined]) {
+      expect(resolveLocale(value)).toBe(DEFAULT_LOCALE);
+    }
   });
 });

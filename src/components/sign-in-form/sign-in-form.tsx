@@ -5,8 +5,8 @@ import { signIn, type SignInResponse } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
+import { FormAlert } from "@/components/form-alert/form-alert";
 import { SubmitButton } from "@/components/submit-button/submit-button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
@@ -56,11 +56,7 @@ export function SignInForm({ callbackUrl }: { callbackUrl: string }) {
 
   return (
     <Form method="post" className="flex flex-col gap-5" onFormSubmit={submit}>
-      {failed && (
-        <Alert variant="destructive">
-          <AlertDescription>{t("failed")}</AlertDescription>
-        </Alert>
-      )}
+      <FormAlert message={failed ? t("failed") : null} />
 
       <Field
         name="email"

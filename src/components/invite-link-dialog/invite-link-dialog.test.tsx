@@ -4,10 +4,7 @@ import { describe, expect, it, vi } from "vitest";
 
 const toastAdd = vi.hoisted(() => vi.fn());
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
-vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
-  useFormatter: () => ({ dateTime: () => "the date" }),
-}));
+vi.mock("next-intl", () => import("@/testing/next-intl-mock"));
 
 import { InviteLinkDialog } from "./invite-link-dialog";
 

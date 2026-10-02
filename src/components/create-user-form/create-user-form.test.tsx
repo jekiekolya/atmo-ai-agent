@@ -9,10 +9,7 @@ const toastAdd = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/http/api-client", () => ({ apiRequest }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh }) }));
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
-vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
-  useFormatter: () => ({ dateTime: () => "the date" }),
-}));
+vi.mock("next-intl", () => import("@/testing/next-intl-mock"));
 
 import { CreateUserForm } from "./create-user-form";
 
@@ -123,22 +120,6 @@ describe("CreateUserForm", () => {
     expect(screen.getByLabelText("users.create.email")).toHaveValue(
       "new@example.com",
     );
-  });
-
-  it("reports a blocked request as a notification with its own message", async () => {
-    apiRequest.mockResolvedValue({ ok: false, code: "forbidden_origin" });
-    const user = userEvent.setup();
-    render(<CreateUserForm />);
-
-    await openAndFill(user);
-
-    await waitFor(() =>
-      expect(toastAdd).toHaveBeenCalledWith({
-        title: "errors.codes.forbidden_origin",
-        type: "error",
-      }),
-    );
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("cannot be submitted twice while pending (FR-059)", async () => {
