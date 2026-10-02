@@ -3,8 +3,12 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 const toastAdd = vi.hoisted(() => vi.fn());
+const formatInstant = vi.hoisted(() => vi.fn(() => "the instant"));
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
 vi.mock("next-intl", () => import("@/testing/next-intl-mock"));
+vi.mock("@/i18n/use-format-instant", () => ({
+  useFormatInstant: () => formatInstant,
+}));
 
 import { InviteLinkDialog } from "./invite-link-dialog";
 
@@ -22,6 +26,16 @@ describe("InviteLinkDialog (FR-042)", () => {
       `${window.location.origin}/invite/abc`,
     );
     expect(screen.getByText("users.invite.shownOnce")).toBeInTheDocument();
+  });
+
+  it("states the expiry through the shared mechanism, as a date and time (FR-011)", async () => {
+    render(<InviteLinkDialog invite={invite} onClose={() => {}} />);
+    await screen.findByLabelText("users.invite.linkLabel");
+
+    expect(formatInstant).toHaveBeenCalledWith(
+      new Date("2026-09-29T12:00:00.000Z"),
+      "dateTime",
+    );
   });
 
   it("copies the link and confirms with a notification", async () => {

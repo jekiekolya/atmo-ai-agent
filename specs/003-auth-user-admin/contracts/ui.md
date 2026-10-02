@@ -83,8 +83,7 @@ caches or refetches it.
 The full name is always rendered through the catalog message `common.fullName`
 (`"{firstName} {lastName}"` in both locales today), so a language can reorder the parts without a
 code change (FR-074). Columns: full name, email, role, status badge, created date, and pending-invite expiry. Dates and
-times go through next-intl's `format.dateTime`, which uses 001's fixed UTC time zone, with the zone
-shown next to times of day. Rows are newest first.
+times go through `useFormatInstant` (feature 004). Rows are newest first.
 
 The row actions menu offers only valid actions:
 

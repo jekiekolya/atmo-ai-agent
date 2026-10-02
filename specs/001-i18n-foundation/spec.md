@@ -310,6 +310,7 @@ prerequisite exists:
   taking precedence over the address's language segment. Deferred: no authentication yet.
 - **Times in the visitor's own time zone** — dates and times shown in the reader's local zone
   rather than UTC. Deferred: pages render on the server, so this needs either the customer's zone
-  from a profile (no database yet) or client-side formatting.
+  from a profile (no database yet) or client-side formatting. Specified in feature 004
+  (`specs/004-reader-time-zone/`).
 - **The AI agent replying in the customer's language** — the support agent detecting and answering
   in the conversation's language. Deferred: no agent yet.

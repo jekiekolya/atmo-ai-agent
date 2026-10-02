@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,7 +15,7 @@ import {
   type RowUser,
   UserRowActions,
 } from "@/components/user-row-actions/user-row-actions";
-import { ZONED_DATE_TIME } from "@/lib/date-formats";
+import { useFormatInstant } from "@/i18n/use-format-instant";
 
 export type UserTableRow = {
   id: string;
@@ -36,7 +36,7 @@ const STATUS_VARIANT = {
 
 export function UserTable({ users }: { users: UserTableRow[] }) {
   const t = useTranslations();
-  const format = useFormatter();
+  const formatInstant = useFormatInstant();
 
   return (
     <Table>
@@ -69,16 +69,13 @@ export function UserTable({ users }: { users: UserTableRow[] }) {
                   {t(`users.status.${user.status}`)}
                 </Badge>
               </TableCell>
-              <TableCell>
-                {format.dateTime(user.createdAt, { dateStyle: "medium" })}
-              </TableCell>
+              <TableCell>{formatInstant(user.createdAt, "date")}</TableCell>
               <TableCell className="min-w-40 whitespace-normal">
                 {user.pendingInvite
                   ? t("users.list.pendingUntil", {
-                      // A time of day always carries its zone (UTC, from 001).
-                      expiresAt: format.dateTime(
+                      expiresAt: formatInstant(
                         user.pendingInvite.expiresAt,
-                        ZONED_DATE_TIME,
+                        "dateTime",
                       ),
                     })
                   : t("users.list.none")}

@@ -7,6 +7,7 @@ import {
 import type { ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 
+import { DemoOpenedAt } from "@/components/demo-opened-at/demo-opened-at";
 import { type Locale } from "@/i18n/locales";
 import en from "@/messages/en.json";
 import uk from "@/messages/uk.json";
@@ -16,7 +17,7 @@ import uk from "@/messages/uk.json";
 // whether a date, an amount, or a plural reads correctly in each language
 // (FR-023, FR-024).
 const MESSAGES = { en, uk } as const;
-const OPENED_AT = new Date("2026-03-14T09:30:00Z");
+const OPENED_AT = new Date("2026-03-14T23:30:00Z");
 
 /** Renders a probe in one locale and returns its text, leaving no DOM behind. */
 function textIn(locale: Locale, node: ReactNode): string {
@@ -32,18 +33,6 @@ function textIn(locale: Locale, node: ReactNode): string {
   const text = container.textContent ?? "";
   unmount();
   return text;
-}
-
-function OpenedAt() {
-  const format = useFormatter();
-  const t = useTranslations("demo");
-  return t("openedAt", {
-    date: format.dateTime(OPENED_AT, {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
-  });
 }
 
 function Output() {
@@ -67,9 +56,13 @@ function Visits({ count }: { count: number }) {
 
 describe("locale-aware formatting", () => {
   it("orders the date by each locale's convention", () => {
-    expect(textIn("en", <OpenedAt />)).toContain("March 14, 2026");
-    // Ukrainian leads with the day and names the month in the genitive.
-    expect(textIn("uk", <OpenedAt />)).toMatch(/14\s+берез/);
+    expect(textIn("en", <DemoOpenedAt openedAt={OPENED_AT} />)).toContain(
+      "Mar 15, 2026",
+    );
+    // Ukrainian leads with the day.
+    expect(textIn("uk", <DemoOpenedAt openedAt={OPENED_AT} />)).toMatch(
+      /15\s+бер/,
+    );
   });
 
   it("uses each locale's decimal and grouping separators", () => {

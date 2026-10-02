@@ -23,6 +23,20 @@ function entries(value: unknown, prefix = ""): Entry[] {
   );
 }
 
+const DATE_ARGUMENT = /\{\s*\w+\s*,\s*(date|time)\b/;
+
+/** Key paths whose message formats a date or time with ICU. */
+function dateArguments(value: unknown, prefix = ""): string[] {
+  if (typeof value === "string") {
+    return DATE_ARGUMENT.test(value) ? [prefix] : [];
+  }
+  if (typeof value !== "object" || value === null) return [];
+
+  return Object.entries(value as Record<string, unknown>).flatMap(
+    ([key, child]) => dateArguments(child, prefix ? `${prefix}.${key}` : key),
+  );
+}
+
 describe("message catalogs", () => {
   it("ships a catalog for every supported locale", () => {
     // A locale added to the constant without its catalog fails here rather
@@ -68,5 +82,19 @@ describe("message catalogs", () => {
     // a discrepancy (FR-024).
     expect(uk.demo.visits).toContain("few");
     expect(en.demo.visits).not.toContain("few");
+  });
+
+  it("formats no date or time itself, leaving that to useFormatInstant (spec 004, FR-015)", () => {
+    // An ICU date argument formats in the provider's zone, unlabelled, where no lint rule can see it.
+    expect(dateArguments({ a: { b: "On {when, date, short}" } })).toEqual([
+      "a.b",
+    ]);
+
+    for (const locale of SUPPORTED_LOCALES) {
+      expect(
+        dateArguments(CATALOGS[locale]),
+        `${locale}: format these through useFormatInstant instead`,
+      ).toEqual([]);
+    }
   });
 });
