@@ -3,6 +3,28 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier/flat";
 
+const PROCESS_ENV = {
+  selector: "MemberExpression[object.name='process'][property.name='env']",
+  message:
+    "Read configuration from @/config, not process.env (Constitution, Principle V).",
+};
+
+const DATE_FORMATTING_MESSAGE =
+  "Format dates and times with useFormatInstant from @/i18n/use-format-instant (spec 004, FR-015).";
+
+const DATE_FORMATTING = [
+  {
+    selector:
+      "CallExpression[callee.property.name=/^(dateTime|dateTimeRange|relativeTime|toLocaleDateString|toLocaleTimeString|toLocaleString)$/]",
+    message: DATE_FORMATTING_MESSAGE,
+  },
+  {
+    selector:
+      "NewExpression[callee.object.name='Intl'][callee.property.name=/^(DateTimeFormat|RelativeTimeFormat)$/]",
+    message: DATE_FORMATTING_MESSAGE,
+  },
+];
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -12,15 +34,22 @@ const eslintConfig = defineConfig([
     files: ["src/**/*.{ts,tsx}"],
     ignores: ["src/config/**"],
     rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector:
-            "MemberExpression[object.name='process'][property.name='env']",
-          message:
-            "Read configuration from @/config, not process.env (Constitution, Principle V).",
-        },
-      ],
+      "no-restricted-syntax": ["error", PROCESS_ENV],
+    },
+  },
+  // Spec 004, FR-016: screen code formats dates only through useFormatInstant.
+  // src/server is browser-less output, decided by the feature that adds it.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: [
+      "src/config/**",
+      "src/server/**",
+      "src/**/*.test.{ts,tsx}",
+      "src/i18n/use-format-instant.ts",
+    ],
+    rules: {
+      // Repeats PROCESS_ENV: a later no-restricted-syntax replaces an earlier one instead of merging.
+      "no-restricted-syntax": ["error", PROCESS_ENV, ...DATE_FORMATTING],
     },
   },
   // src/server is the portable core (MC-008): nothing framework-specific may enter it.
