@@ -5,8 +5,12 @@ import { describe, expect, it, vi } from "vitest";
 const toastAdd = vi.hoisted(() => vi.fn());
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => key,
-  useFormatter: () => ({ dateTime: () => "the date" }),
+  useTranslations: () => (key: string, values?: Record<string, unknown>) =>
+    values?.expiresAt ? `${key} ${values.expiresAt}` : key,
+}));
+vi.mock("@/i18n/use-format-instant", () => ({
+  useFormatInstant: () => (value: Date, format: string) =>
+    `${value.toISOString()}|${format}`,
 }));
 
 import { InviteLinkDialog } from "./invite-link-dialog";
@@ -25,6 +29,16 @@ describe("InviteLinkDialog (FR-042)", () => {
       `${window.location.origin}/invite/abc`,
     );
     expect(screen.getByText("users.invite.shownOnce")).toBeInTheDocument();
+  });
+
+  it("states the expiry through the shared mechanism, as a date and time (FR-011)", async () => {
+    render(<InviteLinkDialog invite={invite} onClose={() => {}} />);
+
+    expect(
+      await screen.findByText(
+        "users.invite.description 2026-09-29T12:00:00.000Z|dateTime",
+      ),
+    ).toBeInTheDocument();
   });
 
   it("copies the link and confirms with a notification", async () => {

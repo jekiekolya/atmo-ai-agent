@@ -11,10 +11,10 @@ vi.mock("next-intl", () => ({
     }
     return key;
   },
-  useFormatter: () => ({
-    dateTime: (date: Date, options: Intl.DateTimeFormatOptions) =>
-      `${date.toISOString()}${options.timeZoneName ? " (zoned)" : ""}`,
-  }),
+}));
+vi.mock("@/i18n/use-format-instant", () => ({
+  useFormatInstant: () => (value: Date, format: string) =>
+    `${value.toISOString()}|${format}`,
 }));
 vi.mock("@/components/user-row-actions/user-row-actions", () => ({
   UserRowActions: ({ user }: { user: { name: string } }) => (
@@ -57,15 +57,15 @@ describe("UserTable (FR-047)", () => {
     expect(within(row).getByText("users.status.invited")).toBeInTheDocument();
   });
 
-  it("formats dates through the locale-aware formatter, zoning only times of day (FR-063)", () => {
+  it("formats each date through the shared mechanism: created as a date, pending expiry as a date and time (FR-011)", () => {
     render(<UserTable users={rows} />);
     const row = screen.getByRole("row", { name: /Lesya Ukrainka/ });
 
     expect(
-      within(row).getByText("2026-09-20T00:00:00.000Z"),
+      within(row).getByText("2026-09-20T00:00:00.000Z|date"),
     ).toBeInTheDocument();
     expect(
-      within(row).getByText("pending until 2026-09-23T00:00:00.000Z (zoned)"),
+      within(row).getByText("pending until 2026-09-23T00:00:00.000Z|dateTime"),
     ).toBeInTheDocument();
   });
 

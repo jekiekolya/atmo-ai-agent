@@ -1,12 +1,13 @@
 import { getFormatter, getTranslations } from "next-intl/server";
 
 import { AppShell } from "@/components/app-shell/app-shell";
+import { DemoOpenedAt } from "@/components/demo-opened-at/demo-opened-at";
 
 // Stand-in for data a real case would carry. Fixed values so the rendering is
 // deterministic: this route exists to prove locale-aware formatting and that a
 // dynamic segment survives a locale switch (FR-028).
 const SAMPLE = {
-  openedAt: new Date("2026-03-14T09:30:00Z"),
+  openedAt: new Date("2026-03-14T23:30:00Z"),
   outputKwh: 1234.56,
   creditEur: 87.5,
   visits: 3,
@@ -27,15 +28,7 @@ export default async function DemoCase({
         {/* Every value below goes through a locale-aware formatter. Assembling
             any of them from strings would take word order and separators away
             from the translator (FR-023, FR-024). */}
-        <p data-testid="opened-at">
-          {t("openedAt", {
-            date: format.dateTime(SAMPLE.openedAt, {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            }),
-          })}
-        </p>
+        <DemoOpenedAt openedAt={SAMPLE.openedAt} />
         <p data-testid="output">
           {t("output", { value: format.number(SAMPLE.outputKwh) })}
         </p>

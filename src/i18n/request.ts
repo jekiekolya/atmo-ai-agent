@@ -16,9 +16,7 @@ export default getRequestConfig(async () => {
   return {
     locale,
     messages: (await import(`../messages/${locale}.json`)).default,
-    // Pages render on the server, so an absent zone means the container's —
-    // the same instant would show a different day per deployment. Showing the
-    // visitor's own zone is a separate feature; see Out of Scope.
+    // The server has no reader zone, so it stays deterministic; screens convert through useFormatInstant.
     timeZone: "UTC",
   };
 });

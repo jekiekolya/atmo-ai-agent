@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormatter, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/toast";
-import { ZONED_DATE_TIME } from "@/lib/date-formats";
+import { useFormatInstant } from "@/i18n/use-format-instant";
 
 export type ShownInvite = { path: string; expiresAt: string; name: string };
 
@@ -26,7 +26,7 @@ export function InviteLinkDialog({
   onClose: () => void;
 }) {
   const t = useTranslations();
-  const format = useFormatter();
+  const formatInstant = useFormatInstant();
   const url = invite ? `${window.location.origin}${invite.path}` : "";
 
   async function copy() {
@@ -49,9 +49,9 @@ export function InviteLinkDialog({
               <DialogDescription className="wrap-break-word">
                 {t("users.invite.description", {
                   name: invite.name,
-                  expiresAt: format.dateTime(
+                  expiresAt: formatInstant(
                     new Date(invite.expiresAt),
-                    ZONED_DATE_TIME,
+                    "dateTime",
                   ),
                 })}
               </DialogDescription>
