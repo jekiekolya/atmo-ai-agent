@@ -62,9 +62,11 @@ export default defineConfig({
         test: {
           name: "ui",
           environment: "jsdom",
-          include: ["src/{components,app}/**/*.test.tsx"],
+          include: ["src/{components,app,i18n}/**/*.test.tsx"],
           exclude,
           setupFiles: ["./vitest.setup.ts"],
+          // A non-UTC zone, so a date that silently assumes UTC fails on a UTC CI runner too.
+          env: { TZ: "Europe/Kyiv" },
         },
       },
     ],
