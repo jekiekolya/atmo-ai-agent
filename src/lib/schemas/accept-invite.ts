@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { password } from "@/lib/schemas/fields";
+import { confirmsPassword, password } from "@/lib/schemas/fields";
 
 export const acceptInviteSchema = z
   .object({
@@ -8,9 +8,9 @@ export const acceptInviteSchema = z
     password,
     confirmPassword: z.string(),
   })
-  .refine((value) => value.confirmPassword === value.password, {
-    path: ["confirmPassword"],
-    error: "validation.confirmPassword.mismatch",
-  });
+  .refine(
+    (value) => confirmsPassword.holds(value.confirmPassword, value.password),
+    { path: ["confirmPassword"], error: confirmsPassword.error },
+  );
 
 export type AcceptInviteInput = z.infer<typeof acceptInviteSchema>;

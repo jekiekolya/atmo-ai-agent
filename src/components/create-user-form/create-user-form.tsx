@@ -5,12 +5,13 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
+import { FormAlert } from "@/components/form-alert/form-alert";
+import { useFormFailure } from "@/components/form-alert/use-form-failure";
 import {
   InviteLinkDialog,
   type ShownInvite,
 } from "@/components/invite-link-dialog/invite-link-dialog";
 import { SubmitButton } from "@/components/submit-button/submit-button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,14 +30,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/api-client";
-import {
-  routeFailure,
-  toFormErrors,
-  validateWith,
-} from "@/lib/http/form-errors";
+import { validateWith } from "@/lib/http/form-errors";
 import { createUserSchema } from "@/lib/schemas/create-user";
 
 type Created = {
@@ -51,14 +47,13 @@ export function CreateUserForm() {
   const translateKey = useTranslateKey();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const failure = useFormFailure();
   const [pending, setPending] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [alert, setAlert] = useState<string | null>(null);
   const [shown, setShown] = useState<ShownInvite | null>(null);
 
   async function submit(values: Record<string, unknown>) {
     setPending(true);
-    setAlert(null);
+    failure.clearAlert();
 
     const result = await apiRequest<Created>("POST", "/api/users", {
       email: values.email,
@@ -78,15 +73,7 @@ export function CreateUserForm() {
       return;
     }
 
-    const route = routeFailure(result);
-    if (route.kind === "fields") {
-      setErrors(toFormErrors(route.fields, translateKey));
-      if (route.alertKey) setAlert(translateKey(route.alertKey));
-    } else if (route.kind === "alert") {
-      setAlert(translateKey(route.key));
-    } else {
-      toast.add({ title: translateKey(route.key), type: "error" });
-    }
+    failure.show(result);
   }
 
   const shape = createUserSchema.shape;
@@ -97,10 +84,7 @@ export function CreateUserForm() {
         open={open}
         onOpenChange={(next) => {
           setOpen(next);
-          if (next) {
-            setErrors({});
-            setAlert(null);
-          }
+          if (next) failure.clear();
         }}
       >
         <DialogTrigger render={<Button />}>
@@ -116,14 +100,10 @@ export function CreateUserForm() {
           <Form
             method="post"
             className="flex flex-col gap-4"
-            errors={errors}
+            errors={failure.errors}
             onFormSubmit={submit}
           >
-            {alert && (
-              <Alert variant="destructive">
-                <AlertDescription>{alert}</AlertDescription>
-              </Alert>
-            )}
+            <FormAlert message={failure.alert} />
             <Field
               name="email"
               validate={validateWith(shape.email, translateKey)}

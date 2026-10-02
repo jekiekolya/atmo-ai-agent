@@ -1,5 +1,7 @@
 import { type Browser, expect, type Page } from "@playwright/test";
 
+import { SUPER_ADMIN } from "./env";
+
 const LABELS = {
   en: { email: "Email", password: "Password", submit: "Sign in" },
   uk: { email: "Електронна пошта", password: "Пароль", submit: "Увійти" },
@@ -38,6 +40,10 @@ export async function signedInPage(
   await submitSignIn(page, email, password, locale);
   await expect(page).toHaveURL(new RegExp(`/${locale}/dashboard$`));
   return page;
+}
+
+export function signedInAsOwner(browser: Browser, locale: Locale = "en") {
+  return signedInPage(browser, SUPER_ADMIN.email, SUPER_ADMIN.password, locale);
 }
 
 export async function signOut(page: Page) {

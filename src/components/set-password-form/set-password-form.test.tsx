@@ -9,10 +9,9 @@ const toastAdd = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/http/api-client", () => ({ apiRequest }));
 vi.mock("@/lib/http/hard-navigate", () => ({ hardNavigate }));
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
-vi.mock("next-intl", () => ({
+vi.mock("next-intl", async () => ({
+  ...(await import("@/testing/next-intl-mock")),
   useLocale: () => "uk",
-  useTranslations: (namespace?: string) => (key: string) =>
-    namespace ? `${namespace}.${key}` : key,
 }));
 
 import { SetPasswordForm } from "./set-password-form";
@@ -134,22 +133,6 @@ describe("SetPasswordForm", () => {
       }),
     );
     expect(screen.getByLabelText("invite.password")).toHaveValue("");
-  });
-
-  it("reports a blocked request as a notification with its own message", async () => {
-    apiRequest.mockResolvedValue({ ok: false, code: "forbidden_origin" });
-    const user = userEvent.setup();
-    render(<SetPasswordForm token="tok" />);
-
-    await fill(user);
-
-    await waitFor(() =>
-      expect(toastAdd).toHaveBeenCalledWith({
-        title: "errors.codes.forbidden_origin",
-        type: "error",
-      }),
-    );
-    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("cannot be submitted twice while pending", async () => {

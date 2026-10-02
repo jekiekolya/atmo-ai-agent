@@ -2,22 +2,17 @@ import { claimAttempt } from "@/server/auth/authenticate";
 import { type Actor, assertSuperAdmin } from "@/server/auth/authorization";
 import { hashPassword, verifyPassword } from "@/server/auth/password";
 import { db } from "@/server/db";
-import {
-  ConflictError,
-  LockedError,
-  NotFoundError,
-  ValidationError,
-} from "@/server/errors";
+import { ConflictError, LockedError, ValidationError } from "@/server/errors";
 import { revokeOutstandingInvites } from "@/server/invites/invite-repository";
 import {
   type IssuedInvite,
   issueInviteFor,
 } from "@/server/invites/invite-service";
 import { isUniqueViolation } from "@/server/prisma-errors";
+import { existingUser } from "@/server/users/existing-user";
 import {
   findSuperAdmin,
   findUserByEmail,
-  findUserById,
   insertAdmin,
   insertSuperAdmin,
   listUsersWithPendingInvite,
@@ -117,12 +112,6 @@ export async function createUser(
 export async function listUsers(actor: Actor): Promise<UserListItem[]> {
   assertSuperAdmin(actor);
   return listUsersWithPendingInvite();
-}
-
-async function existingUser(id: string) {
-  const user = await findUserById(id);
-  if (!user) throw new NotFoundError();
-  return user;
 }
 
 /** A flag, never a delete; ends the user's sessions on their next request. */

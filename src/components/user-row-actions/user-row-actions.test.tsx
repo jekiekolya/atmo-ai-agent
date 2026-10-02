@@ -9,11 +9,7 @@ const toastAdd = vi.hoisted(() => vi.fn());
 vi.mock("@/lib/http/api-client", () => ({ apiRequest }));
 vi.mock("next/navigation", () => ({ useRouter: () => ({ refresh }) }));
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
-vi.mock("next-intl", () => ({
-  useTranslations: (namespace?: string) => (key: string) =>
-    namespace ? `${namespace}.${key}` : key,
-  useFormatter: () => ({ dateTime: () => "the date" }),
-}));
+vi.mock("next-intl", () => import("@/testing/next-intl-mock"));
 
 import { type RowUser, UserRowActions } from "./user-row-actions";
 

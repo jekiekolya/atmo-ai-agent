@@ -1,5 +1,6 @@
 import type { z } from "zod";
 
+import type { PairRule } from "@/lib/schemas/fields";
 import type { FieldErrors } from "@/server/errors";
 
 type Translate = (key: string) => string;
@@ -63,4 +64,10 @@ export function validateWith(schema: z.ZodType, t: Translate) {
     const result = schema.safeParse(value);
     return result.success ? null : t(result.error.issues[0].message);
   };
+}
+
+/** A Base UI `Field.Root validate` that checks a pair rule against another field's value. */
+export function validatePair(rule: PairRule, other: string, t: Translate) {
+  return (value: unknown, values: Record<string, unknown>): string | null =>
+    rule.holds(value, values[other]) ? null : t(rule.error);
 }

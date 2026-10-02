@@ -1,4 +1,4 @@
-import type { Role, User } from "@generated/client";
+import type { User } from "@generated/client";
 
 export type SessionClaims = {
   /** When the sign-in that created the session happened, in milliseconds. */
@@ -7,28 +7,27 @@ export type SessionClaims = {
 
 export type SessionPolicy = { absoluteLifetimeMs: number };
 
-export type SessionIdentity = {
-  role: Role;
-  firstName: string;
-  lastName: string;
-  email: string;
-};
-
-type SessionUser = Pick<
+export type SessionIdentity = Pick<
   User,
-  | "isActive"
-  | "role"
-  | "firstName"
-  | "lastName"
-  | "email"
-  | "passwordChangedAt"
-  | "signedOutAt"
+  "role" | "firstName" | "lastName" | "email"
 >;
+
+export type StoredSessionUser = SessionIdentity &
+  Pick<User, "isActive" | "passwordChangedAt" | "signedOutAt">;
+
+export function identityOf(user: SessionIdentity): SessionIdentity {
+  return {
+    role: user.role,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+  };
+}
 
 /** null rejects; the rolling expiry is enforced earlier, by the cookie itself. */
 export function evaluateSession(
   claims: SessionClaims,
-  user: SessionUser | null,
+  user: StoredSessionUser | null,
   now: Date,
   policy: SessionPolicy,
 ): SessionIdentity | null {
@@ -41,10 +40,5 @@ export function evaluateSession(
   if (issuedBefore(user.signedOutAt)) return null;
   if (now.getTime() - claims.authTime > policy.absoluteLifetimeMs) return null;
 
-  return {
-    role: user.role,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-  };
+  return identityOf(user);
 }

@@ -3,14 +3,11 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 
 const toastAdd = vi.hoisted(() => vi.fn());
+const formatInstant = vi.hoisted(() => vi.fn(() => "the instant"));
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
-vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string, values?: Record<string, unknown>) =>
-    values?.expiresAt ? `${key} ${values.expiresAt}` : key,
-}));
+vi.mock("next-intl", () => import("@/testing/next-intl-mock"));
 vi.mock("@/i18n/use-format-instant", () => ({
-  useFormatInstant: () => (value: Date, format: string) =>
-    `${value.toISOString()}|${format}`,
+  useFormatInstant: () => formatInstant,
 }));
 
 import { InviteLinkDialog } from "./invite-link-dialog";
@@ -33,12 +30,12 @@ describe("InviteLinkDialog (FR-042)", () => {
 
   it("states the expiry through the shared mechanism, as a date and time (FR-011)", async () => {
     render(<InviteLinkDialog invite={invite} onClose={() => {}} />);
+    await screen.findByLabelText("users.invite.linkLabel");
 
-    expect(
-      await screen.findByText(
-        "users.invite.description 2026-09-29T12:00:00.000Z|dateTime",
-      ),
-    ).toBeInTheDocument();
+    expect(formatInstant).toHaveBeenCalledWith(
+      new Date("2026-09-29T12:00:00.000Z"),
+      "dateTime",
+    );
   });
 
   it("copies the link and confirms with a notification", async () => {

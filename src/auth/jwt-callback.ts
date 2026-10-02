@@ -3,23 +3,11 @@ import type { JWT } from "next-auth/jwt";
 import {
   evaluateSession,
   type SessionPolicy,
+  type StoredSessionUser,
 } from "@/server/auth/session-policy";
-import type { User } from "@/server/users/user-repository";
-
-type SessionUser = Pick<
-  User,
-  | "id"
-  | "email"
-  | "firstName"
-  | "lastName"
-  | "role"
-  | "isActive"
-  | "passwordChangedAt"
-  | "signedOutAt"
->;
 
 export type JwtCallbackDeps = {
-  findUser: (id: string) => Promise<SessionUser | null>;
+  findUser: (id: string) => Promise<StoredSessionUser | null>;
   now: () => Date;
   policy: SessionPolicy;
 };
