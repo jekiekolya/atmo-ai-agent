@@ -816,7 +816,8 @@ Accepted limitations, recorded so they are found here rather than discovered lat
   not redirect signed-in visitors.
 - **Times are shown in UTC.** Creation dates and link expiry times follow feature 001's fixed UTC time
   zone; showing each viewer's own zone is outside this feature, as it is outside 001. Where a time of
-  day is shown (link expiry), its zone is shown with it.
+  day is shown (link expiry), its zone is shown with it. Superseded by feature 004: times are shown
+  in the reader's zone, and in labelled UTC until it is known.
 - **Timing uniformity** means no difference an observer could use to learn whether an account exists;
   the plan chooses how to achieve it.
 
