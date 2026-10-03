@@ -1,6 +1,6 @@
-import { defineRoute } from "@/lib/http/define-route";
-import { userIdFrom } from "@/lib/http/params";
-import { created, noContent } from "@/lib/http/route-response";
+import { defineRoute } from "@/lib/http/server/define-route";
+import { userIdFrom } from "@/lib/http/server/params";
+import { created, noContent } from "@/lib/http/server/route-response";
 import { PAGES, pathTo } from "@/lib/routes";
 import { issueInvite, revokeInvite } from "@/server/invites/invite-service";
 

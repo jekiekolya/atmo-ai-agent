@@ -95,9 +95,10 @@ the Back-after-sign-out test.
 
 ```
 src/app/            App Router routes and layouts
-src/components/     one folder per component (see below)
+src/components/     domain groups, one folder per component inside (see below)
 src/components/ui/  shadcn/ui primitives (owned code — edit in place)
 src/config/         the single Config module
+src/conventions/    repo-wide checks that scan source files rather than test one module
 .specify/           constitution, spec templates, spec-kit scripts
 ```
 
@@ -108,14 +109,17 @@ component and its colocated test, even when that is only two files — uniform s
 per-component judgement call:
 
 ```
-src/components/locale-switcher/
+src/components/shell/locale-switcher/
 ├── locale-switcher.tsx
 └── locale-switcher.test.tsx
 ```
 
 Name the file in full rather than `index.tsx`: it stays greppable and the editor does not fill with
 identical tabs. Import from the file, not through a barrel — barrel re-exports cost compile time and
-defeat tree-shaking. Group folders by domain (`chat/`, `tickets/`) once a directory gets crowded.
+defeat tree-shaking. Component folders sit in domain groups (`shell/`, `account/`, `users/`), not
+type groups: a form lives with its domain, and only the parts every form shares sit in `form-kit/`. A
+new component joins its domain's group or starts one (`chat/`, `tickets/`), and a group that gets
+crowded splits the same way.
 
 `src/components/ui/` and the folder the assistant-ui registry installs into are the exceptions and
 stay flat: the shadcn CLI writes those paths, and rearranging them after every `shadcn add` would

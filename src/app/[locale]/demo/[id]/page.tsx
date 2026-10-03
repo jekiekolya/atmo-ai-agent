@@ -1,6 +1,6 @@
 import { getFormatter, getTranslations } from "next-intl/server";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/components/shell/app-shell/app-shell";
 import { DemoOpenedAt } from "@/components/demo-opened-at/demo-opened-at";
 
 // Stand-in for data a real case would carry. Fixed values so the rendering is

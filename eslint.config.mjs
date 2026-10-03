@@ -90,6 +90,38 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    files: ["src/components/**/*.{ts,tsx}", "src/lib/http/client/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/lib/http/server/*"],
+              message: "Route-handler helpers stay out of browser code.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    files: ["src/app/api/**/*.ts", "src/lib/http/server/**/*.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["@/lib/http/client/*"],
+              message: "Browser helpers stay out of route handlers.",
+            },
+          ],
+        },
+      ],
+    },
+  },
   // Last, so it wins: turns off every rule Prettier already owns.
   prettier,
   // Override default ignores of eslint-config-next.
