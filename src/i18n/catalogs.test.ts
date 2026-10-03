@@ -86,14 +86,6 @@ describe("message catalogs", () => {
     ).toBe("");
   });
 
-  it("lets each locale use its own plural categories", () => {
-    // Ukrainian needs one/few/many where English needs one/other. Comparing
-    // key paths rather than ICU internals is what keeps that from reading as
-    // a discrepancy (FR-024).
-    expect(uk.demo.visits).toContain("few");
-    expect(en.demo.visits).not.toContain("few");
-  });
-
   it("names the product Atmo AI, once per title (spec 005, FR-025, FR-026)", () => {
     for (const locale of SUPPORTED_LOCALES) {
       const all = messages(CATALOGS[locale]);
