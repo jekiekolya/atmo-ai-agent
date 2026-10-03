@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/components/shell/app-shell/app-shell";
 import { Link } from "@/i18n/navigation";
 
 export default function NotFound() {

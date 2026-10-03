@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
-import { LocaleSwitcher } from "@/components/locale-switcher/locale-switcher";
-import { ThemeToggle } from "@/components/theme-toggle/theme-toggle";
+import { LocaleSwitcher } from "@/components/shell/locale-switcher/locale-switcher";
+import { ThemeToggle } from "@/components/shell/theme-toggle/theme-toggle";
 
 export function AppShell({
   logo,

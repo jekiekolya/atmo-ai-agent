@@ -5,13 +5,13 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-import { FormAlert } from "@/components/form-alert/form-alert";
-import { useFormFailure } from "@/components/form-alert/use-form-failure";
+import { FormAlert } from "@/components/form-kit/form-alert/form-alert";
+import { useFormFailure } from "@/components/form-kit/form-alert/use-form-failure";
 import {
   InviteLinkDialog,
   type ShownInvite,
-} from "@/components/invite-link-dialog/invite-link-dialog";
-import { SubmitButton } from "@/components/submit-button/submit-button";
+} from "@/components/users/invite-link-dialog/invite-link-dialog";
+import { SubmitButton } from "@/components/form-kit/submit-button/submit-button";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

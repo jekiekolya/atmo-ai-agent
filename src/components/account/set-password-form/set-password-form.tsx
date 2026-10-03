@@ -4,10 +4,10 @@ import { Form } from "@base-ui/react/form";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { FormAlert } from "@/components/form-alert/form-alert";
-import { useFormFailure } from "@/components/form-alert/use-form-failure";
-import { NewPasswordFields } from "@/components/new-password-fields/new-password-fields";
-import { SubmitButton } from "@/components/submit-button/submit-button";
+import { FormAlert } from "@/components/form-kit/form-alert/form-alert";
+import { useFormFailure } from "@/components/form-kit/form-alert/use-form-failure";
+import { NewPasswordFields } from "@/components/account/new-password-fields/new-password-fields";
+import { SubmitButton } from "@/components/form-kit/submit-button/submit-button";
 import { apiRequest } from "@/lib/http/api-client";
 import { hardNavigate } from "@/lib/http/hard-navigate";
 import { API_ROUTES, PAGES } from "@/lib/routes";

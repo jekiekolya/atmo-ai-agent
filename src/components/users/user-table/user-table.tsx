@@ -14,7 +14,7 @@ import {
 import {
   type RowUser,
   UserRowActions,
-} from "@/components/user-row-actions/user-row-actions";
+} from "@/components/users/user-row-actions/user-row-actions";
 import { useFormatInstant } from "@/i18n/use-format-instant";
 
 export type UserTableRow = {

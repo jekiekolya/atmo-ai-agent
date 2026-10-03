@@ -5,8 +5,8 @@ import { signIn, type SignInResponse } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
-import { FormAlert } from "@/components/form-alert/form-alert";
-import { SubmitButton } from "@/components/submit-button/submit-button";
+import { FormAlert } from "@/components/form-kit/form-alert/form-alert";
+import { SubmitButton } from "@/components/form-kit/submit-button/submit-button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";

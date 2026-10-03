@@ -16,7 +16,7 @@ vi.mock("@/i18n/use-format-instant", () => ({
   useFormatInstant: () => (value: Date, format: string) =>
     `${value.toISOString()}|${format}`,
 }));
-vi.mock("@/components/user-row-actions/user-row-actions", () => ({
+vi.mock("@/components/users/user-row-actions/user-row-actions", () => ({
   UserRowActions: ({ user }: { user: { name: string } }) => (
     <span>actions for {user.name}</span>
   ),

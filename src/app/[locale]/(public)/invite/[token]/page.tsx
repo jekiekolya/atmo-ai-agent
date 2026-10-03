@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
-import { BrandLogo } from "@/components/brand-logo/brand-logo";
-import { SetPasswordForm } from "@/components/set-password-form/set-password-form";
+import { BrandLogo } from "@/components/shell/brand-logo/brand-logo";
+import { SetPasswordForm } from "@/components/account/set-password-form/set-password-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Card,

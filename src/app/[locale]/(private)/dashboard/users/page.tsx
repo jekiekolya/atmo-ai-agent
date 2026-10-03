@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { requireSuperAdmin } from "@/auth/dal";
-import { CreateUserForm } from "@/components/create-user-form/create-user-form";
-import { NotPermitted } from "@/components/not-permitted/not-permitted";
-import { UserTable } from "@/components/user-table/user-table";
+import { CreateUserForm } from "@/components/users/create-user-form/create-user-form";
+import { NotPermitted } from "@/components/shell/not-permitted/not-permitted";
+import { UserTable } from "@/components/users/user-table/user-table";
 import { listUsers } from "@/server/users/user-service";
 
 export async function generateMetadata(): Promise<Metadata> {

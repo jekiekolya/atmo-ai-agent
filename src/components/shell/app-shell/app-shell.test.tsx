@@ -1,10 +1,10 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
-vi.mock("@/components/theme-toggle/theme-toggle", () => ({
+vi.mock("@/components/shell/theme-toggle/theme-toggle", () => ({
   ThemeToggle: () => <button type="button">theme</button>,
 }));
-vi.mock("@/components/locale-switcher/locale-switcher", () => ({
+vi.mock("@/components/shell/locale-switcher/locale-switcher", () => ({
   LocaleSwitcher: () => <button type="button">locale</button>,
 }));
 

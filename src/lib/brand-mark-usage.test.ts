@@ -7,8 +7,8 @@ import { describe, expect, it } from "vitest";
 const ALLOWED = new Set([
   "src/app/globals.css",
   "src/app/icon.svg",
-  "src/components/brand-logo/atmo-ai-logo.svg",
-  "src/components/page-loader/page-loader.tsx",
+  "src/components/shell/brand-logo/atmo-ai-logo.svg",
+  "src/components/shell/page-loader/page-loader.tsx",
 ]);
 
 const SCANNED = /\.(ts|tsx|css|svg|json)$/;

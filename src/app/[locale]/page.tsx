@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/components/shell/app-shell/app-shell";
 import { Link } from "@/i18n/navigation";
 import { PAGES, pathTo } from "@/lib/routes";
 

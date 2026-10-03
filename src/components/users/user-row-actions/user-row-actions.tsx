@@ -8,7 +8,7 @@ import { useState } from "react";
 import {
   InviteLinkDialog,
   type ShownInvite,
-} from "@/components/invite-link-dialog/invite-link-dialog";
+} from "@/components/users/invite-link-dialog/invite-link-dialog";
 import {
   AlertDialog,
   AlertDialogAction,
