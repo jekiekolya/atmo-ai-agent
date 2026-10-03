@@ -87,6 +87,9 @@ separators, currency placement, and the count-dependent phrase to follow each la
 with identical underlying values. Ukrainian plural forms must be correct for counts taking `one`,
 `few`, and `many`.
 
+Superseded 2026-10-03: the demo route is removed (spec FR-028), and no real screen shows these values
+yet.
+
 ## Scenario 6 — The gates actually bite (US3, FR-020, FR-021)
 
 Deliberately break each gate and confirm the failure, then revert:
