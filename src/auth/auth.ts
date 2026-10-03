@@ -4,6 +4,7 @@ import Credentials from "next-auth/providers/credentials";
 import { secureCookiesFor } from "@/auth/cookie-policy";
 import { jwtCallback } from "@/auth/jwt-callback";
 import { config } from "@/config";
+import { AUTH_BASE_PATH } from "@/lib/routes";
 import { signInSchema } from "@/lib/schemas/sign-in";
 import { authenticate } from "@/server/auth/authenticate";
 import { identityOf } from "@/server/auth/session-policy";
@@ -13,7 +14,7 @@ import { findUserById } from "@/server/users/user-repository";
 export const { handlers, auth, signIn, signOut } = NextAuth({
   secret: config.authSecret,
   trustHost: true,
-  basePath: "/api/auth",
+  basePath: AUTH_BASE_PATH,
   useSecureCookies: secureCookiesFor(config),
   session: { strategy: "jwt", maxAge: config.sessionMaxAgeSeconds },
   providers: [

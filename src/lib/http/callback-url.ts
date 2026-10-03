@@ -1,10 +1,12 @@
+import { PAGES } from "@/lib/routes";
+
 const DUMMY_ORIGIN = "http://callback.invalid";
 
 export function safeCallbackUrl(
   value: string | null | undefined,
   locale: string,
 ): string {
-  const fallback = `/${locale}/dashboard`;
+  const fallback = `/${locale}${PAGES.dashboard}`;
   if (!value || !value.startsWith("/") || value.startsWith("//"))
     return fallback;
   if (value.startsWith("/\\")) return fallback;
@@ -27,5 +29,5 @@ export function signInUrlFor(location: {
 }): string {
   const locale = location.pathname.split("/")[1];
   const callbackUrl = encodeURIComponent(location.pathname + location.search);
-  return `/${locale}/sign-in?callbackUrl=${callbackUrl}`;
+  return `/${locale}${PAGES.signIn}?callbackUrl=${callbackUrl}`;
 }

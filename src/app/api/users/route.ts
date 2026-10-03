@@ -1,5 +1,6 @@
 import { defineRoute } from "@/lib/http/define-route";
 import { created } from "@/lib/http/route-response";
+import { PAGES, pathTo } from "@/lib/routes";
 import { createUserSchema } from "@/lib/schemas/create-user";
 import { createUser } from "@/server/users/user-service";
 
@@ -11,7 +12,10 @@ export const POST = defineRoute({
     // No language segment: the invitee's own resolution applies (FR-043).
     return created({
       user,
-      invite: { path: `/invite/${invite.token}`, expiresAt: invite.expiresAt },
+      invite: {
+        path: pathTo(PAGES.invite, { token: invite.token }),
+        expiresAt: invite.expiresAt,
+      },
     });
   },
 });

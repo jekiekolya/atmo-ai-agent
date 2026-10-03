@@ -5,11 +5,12 @@ import { useEffect } from "react";
 
 import { signInUrlFor } from "@/lib/http/callback-url";
 import { hardNavigate } from "@/lib/http/hard-navigate";
+import { API_ROUTES } from "@/lib/routes";
 
 // Not getSession(): it reports a failed request as no session, and a dropped connection is not a sign-out.
 async function isRefused(): Promise<boolean> {
   try {
-    const response = await fetch("/api/auth/session", { cache: "no-store" });
+    const response = await fetch(API_ROUTES.session, { cache: "no-store" });
     return response.ok && (await response.json()) === null;
   } catch {
     return false;

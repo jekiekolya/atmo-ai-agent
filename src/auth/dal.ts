@@ -4,6 +4,7 @@ import { cache } from "react";
 import { auth } from "@/auth/auth";
 import { resolveLocale } from "@/i18n/locales";
 import { redirect } from "@/i18n/navigation";
+import { PAGES } from "@/lib/routes";
 import { identityOf, type SessionIdentity } from "@/server/auth/session-policy";
 
 export type SessionUser = SessionIdentity & { id: string };
@@ -24,7 +25,7 @@ export async function verifySession(): Promise<SessionUser> {
   if (user) return user;
 
   return redirect({
-    href: "/sign-in",
+    href: PAGES.signIn,
     locale: resolveLocale(await localeParam()),
   });
 }

@@ -6,6 +6,7 @@ import { AppShell } from "@/components/app-shell/app-shell";
 import { BrandLogo } from "@/components/brand-logo/brand-logo";
 import { SessionKeepAlive } from "@/components/session-keep-alive/session-keep-alive";
 import { Link } from "@/i18n/navigation";
+import { PAGES } from "@/lib/routes";
 
 // Layouts don't re-render, so every page re-checks; no Suspense above this check (R8, R17).
 export default async function PrivateLayout({
@@ -23,7 +24,7 @@ export default async function PrivateLayout({
       <SessionKeepAlive />
       <AppShell
         logo={
-          <Link href="/dashboard" className="rounded-sm">
+          <Link href={PAGES.dashboard} className="rounded-sm">
             <BrandLogo className="h-6 w-auto" />
           </Link>
         }
@@ -32,10 +33,10 @@ export default async function PrivateLayout({
             aria-label={t("shell.navLabel")}
             className="flex gap-4 text-sm whitespace-nowrap"
           >
-            <Link href="/dashboard">{t("shell.home")}</Link>
-            <Link href="/dashboard/account">{t("shell.account")}</Link>
+            <Link href={PAGES.dashboard}>{t("shell.home")}</Link>
+            <Link href={PAGES.account}>{t("shell.account")}</Link>
             {user.role === "SUPER_ADMIN" && (
-              <Link href="/dashboard/users">{t("shell.users")}</Link>
+              <Link href={PAGES.users}>{t("shell.users")}</Link>
             )}
           </nav>
         }

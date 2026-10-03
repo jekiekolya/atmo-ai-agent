@@ -14,6 +14,7 @@ import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/api-client";
 import { validateWith } from "@/lib/http/form-errors";
 import { hardNavigate } from "@/lib/http/hard-navigate";
+import { API_ROUTES, PAGES } from "@/lib/routes";
 import { changePasswordSchema } from "@/lib/schemas/change-password";
 
 export function ChangePasswordForm() {
@@ -29,7 +30,7 @@ export function ChangePasswordForm() {
     setPending(true);
     failure.clearAlert();
 
-    const result = await apiRequest("PUT", "/api/account/password", {
+    const result = await apiRequest("PUT", API_ROUTES.password, {
       currentPassword: values.currentPassword,
       newPassword: values.newPassword,
       confirmPassword: values.confirmPassword,
@@ -37,7 +38,7 @@ export function ChangePasswordForm() {
 
     if (result.ok) {
       // Signed out everywhere, this device included (FR-057).
-      hardNavigate(`/${locale}/sign-in?notice=password-changed`);
+      hardNavigate(`/${locale}${PAGES.signIn}?notice=password-changed`);
       return;
     }
 
