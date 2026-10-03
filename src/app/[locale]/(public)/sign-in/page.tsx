@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { getSessionUser } from "@/auth/dal";
+import { BrandLogo } from "@/components/brand-logo/brand-logo";
 import { SignInForm } from "@/components/sign-in-form/sign-in-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -51,6 +52,7 @@ export default async function SignInPage({
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-4 p-4 sm:p-8">
+      <BrandLogo className="mx-auto h-10 w-auto" />
       {notice && (
         <Alert>
           <AlertDescription>{t(`notice.${notice}`)}</AlertDescription>

@@ -37,6 +37,16 @@ function dateArguments(value: unknown, prefix = ""): string[] {
   );
 }
 
+/** Every message in a catalog, with its key path. */
+function messages(value: unknown, prefix = ""): [string, string][] {
+  if (typeof value === "string") return [[prefix, value]];
+  if (typeof value !== "object" || value === null) return [];
+
+  return Object.entries(value as Record<string, unknown>).flatMap(
+    ([key, child]) => messages(child, prefix ? `${prefix}.${key}` : key),
+  );
+}
+
 describe("message catalogs", () => {
   it("ships a catalog for every supported locale", () => {
     // A locale added to the constant without its catalog fails here rather
@@ -82,6 +92,37 @@ describe("message catalogs", () => {
     // a discrepancy (FR-024).
     expect(uk.demo.visits).toContain("few");
     expect(en.demo.visits).not.toContain("few");
+  });
+
+  it("names the product Atmo AI, once per title (spec 005, FR-025, FR-026)", () => {
+    for (const locale of SUPPORTED_LOCALES) {
+      const all = messages(CATALOGS[locale]);
+      const byPath = new Map(all);
+
+      expect(
+        all
+          .filter(([, text]) => /Atmo(?! AI)/.test(text))
+          .map(([path]) => path),
+        `${locale}: the product is "Atmo AI"`,
+      ).toEqual([]);
+
+      const template = byPath.get("common.titleTemplate") ?? "";
+      expect(template, `${locale}: common.titleTemplate`).toContain("%s");
+      expect(template, `${locale}: common.titleTemplate`).toMatch(/— Atmo AI$/);
+
+      // The template supplies the name, so a page title that repeats it would read "… — Atmo AI — Atmo AI".
+      expect(
+        all
+          .filter(
+            ([path, text]) =>
+              path.endsWith(".metaTitle") &&
+              path !== "common.metaTitle" &&
+              text.includes("Atmo"),
+          )
+          .map(([path]) => path),
+        `${locale}: page titles leave the name to common.titleTemplate`,
+      ).toEqual([]);
+    }
   });
 
   it("formats no date or time itself, leaving that to useFormatInstant (spec 004, FR-015)", () => {

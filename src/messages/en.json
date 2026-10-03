@@ -1,7 +1,8 @@
 {
   "common": {
-    "appName": "Atmo",
-    "metaTitle": "Atmo — solar support",
+    "appName": "Atmo AI",
+    "metaTitle": "Atmo AI — solar support",
+    "titleTemplate": "%s — Atmo AI",
     "metaDescription": "Support for the customers of our solar-energy partners.",
     "fullName": "{firstName} {lastName}"
   },
@@ -88,9 +89,9 @@
   },
   "auth": {
     "signIn": {
-      "metaTitle": "Sign in — Atmo",
+      "metaTitle": "Sign in",
       "title": "Sign in",
-      "description": "Use the email address and password for your Atmo account.",
+      "description": "Use the email address and password for your Atmo AI account.",
       "email": "Email",
       "password": "Password",
       "submit": "Sign in",
@@ -113,7 +114,7 @@
     "users": "Users"
   },
   "dashboard": {
-    "metaTitle": "Home — Atmo",
+    "metaTitle": "Home",
     "title": "Welcome, {firstName}",
     "intro": "This is the staff area. More tools will appear here as they are added."
   },
@@ -125,7 +126,7 @@
     "close": "Close"
   },
   "invite": {
-    "metaTitle": "Set your password — Atmo",
+    "metaTitle": "Set your password",
     "title": "Set your password",
     "account": "This link sets the password for {email}.",
     "password": "New password",
@@ -143,7 +144,7 @@
     "description": "Your account doesn't have access to this page."
   },
   "users": {
-    "metaTitle": "Users — Atmo",
+    "metaTitle": "Users",
     "title": "Users",
     "create": {
       "open": "Create user",
@@ -206,7 +207,7 @@
     }
   },
   "account": {
-    "metaTitle": "Account — Atmo",
+    "metaTitle": "Account",
     "title": "Account",
     "changePassword": "Change password",
     "changePasswordHint": "You'll be signed out everywhere and asked to sign in with the new password.",
@@ -218,5 +219,8 @@
     "pending": "Changing…",
     "currentPasswordWrong": "The current password is incorrect.",
     "locked": "Too many failed attempts. Please try again in a few minutes."
+  },
+  "loader": {
+    "label": "Loading…"
   }
 }

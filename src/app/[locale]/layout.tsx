@@ -1,7 +1,7 @@
 import { NextIntlClientProvider } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { ThemeProvider } from "next-themes";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Roboto } from "next/font/google";
 import type { Metadata } from "next";
 
 import { Toaster } from "@/components/ui/toast";
@@ -10,14 +10,11 @@ import { DEFAULT_THEME_PREFERENCE, THEME_STORAGE_KEY } from "@/lib/theme";
 
 import "../globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// "optional" never swaps after first paint, so text cannot shift (spec 005, FR-015).
+const roboto = Roboto({
+  variable: "--font-roboto",
   subsets: ["latin", "cyrillic"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin", "cyrillic"],
+  display: "optional",
 });
 
 // The root layout: `app/layout.tsx` is deliberately absent so `<html lang>`
@@ -32,7 +29,10 @@ export const dynamicParams = false;
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("common");
 
-  return { title: t("metaTitle"), description: t("metaDescription") };
+  return {
+    title: { template: t("titleTemplate"), default: t("metaTitle") },
+    description: t("metaDescription"),
+  };
 }
 
 export default async function LocaleLayout({
@@ -45,7 +45,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${roboto.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <body className="flex min-h-full flex-col">

@@ -222,7 +222,7 @@ change the appearance and confirm both the language and the current page are unc
 
 - **FR-020**: The server MUST render a generic default appearance, and the resolved appearance MUST be applied to the document before the browser's first paint — so that no direct visit and no reload shows a frame of the wrong appearance.
 - **FR-021**: The document's colour-scheme MUST follow the active appearance, so that native scrollbars, form controls, and browser chrome match rather than contrast with the page.
-- **FR-022**: This feature MUST NOT add, remove, or change any colour token, and MUST NOT edit the existing palette; the dark styling already present in the stylesheet is used unchanged.
+- **FR-022**: This feature MUST NOT add, remove, or change any colour token, and MUST NOT edit the existing palette; the dark styling already present in the stylesheet is used unchanged. Superseded for the palette values by feature 005 (`specs/005-atmo-brand/`).
 - **FR-023**: No route may lose static prerendering as a result of this feature, and the locale middleware and its cookie handling MUST be untouched.
 
 **Copy and configuration**
