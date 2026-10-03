@@ -76,9 +76,9 @@ test.describe("with a stored preference", () => {
 test("a deep unprefixed path keeps its segments and query", async ({
   page,
 }) => {
-  await page.goto("/demo/42?tab=notes");
+  await page.goto("/invite/abc?tab=notes");
 
-  await expect(page).toHaveURL(/\/(en|uk)\/demo\/42\?tab=notes$/);
+  await expect(page).toHaveURL(/\/(en|uk)\/invite\/abc\?tab=notes$/);
 });
 
 test("the negotiation redirect is never cached", async ({ request }) => {
@@ -102,7 +102,7 @@ test.describe("an unmatched path inside a locale", () => {
     ["en", "Page not found"],
   ] as const) {
     test(`renders the not-found page in ${locale}`, async ({ page }) => {
-      const response = await page.goto(`/${locale}/demo`);
+      const response = await page.goto(`/${locale}/invite`);
 
       expect(response?.status()).toBe(404);
       await expect(page.locator("html")).toHaveAttribute("lang", locale);
