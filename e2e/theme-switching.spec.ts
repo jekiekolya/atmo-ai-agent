@@ -85,7 +85,7 @@ test.describe("a visitor who pins an appearance (US2)", () => {
     await page.reload();
     await expect(html(page)).toHaveClass(DARK);
 
-    await page.goto("/en/demo/42");
+    await page.goto("/en/invite/abc");
     await expect(html(page)).toHaveClass(DARK);
   });
 
@@ -250,14 +250,14 @@ test.describe("appearance and language are independent (US4)", () => {
     page,
   }) => {
     await page.emulateMedia({ colorScheme: "light" });
-    await page.goto("/uk/demo/42?tab=notes");
+    await page.goto("/uk/invite/abc?tab=notes");
     const heading = await page.getByRole("heading", { level: 1 }).textContent();
 
     await toggle(page, LABEL_UK).click();
 
     await expect(html(page)).toHaveClass(DARK);
     await expect(html(page)).toHaveAttribute("lang", "uk");
-    await expect(page).toHaveURL(/\/uk\/demo\/42\?tab=notes$/);
+    await expect(page).toHaveURL(/\/uk\/invite\/abc\?tab=notes$/);
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       heading ?? "",
     );

@@ -194,7 +194,8 @@ automated check fails and names the location; remove it and confirm the check pa
   - the pending-invite expiry in the users table;
   - the invite expiry in the invite link dialog;
   - the opened-at date on the demo case page, which today is fixed when the page is produced on the
-    server and MUST instead follow the same rules as the others.
+    server and MUST instead follow the same rules as the others. Superseded 2026-10-03: the page is
+    removed (feature 001, FR-028).
 - **FR-012**: Date-only values MUST be shown as the calendar day of the instant in the display zone,
   even where that differs from the UTC day.
 - **FR-013**: Conversion MUST use the zone's offset in effect at the displayed instant, including
@@ -232,6 +233,8 @@ automated check fails and names the location; remove it and confirm the check pa
   label, on: the users table (creation date and pending-invite expiry), the invite link dialog, and the
   demo case page. The same coverage MUST confirm that none of those pages reports a rendering mismatch
   in the browser console.
+  Superseded 2026-10-03: the demo case page is removed, and its coverage with it, as the Assumptions
+  anticipate.
 - **FR-021**: Component-level coverage MUST show, for the shared mechanism, both states: zone known
   (local value, no label) and zone unknown (UTC value, labelled).
 

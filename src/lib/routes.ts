@@ -3,7 +3,6 @@
 /** Without the locale segment: next-intl's Link and redirect add it. */
 export const PAGES = {
   home: "/",
-  demo: "/demo/[id]",
   signIn: "/sign-in",
   invite: "/invite/[token]",
   dashboard: "/dashboard",

@@ -134,18 +134,4 @@ test.describe("read in Europe/Kyiv", () => {
     await expect(dialog).not.toContainText("UTC");
     expect(issues).toEqual([]);
   });
-
-  test("the demo page shows the opened date in the reader's zone (FR-011)", async ({
-    page,
-  }) => {
-    const issues = collectIssues(page);
-
-    await page.goto("/en/demo/1");
-    await page.waitForLoadState("networkidle");
-
-    await expect(page.getByTestId("opened-at")).toHaveText(
-      "Opened Mar 15, 2026",
-    );
-    expect(issues).toEqual([]);
-  });
 });

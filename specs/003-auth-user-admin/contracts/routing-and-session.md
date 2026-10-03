@@ -4,14 +4,14 @@
 
 ## Addresses
 
-| Address                                        | Group       | Access                                                                                     |
-| ---------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
-| `/{l}` · `/{l}/demo/{id}` · unmatched `/{l}/…` | existing    | public, unchanged (FR-038, FR-065)                                                         |
-| `/{l}/sign-in`                                 | `(public)`  | public; signed-in visitors are redirected to `/{l}/dashboard` **by the page** (FR-031, R4) |
-| `/{l}/invite/{token}`                          | `(public)`  | public; `referrer: no-referrer` metadata (FR-043)                                          |
-| `/{l}/dashboard`                               | `(private)` | any signed-in user — protected home                                                        |
-| `/{l}/dashboard/account`                       | `(private)` | any signed-in user — change password                                                       |
-| `/{l}/dashboard/users`                         | `(private)` | super admin; an admin gets the localized `NotPermitted` view (FR-037)                      |
+| Address                     | Group       | Access                                                                                     |
+| --------------------------- | ----------- | ------------------------------------------------------------------------------------------ |
+| `/{l}` · unmatched `/{l}/…` | existing    | public, unchanged (FR-038, FR-065)                                                         |
+| `/{l}/sign-in`              | `(public)`  | public; signed-in visitors are redirected to `/{l}/dashboard` **by the page** (FR-031, R4) |
+| `/{l}/invite/{token}`       | `(public)`  | public; `referrer: no-referrer` metadata (FR-043)                                          |
+| `/{l}/dashboard`            | `(private)` | any signed-in user — protected home                                                        |
+| `/{l}/dashboard/account`    | `(private)` | any signed-in user — change password                                                       |
+| `/{l}/dashboard/users`      | `(private)` | super admin; an admin gets the localized `NotPermitted` view (FR-037)                      |
 
 An invite link is issued without a language segment (`/invite/{token}`). 001's proxy redirects it to
 the invitee's resolved language, with the token path intact (FR-043).
@@ -92,5 +92,5 @@ R8).
 - No response from the proxy carries `Set-Cookie`. The auth redirect adds none, and the language
   cookie stays stripped (001 FR-030).
 - Every redirect the proxy emits is `no-store` (001 FR-031 and this feature's FR-030).
-- 001's e2e addresses (`/`, `/{l}`, `/{l}/demo/42`, `/{l}/whatever`, `/demo/42?tab=notes`) never meet
-  the auth step's redirect.
+- 001's e2e addresses (`/`, `/{l}`, `/{l}/whatever`, and since the demo route's removal on 2026-10-03
+  `/{l}/invite/abc` and `/invite/abc?tab=notes`) never meet the auth step's redirect.

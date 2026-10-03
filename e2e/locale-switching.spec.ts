@@ -73,7 +73,7 @@ test("a shared link does not overwrite the recipient's own choice", async ({
   await switchTo(page, "English");
   await expect(page).toHaveURL(/\/en$/);
 
-  await page.goto("/uk/demo/42");
+  await page.goto("/uk/invite/shared-token");
   await expect(page.locator("html")).toHaveAttribute("lang", "uk");
 
   const cookie = (await context.cookies(BASE)).find(
@@ -88,16 +88,18 @@ test("a shared link does not overwrite the recipient's own choice", async ({
 test("switching preserves a dynamic segment and the query string", async ({
   page,
 }) => {
-  // FR-013, the case the demonstration route exists for.
-  await page.goto("/uk/demo/42?tab=notes");
+  // FR-013.
+  await page.goto("/uk/invite/abc?tab=notes");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Звернення 42",
+    "Встановіть пароль",
   );
 
   await switchTo(page, "English");
 
-  await expect(page).toHaveURL(/\/en\/demo\/42\?tab=notes$/);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Case 42");
+  await expect(page).toHaveURL(/\/en\/invite\/abc\?tab=notes$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Set your password",
+  );
 });
 
 test("the switcher is operable by keyboard alone", async ({ page }) => {

@@ -206,7 +206,7 @@ conventions.
 **Demonstration surface**
 
 - **FR-027**: This feature MUST replace the application's current scaffolding text with a minimal but genuine localized shell — a welcome heading, a supporting line, and localized page metadata (title and description) — so that a language switch produces a visible, meaningful change in copy rather than a change in placeholder text.
-- **FR-028**: This feature MUST ship at least one nested route carrying a dynamic segment, reachable in every supported language, that renders a date, a decimal number, a monetary amount, and a count-dependent phrase. It exists so that FR-013, FR-023, and FR-024 are verifiable against a real shipped route; later features MAY replace it once real screens cover the same ground.
+- **FR-028**: This feature MUST ship at least one nested route carrying a dynamic segment, reachable in every supported language, that renders a date, a decimal number, a monetary amount, and a count-dependent phrase. It exists so that FR-013, FR-023, and FR-024 are verifiable against a real shipped route; later features MAY replace it once real screens cover the same ground. Superseded 2026-10-03: the route is removed. FR-013 is verified against the invite route (`/{l}/invite/{token}`), and the date in FR-023 against the users table and the invite link dialog. A decimal number, a monetary amount, and FR-024's count-dependent phrase are not verified until a real screen displays one.
 
 ### Mandated Implementation Constraints
 
