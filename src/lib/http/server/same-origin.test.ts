@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isSameOrigin } from "@/lib/http/same-origin";
+import { isSameOrigin } from "@/lib/http/server/same-origin";
 
 function request(headers: Record<string, string>) {
   return new Request("http://internal:3000/api/users", {

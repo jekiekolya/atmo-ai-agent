@@ -11,9 +11,9 @@ import { SubmitButton } from "@/components/form-kit/submit-button/submit-button"
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { useTranslateKey } from "@/i18n/use-translate-key";
-import { apiRequest } from "@/lib/http/api-client";
-import { validateWith } from "@/lib/http/form-errors";
-import { hardNavigate } from "@/lib/http/hard-navigate";
+import { apiRequest } from "@/lib/http/client/api-client";
+import { validateWith } from "@/lib/http/client/form-errors";
+import { hardNavigate } from "@/lib/http/client/hard-navigate";
 import { API_ROUTES, PAGES } from "@/lib/routes";
 import { changePasswordSchema } from "@/lib/schemas/change-password";
 

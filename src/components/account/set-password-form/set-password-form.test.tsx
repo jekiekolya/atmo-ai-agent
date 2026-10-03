@@ -6,8 +6,8 @@ const apiRequest = vi.hoisted(() => vi.fn());
 const hardNavigate = vi.hoisted(() => vi.fn());
 const toastAdd = vi.hoisted(() => vi.fn());
 
-vi.mock("@/lib/http/api-client", () => ({ apiRequest }));
-vi.mock("@/lib/http/hard-navigate", () => ({ hardNavigate }));
+vi.mock("@/lib/http/client/api-client", () => ({ apiRequest }));
+vi.mock("@/lib/http/client/hard-navigate", () => ({ hardNavigate }));
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
 vi.mock("next-intl", async () => ({
   ...(await import("@/testing/next-intl-mock")),

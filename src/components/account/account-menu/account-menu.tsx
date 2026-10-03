@@ -16,8 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
-import { apiRequest } from "@/lib/http/api-client";
-import { hardNavigate } from "@/lib/http/hard-navigate";
+import { apiRequest } from "@/lib/http/client/api-client";
+import { hardNavigate } from "@/lib/http/client/hard-navigate";
 import { API_ROUTES, PAGES } from "@/lib/routes";
 
 export function AccountMenu({ name }: { name: string }) {

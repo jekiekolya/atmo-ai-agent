@@ -8,8 +8,8 @@ import { FormAlert } from "@/components/form-kit/form-alert/form-alert";
 import { useFormFailure } from "@/components/form-kit/form-alert/use-form-failure";
 import { NewPasswordFields } from "@/components/account/new-password-fields/new-password-fields";
 import { SubmitButton } from "@/components/form-kit/submit-button/submit-button";
-import { apiRequest } from "@/lib/http/api-client";
-import { hardNavigate } from "@/lib/http/hard-navigate";
+import { apiRequest } from "@/lib/http/client/api-client";
+import { hardNavigate } from "@/lib/http/client/hard-navigate";
 import { API_ROUTES, PAGES } from "@/lib/routes";
 
 export function SetPasswordForm({ token }: { token: string }) {

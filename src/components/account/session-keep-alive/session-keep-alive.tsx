@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 import { signInUrlFor } from "@/lib/http/callback-url";
-import { hardNavigate } from "@/lib/http/hard-navigate";
+import { hardNavigate } from "@/lib/http/client/hard-navigate";
 import { API_ROUTES } from "@/lib/routes";
 
 // Not getSession(): it reports a failed request as no session, and a dropped connection is not a sign-out.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { KNOWN_DETAILS } from "@/lib/http/form-errors";
+import { KNOWN_DETAILS } from "@/lib/http/client/form-errors";
 import en from "@/messages/en.json";
 import { ERROR_CODES } from "@/server/errors";
 

@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
-import { routeFailure, toFormErrors } from "@/lib/http/form-errors";
+import { routeFailure, toFormErrors } from "@/lib/http/client/form-errors";
 
 type Failure = Parameters<typeof routeFailure>[0];
 

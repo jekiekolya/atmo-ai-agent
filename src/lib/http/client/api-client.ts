@@ -1,5 +1,5 @@
 import { signInUrlFor } from "@/lib/http/callback-url";
-import { hardNavigate } from "@/lib/http/hard-navigate";
+import { hardNavigate } from "@/lib/http/client/hard-navigate";
 import { API_ROUTES } from "@/lib/routes";
 import type { FieldErrors } from "@/server/errors";
 

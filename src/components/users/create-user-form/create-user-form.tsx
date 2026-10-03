@@ -31,8 +31,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useTranslateKey } from "@/i18n/use-translate-key";
-import { apiRequest } from "@/lib/http/api-client";
-import { validateWith } from "@/lib/http/form-errors";
+import { apiRequest } from "@/lib/http/client/api-client";
+import { validateWith } from "@/lib/http/client/form-errors";
 import { createUserSchema } from "@/lib/schemas/create-user";
 import { API_ROUTES } from "@/lib/routes";
 

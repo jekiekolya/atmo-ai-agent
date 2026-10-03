@@ -1,8 +1,8 @@
 import type { z } from "zod";
 
 import { getSessionUser, type SessionUser } from "@/auth/dal";
-import { errorResponse, fromZodError } from "@/lib/http/route-response";
-import { isSameOrigin } from "@/lib/http/same-origin";
+import { errorResponse, fromZodError } from "@/lib/http/server/route-response";
+import { isSameOrigin } from "@/lib/http/server/same-origin";
 import { DomainError, ValidationError } from "@/server/errors";
 
 type Params = Record<string, string | string[]>;

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { userIdFrom } from "@/lib/http/params";
+import { userIdFrom } from "@/lib/http/server/params";
 import { NotFoundError } from "@/server/errors";
 
 describe("userIdFrom", () => {

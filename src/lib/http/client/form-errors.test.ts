@@ -8,7 +8,7 @@ import {
   toFormErrors,
   validatePair,
   validateWith,
-} from "@/lib/http/form-errors";
+} from "@/lib/http/client/form-errors";
 import { confirmsPassword } from "@/lib/schemas/fields";
 
 const t = (key: string) => `T(${key})`;

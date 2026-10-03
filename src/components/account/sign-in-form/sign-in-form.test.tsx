@@ -7,7 +7,7 @@ const hardNavigate = vi.hoisted(() => vi.fn());
 const toastAdd = vi.hoisted(() => vi.fn());
 
 vi.mock("next-auth/react", () => ({ signIn }));
-vi.mock("@/lib/http/hard-navigate", () => ({ hardNavigate }));
+vi.mock("@/lib/http/client/hard-navigate", () => ({ hardNavigate }));
 vi.mock("@/components/ui/toast", () => ({ toast: { add: toastAdd } }));
 vi.mock("next-intl", () => import("@/testing/next-intl-mock"));
 

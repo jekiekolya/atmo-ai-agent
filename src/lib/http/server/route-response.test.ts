@@ -7,7 +7,7 @@ import {
   fromZodError,
   noContent,
   ok,
-} from "@/lib/http/route-response";
+} from "@/lib/http/server/route-response";
 import {
   ConflictError,
   ForbiddenError,

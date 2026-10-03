@@ -29,8 +29,8 @@ import {
 import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
-import { apiRequest } from "@/lib/http/api-client";
-import { errorMessageKey } from "@/lib/http/form-errors";
+import { apiRequest } from "@/lib/http/client/api-client";
+import { errorMessageKey } from "@/lib/http/client/form-errors";
 import { API_ROUTES, pathTo } from "@/lib/routes";
 
 export type RowUser = {

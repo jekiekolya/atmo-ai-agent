@@ -5,7 +5,7 @@ const hardNavigate = vi.hoisted(() => vi.fn());
 const pathname = vi.hoisted(() => ({ value: "/uk/dashboard" }));
 
 vi.mock("next/navigation", () => ({ usePathname: () => pathname.value }));
-vi.mock("@/lib/http/hard-navigate", () => ({ hardNavigate }));
+vi.mock("@/lib/http/client/hard-navigate", () => ({ hardNavigate }));
 
 import { SessionKeepAlive } from "./session-keep-alive";
 

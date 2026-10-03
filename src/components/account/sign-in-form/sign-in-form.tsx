@@ -11,8 +11,8 @@ import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
-import { validateWith } from "@/lib/http/form-errors";
-import { hardNavigate } from "@/lib/http/hard-navigate";
+import { validateWith } from "@/lib/http/client/form-errors";
+import { hardNavigate } from "@/lib/http/client/hard-navigate";
 import { signInSchema } from "@/lib/schemas/sign-in";
 
 export function SignInForm({ callbackUrl }: { callbackUrl: string }) {

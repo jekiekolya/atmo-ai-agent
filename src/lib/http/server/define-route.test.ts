@@ -6,8 +6,8 @@ import { ConflictError } from "@/server/errors";
 const getSessionUser = vi.fn();
 vi.mock("@/auth/dal", () => ({ getSessionUser: () => getSessionUser() }));
 
-const { defineRoute } = await import("@/lib/http/define-route");
-const { noContent, ok } = await import("@/lib/http/route-response");
+const { defineRoute } = await import("@/lib/http/server/define-route");
+const { noContent, ok } = await import("@/lib/http/server/route-response");
 
 const actor = {
   id: "u-1",
