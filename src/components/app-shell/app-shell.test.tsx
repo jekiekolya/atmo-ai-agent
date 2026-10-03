@@ -11,9 +11,10 @@ vi.mock("@/components/locale-switcher/locale-switcher", () => ({
 import { AppShell } from "./app-shell";
 
 describe("AppShell", () => {
-  it("renders one header holding the nav, the preferences and the account slot", () => {
+  it("renders one header holding the logo, the nav, the preferences and the account slot", () => {
     render(
       <AppShell
+        logo={<a href="#home">logo</a>}
         nav={<nav aria-label="Main">links</nav>}
         account={<button type="button">account</button>}
       >
@@ -23,6 +24,10 @@ describe("AppShell", () => {
 
     const headers = screen.getAllByRole("banner");
     expect(headers).toHaveLength(1);
+    // The logo comes first (spec 005, FR-021).
+    expect(headers[0].firstElementChild).toContainElement(
+      screen.getByRole("link", { name: "logo" }),
+    );
     const header = within(headers[0]);
     expect(
       header.getByRole("navigation", { name: "Main" }),
@@ -35,7 +40,7 @@ describe("AppShell", () => {
     ).toBeInTheDocument();
   });
 
-  it("renders only the preferences when there is no nav or account", () => {
+  it("renders only the preferences when there is no logo, nav or account", () => {
     render(
       <AppShell>
         <p>content</p>
@@ -43,6 +48,7 @@ describe("AppShell", () => {
     );
 
     expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
+    expect(screen.queryByRole("link")).not.toBeInTheDocument();
     expect(
       within(screen.getByRole("banner")).getAllByRole("button"),
     ).toHaveLength(2);
