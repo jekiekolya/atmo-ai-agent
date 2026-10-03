@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { verifySession } from "@/auth/dal";
-import { ChangePasswordForm } from "@/components/change-password-form/change-password-form";
+import { ChangePasswordForm } from "@/components/account/change-password-form/change-password-form";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("account");

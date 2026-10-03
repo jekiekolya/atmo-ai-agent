@@ -1,10 +1,10 @@
 import { getTranslations } from "next-intl/server";
 
 import { verifySession } from "@/auth/dal";
-import { AccountMenu } from "@/components/account-menu/account-menu";
-import { AppShell } from "@/components/app-shell/app-shell";
-import { BrandLogo } from "@/components/brand-logo/brand-logo";
-import { SessionKeepAlive } from "@/components/session-keep-alive/session-keep-alive";
+import { AccountMenu } from "@/components/account/account-menu/account-menu";
+import { AppShell } from "@/components/shell/app-shell/app-shell";
+import { BrandLogo } from "@/components/shell/brand-logo/brand-logo";
+import { SessionKeepAlive } from "@/components/account/session-keep-alive/session-keep-alive";
 import { Link } from "@/i18n/navigation";
 import { PAGES } from "@/lib/routes";
 

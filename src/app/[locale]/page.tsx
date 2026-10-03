@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server";
 
-import { AppShell } from "@/components/app-shell/app-shell";
+import { AppShell } from "@/components/shell/app-shell/app-shell";
 
 export default async function Home() {
   const t = await getTranslations("home");
