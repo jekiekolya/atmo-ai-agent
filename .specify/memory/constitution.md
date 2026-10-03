@@ -3,18 +3,21 @@ SYNC IMPACT REPORT — latest first.
 
 ## 1.5.0 → 1.6.0 (2026-10-03)
 
-Technology Constraints: AI moves from the OpenAI Agents SDK to the Vercel AI SDK, with our own
-Prisma tables as the system of record for conversations (a framework may keep a copy alongside,
-and a customer's deletion reaches it); Database is
-reworded so parameterized raw SQL through Prisma is explicitly allowed and only a constant string
-may go through the `Unsafe` variants; a Chat UI entry admits assistant-ui (Base UI variants) as
-headless chat primitives, not a second component library. Governance: added "Proposing a change" —
-a better solution that needs a rule changed is raised with its trade-offs and decided by the
-developer. MINOR — guidance is replaced and expanded; no principle is removed or redefined.
-Mirrored in CLAUDE.md and README.md.
+Technology Constraints: AI moves from the OpenAI Agents SDK to the Vercel AI SDK; each provider
+package needs a stated reason in the feature plan, as a new recipient of customer data. Database is
+reworded: application code uses Prisma Client (over `@prisma/adapter-pg`) and never a driver of its
+own, tests and tooling that cannot load the client may connect directly, raw SQL goes through the
+parameterized tagged templates, and anything that puts text into SQL (`Unsafe`, `Prisma.raw`)
+carries only a constant. A Chat UI entry admits the three assistant-ui packages (Base UI variants)
+as headless chat primitives, not a second component library. Principle VI: our database is the one
+system of record for conversations — a framework may keep a copy alongside, and a customer's
+deletion reaches it. Governance: added "Proposing a change" — a better solution that needs a rule
+changed is raised with its trade-offs and decided by the developer. MINOR — guidance is replaced
+and expanded; no principle is removed or redefined. Mirrored in CLAUDE.md and README.md.
 
 Migration: none. No AI package is installed yet; the one `Unsafe` call (the integration-test
-truncate) runs a constant string.
+truncate) runs a constant string, and the e2e helpers' direct `pg` connection is tooling outside
+the application.
 
 ## 1.4.0 → 1.5.0 (2026-10-03)
 
@@ -192,6 +195,10 @@ The support agent is product code, not runtime configuration:
   like any other code. Model and prompt changes are never made only in a dashboard.
 - Every agent run is traceable: the conversation, the tool calls with their inputs and outcomes,
   and the final response are persisted so any answer given to a customer can be reconstructed.
+  Their one system of record is this application's own database, where tenant scoping, the
+  operator's view of a conversation, and deleting a customer's data live. An AI framework may keep
+  its own copy — memory, traces, evals — only alongside that record, never instead of it, and
+  deleting a customer's data reaches that copy too.
 - Agent tools are typed, least-privilege, and scoped to a single tenant. A tool MUST NOT be able
   to read or write data across the customer/partner boundary; tenant scoping is enforced in the
   data layer, not by prompt instruction.
@@ -248,38 +255,40 @@ The following stack is fixed. Replacing or adding a component at this layer is a
 amendment, not a feature decision:
 
 - **Framework**: Next.js (App Router) with TypeScript in `strict` mode.
-- **Database**: PostgreSQL. Application code reaches it only through Prisma Client — no second
-  driver, query builder, or ORM. Where Prisma's query API cannot express a query (a pgvector
-  similarity search, for example), raw SQL goes through Prisma's parameterized `$queryRaw` /
-  `$executeRaw` tagged templates or TypedSQL. The `Unsafe` variants run the string they are given,
-  so they may carry only a constant string — a value spliced into one is how SQL injection happens.
+- **Database**: PostgreSQL. Application code reaches it only through Prisma Client, which connects
+  through the `@prisma/adapter-pg` driver adapter; application code never imports `pg` or another
+  driver, query builder, or ORM itself. Tests and tooling outside the application MAY connect
+  directly where they cannot load the generated client (the Playwright setup, for example). Where
+  Prisma's query API cannot express a query (a pgvector similarity search, for example), raw SQL
+  goes through the `$queryRaw` / `$executeRaw` tagged templates or TypedSQL, which send every
+  interpolated value as a parameter. Anything that puts text into the SQL itself — the `Unsafe`
+  variants, `Prisma.raw` — carries only a constant string, picked from a fixed list when it must
+  vary (a sort column, for example): a value spliced into SQL text is how SQL injection happens.
   Schema changes ship as committed migrations — never `db push` against a shared environment, never
   hand-edited SQL out of band.
 - **AI**: Vercel AI SDK — `ai` for model calls, the tool loop, structured output, and streaming;
-  `@ai-sdk/react` for the chat client; one provider package per model provider in use. The provider
-  is swappable, but the model a production agent runs is fixed in code (Principle VI).
-  Conversations, tool calls, and responses have one system of record: this application's own
-  Prisma tables, where tenant scoping, the operator's view of a conversation, and deleting a
-  customer's data live. An AI framework may keep its own copy — memory, traces, evals — only
-  alongside that record, never instead of it, and deleting a customer's data reaches that copy too.
+  `@ai-sdk/react` for the chat client; a provider package for each model provider in use. The
+  provider is swappable, but the model a production agent runs is fixed in code, and conversations
+  keep their system of record in our database (Principle VI). Each provider package needs a stated
+  reason in the feature plan, like any runtime dependency: it is a new recipient of customer data.
 - **Styling**: Tailwind CSS. No parallel styling system (CSS-in-JS, ad-hoc global stylesheets).
 - **UI components**: shadcn/ui (Base UI primitives, vendored into the repo under
   `src/components/ui` via its CLI) is the single component baseline. No second component library —
   no MUI, Chakra, Ant Design, or equivalent. Design tokens live in the Tailwind config and the
   shadcn theme, never as hardcoded colors, spacings, or radii inside components.
 - **Chat UI**: assistant-ui supplies the chat interface's headless primitives — its runtime
-  packages (`@assistant-ui/react` and its AI SDK and markdown adapters) and the components its
-  registry installs through the shadcn CLI in their Base UI variants. Those components compose our
-  shadcn primitives and are owned code under the same rules as `src/components/ui`; assistant-ui is
-  not a second component library.
+  packages (`@assistant-ui/react`, `@assistant-ui/react-ai-sdk`, `@assistant-ui/react-markdown`)
+  and the components its registry installs through the shadcn CLI in their Base UI variants. Those
+  components compose our shadcn primitives and are owned code under the same rules as
+  `src/components/ui`; assistant-ui is not a second component library.
 - **i18n**: next-intl.
 - **Testing**: Vitest for unit/integration, Playwright for end-to-end.
 
 Adding a runtime dependency requires a stated reason in the feature plan: what it does, what
 building it ourselves would cost, and what the dependency costs. Prefer the platform and existing
 dependencies first. Pulling in a shadcn/ui component through its CLI is expected and exempt from
-this rule — the Base UI packages it brings along are part of the baseline above, as are the
-packages the AI and Chat UI entries name.
+this rule — the Base UI packages it brings along are part of the baseline above, as are `ai`,
+`@ai-sdk/react`, and the three assistant-ui packages named above. Provider packages are not.
 
 **Libraries are used the way they are built.** Where memory, an article, or another major version
 disagrees with the version installed in this repository, the installed version wins. Patching a
