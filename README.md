@@ -111,7 +111,7 @@ Tests run on Vitest (unit/integration, colocated with the code) and Playwright (
 `E2E_PORT=<port> npm run e2e` reuses a server you already have running instead — it must be a
 production server (`next start`) on the `atmo_e2e` database; the suite stops if it cannot sign in.
 
-Planned per the project constitution: the OpenAI Agents SDK.
+Planned per the project constitution: the Vercel AI SDK, with assistant-ui for the chat interface.
 
 ## How we work
 
