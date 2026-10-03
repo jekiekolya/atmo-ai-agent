@@ -25,6 +25,17 @@ const DATE_FORMATTING = [
   },
 ];
 
+const ROUTE_PATHS_MESSAGE =
+  "Import page and API paths from @/lib/routes (Constitution, Principle VIII).";
+
+const ROUTE_PATHS = [
+  { selector: "Literal[value=/^\\/[a-z]/]", message: ROUTE_PATHS_MESSAGE },
+  {
+    selector: "TemplateElement[value.raw=/^\\/[a-z]/]",
+    message: ROUTE_PATHS_MESSAGE,
+  },
+];
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -37,6 +48,14 @@ const eslintConfig = defineConfig([
       "no-restricted-syntax": ["error", PROCESS_ENV],
     },
   },
+  // Constitution, Principle VIII. Tests keep literal paths: they must fail when an address changes.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/config/**", "src/**/*.test.{ts,tsx}", "src/lib/routes.ts"],
+    rules: {
+      "no-restricted-syntax": ["error", PROCESS_ENV, ...ROUTE_PATHS],
+    },
+  },
   // Spec 004, FR-016: screen code formats dates only through useFormatInstant.
   // src/server is browser-less output, decided by the feature that adds it.
   {
@@ -46,10 +65,16 @@ const eslintConfig = defineConfig([
       "src/server/**",
       "src/**/*.test.{ts,tsx}",
       "src/i18n/use-format-instant.ts",
+      "src/lib/routes.ts",
     ],
     rules: {
-      // Repeats PROCESS_ENV: a later no-restricted-syntax replaces an earlier one instead of merging.
-      "no-restricted-syntax": ["error", PROCESS_ENV, ...DATE_FORMATTING],
+      // Repeats the rules above: a later no-restricted-syntax replaces an earlier one instead of merging.
+      "no-restricted-syntax": [
+        "error",
+        PROCESS_ENV,
+        ...DATE_FORMATTING,
+        ...ROUTE_PATHS,
+      ],
     },
   },
   // src/server is the portable core (MC-008): nothing framework-specific may enter it.

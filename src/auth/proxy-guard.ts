@@ -4,8 +4,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { secureCookiesFor } from "@/auth/cookie-policy";
 import { config } from "@/config";
 import { isSupportedLocale } from "@/i18n/locales";
+import { PAGES } from "@/lib/routes";
 
-const PROTECTED_SEGMENT = "dashboard";
+const PROTECTED_SEGMENT = PAGES.dashboard.split("/")[1];
 
 function protectedLocale(pathname: string): string | null {
   const [, locale, segment] = pathname.split("/");
@@ -28,7 +29,7 @@ export async function proxyGuard(
   });
   if (token) return intlResponse;
 
-  const signIn = new URL(`/${locale}/sign-in`, request.url);
+  const signIn = new URL(`/${locale}${PAGES.signIn}`, request.url);
   signIn.searchParams.set(
     "callbackUrl",
     `${request.nextUrl.pathname}${request.nextUrl.search}`,

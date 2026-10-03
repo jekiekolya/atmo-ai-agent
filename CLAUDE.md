@@ -18,6 +18,9 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
   coerces at startup and exports one typed frozen object; everything else imports that.
   Every variable it reads gets an `.env.example` entry. Missing required variables fail fast.
   Tooling configs at the repo root and build/CI scripts are exempt — they run outside the app.
+- **No route path literals outside the routes module.** Page paths and API endpoints are defined
+  once and imported everywhere else; a test checks them against `src/app`. The proxy `matcher` and
+  tests keep literals — a test must fail when an address changes.
 - **No hardcoded user-facing strings.** All copy resolves through next-intl. A key missing
   from any supported locale is a build failure, not a fallback.
 - **Tests are required for changed behavior.** Test-first for domain services, business rules,

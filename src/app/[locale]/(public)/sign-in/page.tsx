@@ -15,6 +15,7 @@ import {
 import { resolveLocale } from "@/i18n/locales";
 import { redirect } from "@/i18n/navigation";
 import { safeCallbackUrl } from "@/lib/http/callback-url";
+import { PAGES } from "@/lib/routes";
 
 const NOTICES = {
   "password-set": "passwordSet",
@@ -34,7 +35,7 @@ export default async function SignInPage({
 
   // The full check, not the proxy's: a revoked session must see the form, not loop (R4).
   if (await getSessionUser()) {
-    redirect({ href: "/dashboard", locale });
+    redirect({ href: PAGES.dashboard, locale });
   }
 
   const query = await searchParams;

@@ -10,6 +10,7 @@ import { NewPasswordFields } from "@/components/new-password-fields/new-password
 import { SubmitButton } from "@/components/submit-button/submit-button";
 import { apiRequest } from "@/lib/http/api-client";
 import { hardNavigate } from "@/lib/http/hard-navigate";
+import { API_ROUTES, PAGES } from "@/lib/routes";
 
 export function SetPasswordForm({ token }: { token: string }) {
   const t = useTranslations("invite");
@@ -22,14 +23,14 @@ export function SetPasswordForm({ token }: { token: string }) {
     setPending(true);
     failure.clearAlert();
 
-    const result = await apiRequest("POST", "/api/invites/accept", {
+    const result = await apiRequest("POST", API_ROUTES.acceptInvite, {
       token,
       password: values.password,
       confirmPassword: values.confirmPassword,
     });
 
     if (result.ok) {
-      hardNavigate(`/${locale}/sign-in?notice=password-set`);
+      hardNavigate(`/${locale}${PAGES.signIn}?notice=password-set`);
       return;
     }
 

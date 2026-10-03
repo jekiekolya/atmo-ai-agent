@@ -31,6 +31,7 @@ import { toast } from "@/components/ui/toast";
 import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/api-client";
 import { errorMessageKey } from "@/lib/http/form-errors";
+import { API_ROUTES, pathTo } from "@/lib/routes";
 
 export type RowUser = {
   id: string;
@@ -54,7 +55,7 @@ export function UserRowActions({ user }: { user: RowUser }) {
 
   if (user.role === "SUPER_ADMIN") return null;
 
-  const base = `/api/users/${user.id}`;
+  const id = { id: user.id };
 
   function askToConfirm(kind: ConfirmKind) {
     setConfirmKind(kind);
@@ -108,7 +109,9 @@ export function UserRowActions({ user }: { user: RowUser }) {
         <DropdownMenuContent>
           {active ? (
             <>
-              <DropdownMenuItem onClick={() => run("POST", `${base}/invite`)}>
+              <DropdownMenuItem
+                onClick={() => run("POST", pathTo(API_ROUTES.userInvite, id))}
+              >
                 {t("actions.issueLink")}
               </DropdownMenuItem>
               {user.hasPendingInvite && (
@@ -125,7 +128,13 @@ export function UserRowActions({ user }: { user: RowUser }) {
             </>
           ) : (
             <DropdownMenuItem
-              onClick={() => run("POST", `${base}/reactivate`, "reactivated")}
+              onClick={() =>
+                run(
+                  "POST",
+                  pathTo(API_ROUTES.userReactivate, id),
+                  "reactivated",
+                )
+              }
             >
               {t("actions.reactivate")}
             </DropdownMenuItem>
@@ -161,8 +170,12 @@ export function UserRowActions({ user }: { user: RowUser }) {
               disabled={pending}
               onClick={() =>
                 confirmKind === "revoke"
-                  ? run("DELETE", `${base}/invite`, "revoked")
-                  : run("POST", `${base}/deactivate`, "deactivated")
+                  ? run("DELETE", pathTo(API_ROUTES.userInvite, id), "revoked")
+                  : run(
+                      "POST",
+                      pathTo(API_ROUTES.userDeactivate, id),
+                      "deactivated",
+                    )
               }
             >
               {pending && <Spinner data-icon="inline-start" aria-hidden />}

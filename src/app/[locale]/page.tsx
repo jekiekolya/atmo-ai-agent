@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 
 import { AppShell } from "@/components/app-shell/app-shell";
 import { Link } from "@/i18n/navigation";
+import { PAGES, pathTo } from "@/lib/routes";
 
 export default async function Home() {
   const t = await getTranslations("home");
@@ -15,7 +16,7 @@ export default async function Home() {
             address that omits the locale segment (MC-001). */}
         <Link
           className="text-primary underline underline-offset-4"
-          href="/demo/42"
+          href={pathTo(PAGES.demo, { id: "42" })}
         >
           {t("demoLink")}
         </Link>

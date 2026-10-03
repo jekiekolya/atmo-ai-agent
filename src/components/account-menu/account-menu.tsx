@@ -18,6 +18,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { toast } from "@/components/ui/toast";
 import { apiRequest } from "@/lib/http/api-client";
 import { hardNavigate } from "@/lib/http/hard-navigate";
+import { API_ROUTES, PAGES } from "@/lib/routes";
 
 export function AccountMenu({ name }: { name: string }) {
   const t = useTranslations();
@@ -26,11 +27,11 @@ export function AccountMenu({ name }: { name: string }) {
 
   async function signOut() {
     setPending(true);
-    const result = await apiRequest("POST", "/api/session/sign-out");
+    const result = await apiRequest("POST", API_ROUTES.signOut);
 
     // A full load, so Back cannot restore a cached protected page (FR-067).
     if (result.ok) {
-      hardNavigate(`/${locale}/sign-in`);
+      hardNavigate(`/${locale}${PAGES.signIn}`);
       return;
     }
 

@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Link } from "@/i18n/navigation";
+import { PAGES } from "@/lib/routes";
 import { inspectInvite } from "@/server/invites/invite-service";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -52,7 +53,7 @@ export default async function InvitePage({
           {outcome.status === "used" && (
             <Link
               className="text-primary underline underline-offset-4"
-              href="/sign-in"
+              href={PAGES.signIn}
             >
               {t("toSignIn")}
             </Link>

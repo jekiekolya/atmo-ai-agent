@@ -34,6 +34,7 @@ import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/api-client";
 import { validateWith } from "@/lib/http/form-errors";
 import { createUserSchema } from "@/lib/schemas/create-user";
+import { API_ROUTES } from "@/lib/routes";
 
 type Created = {
   user: { firstName: string; lastName: string };
@@ -55,7 +56,7 @@ export function CreateUserForm() {
     setPending(true);
     failure.clearAlert();
 
-    const result = await apiRequest<Created>("POST", "/api/users", {
+    const result = await apiRequest<Created>("POST", API_ROUTES.users, {
       email: values.email,
       firstName: values.firstName,
       lastName: values.lastName,

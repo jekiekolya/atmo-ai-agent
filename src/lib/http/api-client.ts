@@ -1,5 +1,6 @@
 import { signInUrlFor } from "@/lib/http/callback-url";
 import { hardNavigate } from "@/lib/http/hard-navigate";
+import { API_ROUTES } from "@/lib/routes";
 import type { FieldErrors } from "@/server/errors";
 
 export type ApiResult<T> =
@@ -33,7 +34,7 @@ export async function apiRequest<T = undefined>(
 
   if (response.status === 401) return redirectToSignIn();
   // A route handler's auth() cannot write the renewed cookie, so the client asks for it (research R3).
-  void fetch("/api/auth/session", { cache: "no-store" }).catch(() => undefined);
+  void fetch(API_ROUTES.session, { cache: "no-store" }).catch(() => undefined);
   if (response.status >= 500) return { ok: false, code: "unexpected" };
   if (response.status === 204) return { ok: true, data: undefined as T };
 

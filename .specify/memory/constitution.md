@@ -1,6 +1,19 @@
 <!--
 SYNC IMPACT REPORT — latest first.
 
+## 1.4.0 → 1.5.0 (2026-10-03)
+
+Added principle VIII. Addresses Have One Owner: page paths and API endpoints are defined in one
+routes module, which the test suite checks against src/app; framework-static values (the proxy
+matcher) and tests keep literals. Development Workflow: the review checklist names route paths.
+MINOR — a principle is added. Mirrored in CLAUDE.md.
+
+Migration: 21 literal paths in 15 files of application code violated the new rule — the proxy
+guard, callback-url, the private layout, the home, sign-in and invite pages, the auth DAL, the user
+and invite route handlers, the Auth.js basePath, the session keep-alive and API client, and the
+forms and menu that call the API or navigate after it. The same pull request moves them to
+src/lib/routes.ts and adds a lint rule against new ones.
+
 ## 1.3.0 → 1.4.0 (2026-09-17)
 
 Technology Constraints: added a library-fidelity requirement — the version installed in this
@@ -192,6 +205,28 @@ manual string assembly. The agent responds in the customer's locale.
 reads as a broken one. Enforcing completeness at build time is the only version of this rule that
 holds under deadline pressure.
 
+### VIII. Addresses Have One Owner
+
+Every address the application owns — page paths and API endpoints — is defined once, in a single
+routes module (`src/lib/routes.ts` or equivalent). Every other application file that names one of
+those addresses — links, redirects, the proxy guard, API calls, route handlers that hand out a
+link — imports it from that module. Writing such a path as a string literal anywhere else is a
+review-blocking violation.
+
+The module is checked against `src/app` by the test suite: an entry that names no page or route
+handler, or a page or route handler that has no entry — other than the catch-all page that only
+renders not-found — fails the suite.
+
+Two kinds of file keep literal paths. Values the framework must analyze statically, such as the
+proxy `matcher`, cannot import a constant. Tests — unit, integration, and end-to-end — assert the
+addresses people actually reach, and MUST fail when one of them changes rather than follow the
+rename silently.
+
+*Rationale*: Some addresses outlive the code that serves them — an invite link waits in someone's
+inbox — and the proxy guard decides what is protected by matching a path segment. Defining each
+address once makes a rename one visible change; checking the definitions against the routes keeps
+that change from passing in silence.
+
 ## Technology Constraints
 
 The following stack is fixed. Replacing or adding a component at this layer is a constitution
@@ -222,7 +257,8 @@ package or depending on its undocumented internals requires a stated reason in t
 
 - **Branching**: feature work happens on a branch, never directly on `main` or `dev`.
 - **Pull requests**: every change is reviewed. The review explicitly checks constitution
-  compliance — types, test regime, Config usage, localization, tenant scoping, and spec alignment.
+  compliance — types, test regime, Config usage, route paths, localization, tenant scoping, and
+  spec alignment.
 - **Merge gates**, all required to pass: TypeScript compiles with no errors, lint clean, Vitest
   suite green, Playwright suite green for affected flows, message-catalog completeness check green
   for every supported locale, Prisma migrations present and applying cleanly, `.env.example`
@@ -251,4 +287,4 @@ blocks merge. The constitution is re-read at the start of each feature's plannin
 resulting plan records its constitution check. Runtime development guidance for agents lives in
 `CLAUDE.md` and the `.specify/templates/` templates, which must not contradict this file.
 
-**Version**: 1.4.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-09-17
+**Version**: 1.5.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-10-03
