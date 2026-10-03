@@ -1,8 +1,30 @@
+import { readFileSync } from "node:fs";
+import { basename } from "node:path";
+
 import react from "@vitejs/plugin-react";
 import tsconfigPaths from "vite-tsconfig-paths";
-import { defineConfig } from "vitest/config";
+import { defineConfig, type Plugin } from "vitest/config";
 
 import { INTEGRATION_DATABASE_URL } from "./vitest.integration.env";
+
+// Next imports an .svg as { src, width, height }; Vite would give a bare URL string.
+const nextStaticSvg: Plugin = {
+  name: "next-static-svg",
+  enforce: "pre",
+  load(id) {
+    const file = id.split("?")[0];
+    if (!file.endsWith(".svg")) return null;
+
+    const root = readFileSync(file, "utf8").match(/<svg\b[^>]*>/)?.[0] ?? "";
+    const attribute = (name: string) =>
+      root.match(new RegExp(`\\s${name}="([\\d.]+)"`))?.[1];
+    const viewBox = root.match(/\sviewBox="([^"]+)"/)?.[1].split(/[\s,]+/);
+    const width = Number(attribute("width") ?? viewBox?.[2]);
+    const height = Number(attribute("height") ?? viewBox?.[3]);
+
+    return `export default ${JSON.stringify({ src: `/${basename(file)}`, width, height })};`;
+  },
+};
 
 // Tests live next to the code they cover, so the environment is split by file
 // suffix, not directory. e2e/ is excluded — Playwright owns those files.
@@ -58,7 +80,7 @@ export default defineConfig({
         },
       },
       {
-        plugins: [tsconfigPaths(), react()],
+        plugins: [tsconfigPaths(), react(), nextStaticSvg],
         test: {
           name: "ui",
           environment: "jsdom",
