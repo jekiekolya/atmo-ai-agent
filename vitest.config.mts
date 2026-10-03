@@ -44,7 +44,9 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: ["src/{config,i18n,lib,server,auth}/**/*.test.ts"],
+          include: [
+            "src/{config,conventions,i18n,lib,server,auth}/**/*.test.ts",
+          ],
           exclude: [...exclude, "**/*.integration.test.ts"],
           // A database that does not exist, so a unit test that queries fails loudly.
           env: {
