@@ -27,7 +27,14 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
   agent tools, Config, and validation helpers — the failing Vitest test comes first and the
   commit order shows it. Test-together for UI and e2e flows.
 - **Tenant scoping lives in the data layer**, never in a prompt instruction. Agent tools are
-  typed, least-privilege, and single-tenant.
+  typed, least-privilege, and single-tenant. Our own Prisma tables are the system of record for
+  conversations and tool calls; an AI framework's copy (memory, traces, evals) sits alongside,
+  never instead, and a customer's deletion reaches it too.
+- **Application code reaches Postgres only through Prisma Client**, never through `pg` itself;
+  tests and tooling that cannot load the client (the Playwright setup) may. Raw SQL goes through the
+  `$queryRaw` / `$executeRaw` tagged templates or TypedSQL, only where the query API cannot express
+  the query. Anything that puts text into the SQL — an `Unsafe` variant, `Prisma.raw` — carries a
+  constant string only, picked from a fixed list when it must vary.
 - **UI is composed from `src/components/ui`** (shadcn/ui, vendored via its CLI). Customize
   those primitives in place; preserve their Base UI accessibility semantics. No second
   component library.
@@ -42,24 +49,29 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
   documented library idiom. Prose in the repo ages faster than the code it sits above, so a comment
   that duplicates a document is a future lie. If the reasoning needs a paragraph, it belongs in the
   spec or the commit message.
+- **A better solution that needs a rule changed is proposed, not taken.** Name the rule, the
+  change, and the trade-offs both ways; keep working within the rule until the developer decides.
 
 ## Stack
 
 Fixed by the constitution — changing this layer is an amendment, not a feature decision.
 
-|           |                                                                   |
-| --------- | ----------------------------------------------------------------- |
-| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript `strict` |
-| Styling   | Tailwind CSS v4                                                   |
-| UI        | shadcn/ui on Base UI, vendored via its CLI                        |
-| Database  | PostgreSQL via Prisma, committed migrations only                  |
-| AI        | OpenAI Agents SDK — _not yet installed_                           |
-| i18n      | next-intl (locale-prefixed routing, catalogs in `src/messages/`)  |
-| Testing   | Vitest (unit/integration), Playwright (e2e)                       |
+|           |                                                                         |
+| --------- | ----------------------------------------------------------------------- |
+| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript `strict`       |
+| Styling   | Tailwind CSS v4                                                         |
+| UI        | shadcn/ui on Base UI, vendored via its CLI                              |
+| Chat UI   | assistant-ui, Base UI variants via the shadcn CLI — _not yet installed_ |
+| Database  | PostgreSQL via Prisma, committed migrations only                        |
+| AI        | Vercel AI SDK, a provider package per provider — _not yet installed_    |
+| i18n      | next-intl (locale-prefixed routing, catalogs in `src/messages/`)        |
+| Testing   | Vitest (unit/integration), Playwright (e2e)                             |
 
 Adding any other runtime dependency requires a stated reason in the feature plan: what it
 does, what building it ourselves would cost, what the dependency costs. Pulling a shadcn/ui
-component through its CLI is exempt.
+component through its CLI is exempt, and so are `ai`, `@ai-sdk/react`, `@assistant-ui/react`,
+`@assistant-ui/react-ai-sdk`, and `@assistant-ui/react-markdown`. A provider package is not: each
+one is a new recipient of customer data, and the plan says why.
 
 ## Commands
 
@@ -105,8 +117,9 @@ Name the file in full rather than `index.tsx`: it stays greppable and the editor
 identical tabs. Import from the file, not through a barrel — barrel re-exports cost compile time and
 defeat tree-shaking. Group folders by domain (`chat/`, `tickets/`) once a directory gets crowded.
 
-`src/components/ui/` is the one exception and stays flat: the shadcn CLI writes those paths, and
-rearranging them after every `shadcn add` would cost more than the consistency is worth.
+`src/components/ui/` and the folder the assistant-ui registry installs into are the exceptions and
+stay flat: the shadcn CLI writes those paths, and rearranging them after every `shadcn add` would
+cost more than the consistency is worth.
 
 ## Merge gates
 
