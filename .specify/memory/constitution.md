@@ -1,6 +1,21 @@
 <!--
 SYNC IMPACT REPORT — latest first.
 
+## 1.5.0 → 1.6.0 (2026-10-03)
+
+Technology Constraints: AI moves from the OpenAI Agents SDK to the Vercel AI SDK, with our own
+Prisma tables as the system of record for conversations (a framework may keep a copy alongside,
+and a customer's deletion reaches it); Database is
+reworded so parameterized raw SQL through Prisma is explicitly allowed and only a constant string
+may go through the `Unsafe` variants; a Chat UI entry admits assistant-ui (Base UI variants) as
+headless chat primitives, not a second component library. Governance: added "Proposing a change" —
+a better solution that needs a rule changed is raised with its trade-offs and decided by the
+developer. MINOR — guidance is replaced and expanded; no principle is removed or redefined.
+Mirrored in CLAUDE.md and README.md.
+
+Migration: none. No AI package is installed yet; the one `Unsafe` call (the integration-test
+truncate) runs a constant string.
+
 ## 1.4.0 → 1.5.0 (2026-10-03)
 
 Added principle VIII. Addresses Have One Owner: page paths and API endpoints are defined in one
@@ -233,21 +248,38 @@ The following stack is fixed. Replacing or adding a component at this layer is a
 amendment, not a feature decision:
 
 - **Framework**: Next.js (App Router) with TypeScript in `strict` mode.
-- **Database**: PostgreSQL, accessed exclusively through Prisma. Schema changes ship as committed
-  migrations — never `db push` against a shared environment, never hand-edited SQL out of band.
-- **AI**: OpenAI Agents SDK for agent orchestration and tool calling.
+- **Database**: PostgreSQL. Application code reaches it only through Prisma Client — no second
+  driver, query builder, or ORM. Where Prisma's query API cannot express a query (a pgvector
+  similarity search, for example), raw SQL goes through Prisma's parameterized `$queryRaw` /
+  `$executeRaw` tagged templates or TypedSQL. The `Unsafe` variants run the string they are given,
+  so they may carry only a constant string — a value spliced into one is how SQL injection happens.
+  Schema changes ship as committed migrations — never `db push` against a shared environment, never
+  hand-edited SQL out of band.
+- **AI**: Vercel AI SDK — `ai` for model calls, the tool loop, structured output, and streaming;
+  `@ai-sdk/react` for the chat client; one provider package per model provider in use. The provider
+  is swappable, but the model a production agent runs is fixed in code (Principle VI).
+  Conversations, tool calls, and responses have one system of record: this application's own
+  Prisma tables, where tenant scoping, the operator's view of a conversation, and deleting a
+  customer's data live. An AI framework may keep its own copy — memory, traces, evals — only
+  alongside that record, never instead of it, and deleting a customer's data reaches that copy too.
 - **Styling**: Tailwind CSS. No parallel styling system (CSS-in-JS, ad-hoc global stylesheets).
 - **UI components**: shadcn/ui (Base UI primitives, vendored into the repo under
   `src/components/ui` via its CLI) is the single component baseline. No second component library —
   no MUI, Chakra, Ant Design, or equivalent. Design tokens live in the Tailwind config and the
   shadcn theme, never as hardcoded colors, spacings, or radii inside components.
+- **Chat UI**: assistant-ui supplies the chat interface's headless primitives — its runtime
+  packages (`@assistant-ui/react` and its AI SDK and markdown adapters) and the components its
+  registry installs through the shadcn CLI in their Base UI variants. Those components compose our
+  shadcn primitives and are owned code under the same rules as `src/components/ui`; assistant-ui is
+  not a second component library.
 - **i18n**: next-intl.
 - **Testing**: Vitest for unit/integration, Playwright for end-to-end.
 
 Adding a runtime dependency requires a stated reason in the feature plan: what it does, what
 building it ourselves would cost, and what the dependency costs. Prefer the platform and existing
 dependencies first. Pulling in a shadcn/ui component through its CLI is expected and exempt from
-this rule — the Base UI packages it brings along are part of the baseline above.
+this rule — the Base UI packages it brings along are part of the baseline above, as are the
+packages the AI and Chat UI entries name.
 
 **Libraries are used the way they are built.** Where memory, an article, or another major version
 disagrees with the version installed in this repository, the installed version wins. Patching a
@@ -277,6 +309,12 @@ a tool default or a habit conflicts with a rule here, this document wins.
 existing code would violate the new rule — includes a migration note describing how and by when
 that code is brought into compliance. Amendments take effect on merge.
 
+**Proposing a change**: a fixed rule or stack item is not a reason to settle for a worse solution.
+Whoever finds that changing one would give a materially better result — an AI agent included —
+says so: the rule, the proposed change, and the trade-offs both ways. Work continues within the
+current rule until the developer decides; an accepted change is made by amendment, never by working
+around the rule.
+
 **Versioning** follows semantic versioning of governance impact:
 - **MAJOR**: a principle is removed or redefined in a backward-incompatible way.
 - **MINOR**: a principle or section is added, or existing guidance is materially expanded.
@@ -287,4 +325,4 @@ blocks merge. The constitution is re-read at the start of each feature's plannin
 resulting plan records its constitution check. Runtime development guidance for agents lives in
 `CLAUDE.md` and the `.specify/templates/` templates, which must not contradict this file.
 
-**Version**: 1.5.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-10-03
+**Version**: 1.6.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-10-03
