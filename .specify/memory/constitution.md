@@ -1,6 +1,16 @@
 <!--
 SYNC IMPACT REPORT — latest first.
 
+## 1.6.0 → 1.6.1 (2026-10-04)
+
+Principle VII: "the agent responds in the customer's locale" becomes "the agent replies in the
+language the customer writes in, and in the customer's locale when that is unclear". PATCH — the
+intent, a customer answered in their own language, is unchanged; the locale stays the fallback.
+Raised by feature 006 (AI chat), whose agent follows the language of the latest message. No other
+principle, template, CLAUDE.md, or README text states the rule, so nothing else is mirrored.
+
+Migration: none. No agent exists yet.
+
 ## 1.5.0 → 1.6.0 (2026-10-03)
 
 Technology Constraints: AI moves from the OpenAI Agents SDK to the Vercel AI SDK; each provider
@@ -221,7 +231,8 @@ supported locale is a build failure: merge is blocked until the translation exis
 fallback that ships untranslated text as though it were correct is forbidden.
 
 Locale-dependent formatting (dates, numbers, currency, units) uses locale-aware formatters, never
-manual string assembly. The agent responds in the customer's locale.
+manual string assembly. The agent replies in the language the customer writes in, and in the
+customer's locale when that is unclear.
 
 *Rationale*: Solar customers are supported across markets, and a half-translated support interface
 reads as a broken one. Enforcing completeness at build time is the only version of this rule that
@@ -334,4 +345,4 @@ blocks merge. The constitution is re-read at the start of each feature's plannin
 resulting plan records its constitution check. Runtime development guidance for agents lives in
 `CLAUDE.md` and the `.specify/templates/` templates, which must not contradict this file.
 
-**Version**: 1.6.0 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-10-03
+**Version**: 1.6.1 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-10-04
