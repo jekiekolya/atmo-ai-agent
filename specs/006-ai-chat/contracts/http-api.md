@@ -57,6 +57,7 @@ disconnects ends the reply as `STOPPED` (FR-016).
 | 400    | `validation_failed`   | schema fails: empty, too long, unsupported locale, bad shape           | `fields` (catalog keys)      |
 | 401    | `unauthenticated`     | no valid session                                                       |                              |
 | 403    | `forbidden_origin`    | cross-origin                                                           |                              |
+| 403    | `forbidden`           | the user's role is not a staff role (FR-001; none exists yet)          |                              |
 | 404    | `not_found`           | conversation missing, another user's, or malformed id (FR-004)         |                              |
 | 409    | `reply_in_progress`   | a reply is being written in this conversation (FR-012, FR-022, FR-023) |                              |
 | 409    | `nothing_to_retry`    | Try again when the latest reply did not fail (FR-022)                  |                              |

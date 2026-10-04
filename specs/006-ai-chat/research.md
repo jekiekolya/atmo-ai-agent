@@ -506,7 +506,7 @@ Tooling settings:
   boolean variable in the repository.
 - The `drops variables it does not declare` test lists every key and is updated with them.
 
-## R15. The instructions, and what Principle VII's "agent-visible text" covers
+## R15. The instructions, in English (Principle VII, 1.6.3)
 
 **Decision**: `buildInstructions({ locale, today })` returns English text, reviewed like code. It
 states:
@@ -520,10 +520,10 @@ states:
 A test-first unit test asserts that the date and the language fallback are present and that each rule
 appears.
 
-**Rationale**: Principle VII routes "agent-visible text" through next-intl. That reads as text the agent
-shows to people — its UI, notices, errors — not the model's own instructions. Instructions are model
-input, kept in one language, and the model is told which language to answer in (Principle VII, amended
-1.6.1). The plan's constitution check records this interpretation.
+**Rationale**: Principle VII routes the text the agent shows to people through next-intl; the agent's
+instructions are model input and may be written in one language (constitution 1.6.3, which settled the
+earlier wording "agent-visible text" during analysis). The model is told which language to answer in
+(Principle VII, 1.6.1).
 
 ## R16. Screen readers: nothing is announced
 

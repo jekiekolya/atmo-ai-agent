@@ -103,6 +103,12 @@ conversation.
   earlier answer, or add an announcement region? → A: Keep it. The boundary now states plainly that a
   screen-reader user is not told a reply arrived until they move to it.
 
+### Session 2026-10-04 (analysis)
+
+- Q: FR-001 opened the chat to "any role", so a customer role added later would get it before
+  escalation exists. Narrow it? → A: Yes — staff roles only, as a closed list with a test that fails
+  when a new role is undecided (FR-001, FR-002).
+
 ## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Ask a question and watch the answer arrive (Priority: P1)
@@ -120,7 +126,7 @@ the address changes to the conversation's own; reload and confirm the same two m
 
 **Acceptance Scenarios**:
 
-1. **Given** any signed-in user of any role, **When** they look at the header of the signed-in area,
+1. **Given** any signed-in user with a staff role, **When** they look at the header of the signed-in area,
    **Then** it shows a Chat link that opens the new-conversation page in the current language.
 2. **Given** the new-conversation page, **When** nothing has been sent yet, **Then** a localized
    greeting is shown and no conversation has been stored.
@@ -389,12 +395,14 @@ switch language on a conversation page and confirm the same conversation is show
 
 **Access and ownership**
 
-- **FR-001**: Every signed-in, active user, of any role, MUST be able to use the chat: a
+- **FR-001**: Every signed-in, active user with a staff role — today `ADMIN` or `SUPER_ADMIN`, which
+  are all the roles there are — MUST be able to use the chat: a
   new-conversation page at `/{locale}/dashboard/chat` and each existing conversation at
   `/{locale}/dashboard/chat/{id}`. Anonymous visitors are handled as at any protected address
-  (feature 003).
+  (feature 003). A role added later gets no chat until a spec grants it: the allowed roles are a closed
+  list, and a test fails when a role exists that the list does not decide (_amended during analysis_).
 - **FR-002**: The header of the signed-in area MUST show a localized Chat link to the new-conversation
-  page for every role, placed after Home.
+  page for every staff role, placed after Home.
 - **FR-003**: A conversation MUST belong to the user who started it. Only that user can see, list,
   continue, try again in, or delete it; no role grants access to another user's conversation.
 - **FR-004**: A conversation that does not exist, belongs to another user, or is named by a malformed

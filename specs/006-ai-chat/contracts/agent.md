@@ -21,8 +21,10 @@ getChatAgent(): Promise<ToolLoopAgent<{ locale: Locale; today: string }>>
 | tools               | none (FR-046)                                                                                                                         |         |
 | `temperature` etc.  | not set — deprecated for this model                                                                                                   | R1      |
 
-`MODEL_ID` and the two numbers are exported constants: `respond.ts` records `MODEL_ID` on each reply
-(FR-048), and the test model reports its own id.
+`GEMINI_MODEL_ID = "gemini-3.5-flash-lite"` is the one place the model is named (FR-047). `getChatAgent()`
+returns `{ agent, modelId }`, where `modelId` is read from the model object actually built —
+`gemini-3.5-flash-lite`, or `fake-model` under `AI_FAKE_MODEL` — and `respond.ts` records that on each
+reply (FR-048), so a stored reply never names a model that did not write it.
 
 ## `instructions.ts` — `buildInstructions({ locale, today })` (R15, test-first)
 
@@ -50,7 +52,7 @@ onError, onEnd, consumeSseStream: consumeStream })` (R3).
 4. `onError(error)`: `console.error` with the provider detail; set the failure flag; return
    `"model_failed"`.
 5. `onEnd({ responseMessage, isAborted })` → `finishReply(turn.replyId, decideOutcome(…),
-responseMessage.parts, usage, MODEL_ID)`; a failed write is logged, never thrown into the stream.
+responseMessage.parts, usage, modelId)`; a failed write is logged, never thrown into the stream.
 
 ## `fake-model.ts` — the test model (FR-051, R13)
 

@@ -30,8 +30,9 @@ The technical spine:
 Research changed the spec before this plan in four places, each marked _amended during planning_. It also
 forced one structural change the spec had not foreseen: a `loading.tsx` above a page turns `notFound()`
 into a 200. To keep FR-004's real 404, the dashboard home moves into a route group, and the ownership
-check runs in a layout (R7). Two constitution PATCH amendments happened on this branch: 1.6.1, the
-language of replies, and 1.6.2, the `@assistant-ui/ai-sdk` package name.
+check runs in a layout (R7). Three constitution PATCH amendments happened on this branch: 1.6.1, the
+language of replies; 1.6.2, the `@assistant-ui/ai-sdk` package name; and 1.6.3, which states that the
+agent's instructions are model input, not copy.
 
 ## Technical Context
 
@@ -100,7 +101,7 @@ _GATE: evaluated before Phase 0 and re-evaluated after Phase 1 design. Both pass
 | **IV. Tested Business Logic**           | PASS with one recorded deviation | Every module has a regime below. Chat send and receive and locale switching are covered by Playwright. **Deviation**: "escalation to a human" Playwright coverage is deferred with escalation itself (spec Known Boundaries). The users are our own staff, and the chat MUST NOT be opened to customers before escalation exists.                                                                                                                                                                                                                      |
 | **V. Centralized Config, Zero Secrets** | PASS                             | Six variables go through `src/config` with two cross-field rules (R14). Each has an `.env.example` entry. The provider key is passed to the provider explicitly from Config. The e2e and Vitest environments are set in tooling configs, which are exempt. No key appears in the repository.                                                                                                                                                                                                                                                           |
 | **VI. Accountable AI Agents**           | PASS with one recorded deviation | The instructions, model id, and settings live in the repository (FR-044, FR-047). Our tables record every question, reply, model, token count, and outcome (FR-048); no framework keeps a copy. The agent has no tools, so tenant scoping of tools does not arise, and every query is scoped to the owner in the data layer. Customer data sent to the model is limited to the conversation's recent messages (FR-042). **Deviation**: there is no path to a human. Recorded in the spec's Known Boundaries, it blocks opening this chat to customers. |
-| **VII. Localized by Default**           | PASS, with one interpretation    | All copy is in `en` and `uk`, enforced by the parity test. The API returns codes, and the browser translates them. FR-055's hour count uses an ICU plural. The agent replies in the customer's language, with the locale as fallback (1.6.1). **Interpretation**: "agent-visible text" means text the agent shows to people, not the model's own instructions. Those are English model input, reviewed like code (R15).                                                                                                                                |
+| **VII. Localized by Default**           | PASS                             | All copy is in `en` and `uk`, enforced by the parity test. The API returns codes, and the browser translates them. FR-055's hour count uses an ICU plural. The agent replies in the customer's language, with the locale as fallback (1.6.1). The model's instructions are English model input, reviewed like code, as 1.6.3 states (R15).                                                                                                                                                                                                             |
 | **VIII. Addresses Have One Owner**      | PASS                             | Two pages and two endpoints are added to `src/lib/routes.ts`. `routes.test.ts` already ignores route groups. The browser builds conversation addresses with `pathTo` and next-intl's `getPathname`, never as literals. e2e specs keep literals.                                                                                                                                                                                                                                                                                                        |
 | **Technology Constraints**              | PASS                             | Postgres is reached through Prisma, with a committed migration and the partial index declared in the schema. One raw `$queryRaw` tagged template (`FOR UPDATE`) is used where the query API cannot express it (R4). The AI SDK and assistant-ui are used as the constitution names them (1.6.2). The registry gives Base UI variants only. The provider package and `remark-gfm` are justified (R17). Library fidelity: every API named here was read from the pinned versions (research preamble).                                                    |
 
@@ -171,7 +172,7 @@ src/
 ├── server/
 │   ├── errors.ts                          # UPDATED — 5 codes, RateLimitError
 │   └── chat/                              # NEW — imports nothing from Next or React
-│       ├── agent.ts                       #   getChatAgent(), MODEL_ID, limits (R1, R2)
+│       ├── agent.ts                       #   getChatAgent() → { agent, modelId }, limits (R1, R2)
 │       ├── instructions.ts / .test.ts     #   buildInstructions (R15)
 │       ├── fake-model.ts / .test.ts       #   MockLanguageModelV4, markers (R13)
 │       ├── title.ts / .test.ts
