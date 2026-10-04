@@ -1,6 +1,17 @@
 <!--
 SYNC IMPACT REPORT — latest first.
 
+## 1.6.2 → 1.6.3 (2026-10-04)
+
+Principle VII: "agent-visible text" becomes "any text the agent shows to people", and a sentence
+states that the agent's instructions are model input, kept in the repository under Principle VI, and
+may be written in one language. PATCH — it settles an ambiguous phrase ("visible to the agent" or
+"shown by the agent") in the reading the principle's rationale supports; no requirement on copy
+changes. Raised by feature 006's analysis, whose system prompt is English. No other file states the
+rule.
+
+Migration: none. No agent exists yet.
+
 ## 1.6.1 → 1.6.2 (2026-10-04)
 
 Technology Constraints, Chat UI: `@assistant-ui/react-ai-sdk` is replaced by `@assistant-ui/ai-sdk`.
@@ -233,8 +244,9 @@ attributable, reproducible, and confined to the right tenant.
 
 ### VII. Localized by Default
 
-No user-facing string is hardcoded. All copy — UI, emails, error messages, and agent-visible text
-— resolves through next-intl message catalogs.
+No user-facing string is hardcoded. All copy — UI, emails, error messages, and any text the agent
+shows to people — resolves through next-intl message catalogs. The agent's own instructions are model
+input, not copy: they live in the repository under Principle VI and may be written in one language.
 
 Adding a string means adding its key to **every** supported locale. A key missing from any
 supported locale is a build failure: merge is blocked until the translation exists. A silent
@@ -355,4 +367,4 @@ blocks merge. The constitution is re-read at the start of each feature's plannin
 resulting plan records its constitution check. Runtime development guidance for agents lives in
 `CLAUDE.md` and the `.specify/templates/` templates, which must not contradict this file.
 
-**Version**: 1.6.2 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-10-04
+**Version**: 1.6.3 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-10-04
