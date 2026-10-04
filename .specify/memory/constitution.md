@@ -1,6 +1,16 @@
 <!--
 SYNC IMPACT REPORT — latest first.
 
+## 1.6.1 → 1.6.2 (2026-10-04)
+
+Technology Constraints, Chat UI: `@assistant-ui/react-ai-sdk` is replaced by `@assistant-ui/ai-sdk`.
+The former is now only a re-export of the latter (`export * from "@assistant-ui/ai-sdk"`), its README
+tells new code to depend on `@assistant-ui/ai-sdk` directly, and the assistant-ui docs install that
+name. PATCH — the same package under its current name; the exemption covers nothing new. Mirrored in
+CLAUDE.md. Raised by feature 006's planning.
+
+Migration: none. No assistant-ui package is installed yet.
+
 ## 1.6.0 → 1.6.1 (2026-10-04)
 
 Principle VII: "the agent responds in the customer's locale" becomes "the agent replies in the
@@ -288,7 +298,7 @@ amendment, not a feature decision:
   no MUI, Chakra, Ant Design, or equivalent. Design tokens live in the Tailwind config and the
   shadcn theme, never as hardcoded colors, spacings, or radii inside components.
 - **Chat UI**: assistant-ui supplies the chat interface's headless primitives — its runtime
-  packages (`@assistant-ui/react`, `@assistant-ui/react-ai-sdk`, `@assistant-ui/react-markdown`)
+  packages (`@assistant-ui/react`, `@assistant-ui/ai-sdk`, `@assistant-ui/react-markdown`)
   and the components its registry installs through the shadcn CLI in their Base UI variants. Those
   components compose our shadcn primitives and are owned code under the same rules as
   `src/components/ui`; assistant-ui is not a second component library.
@@ -345,4 +355,4 @@ blocks merge. The constitution is re-read at the start of each feature's plannin
 resulting plan records its constitution check. Runtime development guidance for agents lives in
 `CLAUDE.md` and the `.specify/templates/` templates, which must not contradict this file.
 
-**Version**: 1.6.1 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-10-04
+**Version**: 1.6.2 | **Ratified**: 2026-08-02 | **Last Amended**: 2026-10-04

@@ -70,7 +70,7 @@ Fixed by the constitution — changing this layer is an amendment, not a feature
 Adding any other runtime dependency requires a stated reason in the feature plan: what it
 does, what building it ourselves would cost, what the dependency costs. Pulling a shadcn/ui
 component through its CLI is exempt, and so are `ai`, `@ai-sdk/react`, `@assistant-ui/react`,
-`@assistant-ui/react-ai-sdk`, and `@assistant-ui/react-markdown`. A provider package is not: each
+`@assistant-ui/ai-sdk`, and `@assistant-ui/react-markdown`. A provider package is not: each
 one is a new recipient of customer data, and the plan says why.
 
 ## Commands
@@ -124,6 +124,12 @@ crowded splits the same way.
 `src/components/ui/` and the folder the assistant-ui registry installs into are the exceptions and
 stay flat: the shadcn CLI writes those paths, and rearranging them after every `shadcn add` would
 cost more than the consistency is worth.
+
+**Chat UI comes from the assistant-ui registry first.** Before writing a chat element — tool calls,
+attachments, suggestions, a thread list — pull its registry item in the Base UI style
+(`@assistant-ui` in `components.json`) and customize it in place. Feature 006 composed its own
+thread from assistant-ui primitives only because the registry `thread` brought features its spec
+excluded (specs/006-ai-chat/research.md R9); that thread is the place a new registry item plugs in.
 
 ## Merge gates
 
