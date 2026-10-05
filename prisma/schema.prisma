@@ -15,6 +15,19 @@ enum Role {
   ADMIN
 }
 
+enum MessageRole {
+  USER
+  ASSISTANT
+}
+
+enum ReplyFinish {
+  IN_PROGRESS
+  COMPLETED
+  STOPPED
+  CUT
+  FAILED
+}
+
 model User {
   id                String    @id @default(uuid(7)) @db.Uuid
   // Stored normalized (trimmed, lowercased); never changed, never released.
@@ -31,8 +44,9 @@ model User {
   createdAt         DateTime  @default(now()) @db.Timestamptz(3)
   updatedAt         DateTime  @updatedAt @db.Timestamptz(3)
 
-  invites       Invite[] @relation("InviteUser")
-  issuedInvites Invite[] @relation("InviteIssuer")
+  invites       Invite[]       @relation("InviteUser")
+  issuedInvites Invite[]       @relation("InviteIssuer")
+  conversations Conversation[]
 
   @@unique([role], map: "users_one_super_admin", where: { role: "SUPER_ADMIN" })
   @@map("users")
@@ -54,4 +68,36 @@ model Invite {
   @@unique([userId], map: "invites_one_outstanding_per_user", where: raw("\"consumedAt\" IS NULL AND \"revokedAt\" IS NULL"))
   @@index([userId])
   @@map("invites")
+}
+
+model Conversation {
+  id        String    @id @default(uuid(7)) @db.Uuid
+  userId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  title     String
+  createdAt DateTime  @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+  messages  Message[]
+
+  @@index([userId, updatedAt(sort: Desc)])
+  @@map("conversations")
+}
+
+model Message {
+  id             String       @id @default(uuid(7)) @db.Uuid
+  conversationId String       @db.Uuid
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  role           MessageRole
+  // AI SDK UIMessage parts as shown; [] while the reply is IN_PROGRESS.
+  parts          Json
+  createdAt      DateTime     @db.Timestamptz(3)
+  model          String?
+  inputTokens    Int?
+  outputTokens   Int?
+  // Null on USER rows.
+  finishReason   ReplyFinish?
+
+  @@unique([conversationId], map: "messages_one_reply_in_progress", where: { finishReason: "IN_PROGRESS" })
+  @@index([conversationId, createdAt])
+  @@map("messages")
 }
