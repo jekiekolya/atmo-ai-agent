@@ -6,6 +6,7 @@ import { resolveLocale } from "@/i18n/locales";
 import { redirect } from "@/i18n/navigation";
 import { PAGES } from "@/lib/routes";
 import { identityOf, type SessionIdentity } from "@/server/auth/session-policy";
+import { canUseChat } from "@/server/chat/access";
 
 export type SessionUser = SessionIdentity & { id: string };
 
@@ -37,4 +38,13 @@ export async function requireSuperAdmin(): Promise<{
 }> {
   const user = await verifySession();
   return { user, permitted: user.role === "SUPER_ADMIN" };
+}
+
+/** A role without the chat gets `permitted: false` and the page renders NotPermitted (FR-001). */
+export async function requireChatAccess(): Promise<{
+  user: SessionUser;
+  permitted: boolean;
+}> {
+  const user = await verifySession();
+  return { user, permitted: canUseChat(user.role) };
 }

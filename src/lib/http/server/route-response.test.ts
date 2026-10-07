@@ -15,6 +15,7 @@ import {
   InvalidInviteError,
   LockedError,
   NotFoundError,
+  RateLimitError,
   ValidationError,
 } from "@/server/errors";
 
@@ -24,6 +25,8 @@ describe("errorResponse", () => {
     [new NotFoundError(), 404, "not_found"],
     [new InvalidInviteError(), 404, "invite_invalid"],
     [new ConflictError("email_in_use"), 409, "email_in_use"],
+    [new ConflictError("reply_in_progress"), 409, "reply_in_progress"],
+    [new ConflictError("nothing_to_retry"), 409, "nothing_to_retry"],
     [new GoneError("invite_expired"), 410, "invite_expired"],
     [new LockedError(), 423, "account_locked"],
   ])("maps %s to %i", async (error, status, code) => {
@@ -31,6 +34,30 @@ describe("errorResponse", () => {
 
     expect(response.status).toBe(status);
     expect(await response.json()).toEqual({ error: { code } });
+  });
+
+  it.each([
+    ["rate_limited", 42],
+    ["daily_limit_reached", 7260],
+  ] as const)(
+    "answers %s with 429, the wait in the body, and Retry-After",
+    async (code, seconds) => {
+      const response = errorResponse(new RateLimitError(code, seconds));
+
+      expect(response.status).toBe(429);
+      expect(response.headers.get("Retry-After")).toBe(String(seconds));
+      expect(await response.json()).toEqual({
+        error: { code, retryAfterSeconds: seconds },
+      });
+    },
+  );
+
+  it("sets Retry-After on no other response", () => {
+    expect(
+      errorResponse(new ConflictError("reply_in_progress")).headers.get(
+        "Retry-After",
+      ),
+    ).toBeNull();
   });
 
   it("carries a detail when the error has one", async () => {

@@ -40,17 +40,19 @@ beforeEach(() => {
 });
 
 describe("defineRoute", () => {
-  it("passes the parsed body, the actor and the awaited params to the handler", async () => {
+  it("passes the parsed body, the actor, the awaited params and the request to the handler", async () => {
     const handler = vi.fn(async () => ok({ done: true }));
     const route = defineRoute({ schema, session: "required", handler });
+    const request = post({ name: "Olena" });
 
-    const response = await route(post({ name: "Olena" }), context);
+    const response = await route(request, context);
 
     expect(response.status).toBe(200);
     expect(handler).toHaveBeenCalledWith({
       body: { name: "Olena" },
       actor,
       params: { id: "t-1" },
+      request,
     });
   });
 
@@ -133,6 +135,7 @@ describe("defineRoute", () => {
       body: { name: "Olena" },
       actor: null,
       params: { id: "t-1" },
+      request: expect.any(Request),
     });
   });
 
@@ -185,6 +188,7 @@ describe("defineRoute", () => {
       body: undefined,
       actor,
       params: { id: "t-1" },
+      request: expect.any(Request),
     });
   });
 

@@ -8,6 +8,8 @@ export const PAGES = {
   dashboard: "/dashboard",
   account: "/dashboard/account",
   users: "/dashboard/users",
+  chat: "/dashboard/chat",
+  chatConversation: "/dashboard/chat/[id]",
 } as const;
 
 export const AUTH_BASE_PATH = "/api/auth";
@@ -21,6 +23,8 @@ export const API_ROUTES = {
   acceptInvite: "/api/invites/accept",
   password: "/api/account/password",
   signOut: "/api/session/sign-out",
+  chat: "/api/chat",
+  chatConversation: "/api/chat/[id]",
 } as const;
 
 type ParamNames<Pattern extends string> =
