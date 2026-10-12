@@ -42,7 +42,7 @@ export function createChatAgent(model: ChatModel): ChatAgent {
     maxOutputTokens: MAX_OUTPUT_TOKENS,
     providerOptions: {
       google: {
-        thinkingConfig: { thinkingLevel: "low", includeThoughts: true },
+        thinkingConfig: { thinkingLevel: "medium", includeThoughts: true },
       } satisfies GoogleGenerativeAIProviderOptions,
     },
     callOptionsSchema,

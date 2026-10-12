@@ -109,6 +109,14 @@ conversation.
   escalation exists. Narrow it? → A: Yes — staff roles only, as a closed list with a test that fails
   when a new role is undecided (FR-001, FR-002).
 
+### Session 2026-10-12
+
+- Q: At the low effort the model reasoned in its own channel on 1 of 13 questions, and once wrote its
+  plan, with a paraphrase of its instructions, into the reply itself. Keep low? → A: No — raise the
+  effort to medium (FR-054). The 4 096-token cap stays (FR-052); medium spends about 2.5–3 times the
+  output tokens, so more replies may end cut and the daily budget is reached sooner. An instruction
+  forbidding the plan in the reply was presented and deferred.
+
 ## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Ask a question and watch the answer arrive (Priority: P1)
@@ -492,9 +500,10 @@ switch language on a conversation page and confirm the same conversation is show
   the reply ends. No duration is shown.
 - **FR-053**: Reasoning MUST be stored with its reply and shown after a reload in a collapsed block with
   the same content (FR-010). Deleting the conversation deletes it.
-- **FR-054**: The model's reasoning effort MUST be fixed in the repository alongside the model, at a low
-  level. _Amended during planning:_ the model bounds reasoning only by this level, not by a separate
-  token limit, so reasoning and text share FR-052's limit.
+- **FR-054**: The model's reasoning effort MUST be fixed in the repository alongside the model, at a
+  medium level. _Amended during planning:_ the model bounds reasoning only by this level, not by a
+  separate token limit, so reasoning and text share FR-052's limit. _Amended 2026-10-12:_ low → medium,
+  after low left most replies without reasoning and once put the model's plan into the reply.
 
 **Conversation list**
 
@@ -771,7 +780,7 @@ All settled in the plan; see [research.md](./research.md).
 
 - **Principles IV and VI** — escalation and its end-to-end test are recorded as a justified deviation in
   the plan's constitution check.
-- **The model** — `gemini-3.5-flash-lite`, low reasoning effort with summaries, a 4 096-token cap (R1);
+- **The model** — `gemini-3.5-flash-lite`, medium reasoning effort with summaries, a 4 096-token cap (R1);
   the provider justified as a new data recipient (R17).
 - **The provider key's variable name** — `GOOGLE_GENERATIVE_AI_API_KEY`, passed explicitly from Config
   (R14).

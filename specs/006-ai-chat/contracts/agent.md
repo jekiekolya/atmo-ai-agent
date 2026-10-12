@@ -15,7 +15,7 @@ getChatAgent(): Promise<ToolLoopAgent<{ locale: Locale; today: string }>>
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ------- |
 | `model`             | `createGoogleGenerativeAI({ apiKey: config.ai.googleApiKey })("gemini-3.5-flash-lite")`, or the test model when `config.ai.fakeModel` | R1, R13 |
 | `maxOutputTokens`   | `4096` — reasoning and text together                                                                                                  | FR-052  |
-| `providerOptions`   | `{ google: { thinkingConfig: { thinkingLevel: "low", includeThoughts: true } } }`                                                     | FR-054  |
+| `providerOptions`   | `{ google: { thinkingConfig: { thinkingLevel: "medium", includeThoughts: true } } }`                                                  | FR-054  |
 | `callOptionsSchema` | `{ locale: enum(routing.locales), today: ISO date }`                                                                                  | R2      |
 | `prepareCall`       | `({ options, ...rest }) => ({ ...rest, instructions: buildInstructions(options) })`                                                   | R2      |
 | tools               | none (FR-046)                                                                                                                         |         |

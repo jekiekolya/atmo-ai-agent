@@ -49,7 +49,8 @@ npm run dev
 Before the first merge, with the real model:
 
 - SC-002: the thinking block or the first words appear within 3 s of sending.
-- Reasoning: note how many of ~10 typical questions show a reasoning block at `low` effort (R1).
+- Reasoning: note how many of ~10 typical questions show a reasoning block at `medium` effort, and
+  that no reply's text opens with the model's plan or a paraphrase of its instructions (R1).
 - R6: send a message, force a failure (temporarily set an invalid key and restart), restore the key,
   send another message — the model must accept two consecutive user turns. If it rejects them, join
   consecutive user turns in `toModelHistory` before merging.

@@ -199,6 +199,21 @@ describe("respondToChat", () => {
     expect(system.content).toMatch(/Ukrainian/);
     expect(system.content).toContain(new Date().toISOString().slice(0, 10));
   });
+
+  it("asks the model for medium reasoning with summaries, within one 4 096-token cap (FR-052, FR-054)", async () => {
+    const model = useModel(answer());
+    const user = await createUserRow();
+
+    await chunksOf(
+      await respondToChat(actorOf(user), send, new AbortController().signal),
+    );
+
+    const [call] = model.doStreamCalls;
+    expect(call.maxOutputTokens).toBe(4096);
+    expect(call.providerOptions?.google).toEqual({
+      thinkingConfig: { thinkingLevel: "medium", includeThoughts: true },
+    });
+  });
 });
 
 function slowAnswer(): StreamPart[] {

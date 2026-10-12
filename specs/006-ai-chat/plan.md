@@ -15,7 +15,7 @@ long conversation.
 
 The technical spine:
 
-1. **One agent module.** A `ToolLoopAgent` on `gemini-3.5-flash-lite` with low reasoning effort and one
+1. **One agent module.** A `ToolLoopAgent` on `gemini-3.5-flash-lite` with medium reasoning effort and one
    4 096-token cap. A per-call `prepareCall` injects the date and the page locale into instructions that
    are reviewed like code (R1, R2).
 2. **One streaming endpoint.** `POST /api/chat` runs one transaction under a lock on the user's row:
@@ -265,7 +265,7 @@ Recorded here because Principle III forbids the code being the only record of in
 - **SC-002**: first reasoning or text from the model after 0.6–1.4 s across 13 questions, well inside 3 s (measured at the model; the page adds one transaction).
 - **R6**: Gemini accepted two consecutive user turns; `toModelHistory` needs no join.
 - **FR-020**: with an invalid key the browser received only `errorText: "model_failed"`; the provider's message reached the server log only. The AI SDK's own default error logging also prints the failed request, conversation included, to the server log.
-- **Reasoning at `low` (R1, FR-054)**: the model reasoned on 1 of 13 questions; the others arrived with no reasoning block. At `medium` it reasoned on 3 of 3, with the first output after 1.3–1.6 s and about 2.5–3 times the output tokens. R1 names this as the trigger to revisit the level; FR-054 fixes it at low, so the choice is left to the developer.
+- **Reasoning at `low` (R1, FR-054)**: the model reasoned on 1 of 13 questions; the others arrived with no reasoning block. At `medium` it reasoned on 3 of 3, with the first output after 1.3–1.6 s and about 2.5–3 times the output tokens. R1 names this as the trigger to revisit the level; FR-054 fixes it at low, so the choice is left to the developer. On 2026-10-12, after a reply at `low` carried the model's plan in its text, the developer chose `medium` and FR-054 was amended.
 
 ## Phase Status
 

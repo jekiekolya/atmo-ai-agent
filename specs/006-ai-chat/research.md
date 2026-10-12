@@ -20,10 +20,10 @@ did not foresee: a `loading.tsx` above a page turns its `notFound()` into a 200 
 
 ---
 
-## R1. The model: `gemini-3.5-flash-lite`, low reasoning effort, one 4 096-token cap
+## R1. The model: `gemini-3.5-flash-lite`, medium reasoning effort, one 4 096-token cap
 
 **Decision**: `google("gemini-3.5-flash-lite")` with
-`providerOptions.google.thinkingConfig = { thinkingLevel: "low", includeThoughts: true }` and
+`providerOptions.google.thinkingConfig = { thinkingLevel: "medium", includeThoughts: true }` and
 `maxOutputTokens: 4096`. No `temperature`, `topP`, or `topK`. Earlier replies' reasoning is not sent
 back as context (R6).
 
@@ -62,6 +62,11 @@ unconfirmed for 3.x and possibly removed with a model update; the user chose the
 `gemini-3.1-flash-lite` — cheaper ($0.25 / $1.50 per 1M against $0.30 / $2.50) but shuts down in seven
 months. Medium effort — more reliable summaries, at more latency and output cost; revisit if `low`
 leaves most replies without a reasoning block.
+
+**Revisited 2026-10-12**: `low` reasoned on 1 of 13 live questions, and once the model wrote its plan, with
+a paraphrase of its instructions, into an ordinary text part — the provider maps only parts marked
+`thought` to reasoning (`dist/index.js:1862`). `medium` reasoned on 3 of 3 (plan.md, live model check).
+The level is now `medium`; the cap stays at 4 096 (spec FR-054, session 2026-10-12).
 
 ## R2. One agent module: a `ToolLoopAgent` with per-call options for date and locale
 
