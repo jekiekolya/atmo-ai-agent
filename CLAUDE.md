@@ -56,16 +56,16 @@ anything in this file. Re-read it when planning a feature. The rules that bite m
 
 Fixed by the constitution — changing this layer is an amendment, not a feature decision.
 
-|           |                                                                         |
-| --------- | ----------------------------------------------------------------------- |
-| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript `strict`       |
-| Styling   | Tailwind CSS v4                                                         |
-| UI        | shadcn/ui on Base UI, vendored via its CLI                              |
-| Chat UI   | assistant-ui, Base UI variants via the shadcn CLI — _not yet installed_ |
-| Database  | PostgreSQL via Prisma, committed migrations only                        |
-| AI        | Vercel AI SDK, a provider package per provider — _not yet installed_    |
-| i18n      | next-intl (locale-prefixed routing, catalogs in `src/messages/`)        |
-| Testing   | Vitest (unit/integration), Playwright (e2e)                             |
+|           |                                                                   |
+| --------- | ----------------------------------------------------------------- |
+| Framework | Next.js 16 (App Router, Turbopack), React 19, TypeScript `strict` |
+| Styling   | Tailwind CSS v4                                                   |
+| UI        | shadcn/ui on Base UI, vendored via its CLI                        |
+| Chat UI   | assistant-ui, Base UI variants via the shadcn CLI                 |
+| Database  | PostgreSQL via Prisma, committed migrations only                  |
+| AI        | Vercel AI SDK, a provider package per provider — `@ai-sdk/google` |
+| i18n      | next-intl (locale-prefixed routing, catalogs in `src/messages/`)  |
+| Testing   | Vitest (unit/integration), Playwright (e2e)                       |
 
 Adding any other runtime dependency requires a stated reason in the feature plan: what it
 does, what building it ourselves would cost, what the dependency costs. Pulling a shadcn/ui
@@ -99,6 +99,7 @@ src/components/     domain groups, one folder per component inside (see below)
 src/components/ui/  shadcn/ui primitives (owned code — edit in place)
 src/config/         the single Config module
 src/conventions/    repo-wide checks that scan source files rather than test one module
+src/hooks/          hooks the shadcn CLI installs; hooks we write sit beside their domain
 .specify/           constitution, spec templates, spec-kit scripts
 ```
 
