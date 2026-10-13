@@ -545,6 +545,9 @@ which means a model failure is announced.
 | ----------------------- | ----------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@ai-sdk/google@4.0.87` | runtime, provider                               | Gemini API client for the AI SDK. It maps streaming, thinking, usage, and finish reasons | The Gemini REST and SSE protocol, the thought-part mapping, and usage accounting. All of it is behind the `ai` interfaces we already use | **A new recipient of customer data.** Every question and the conversation history go to Google. On the free tier Google uses them to improve its products, and human reviewers may read them. That is why the tier is limited to development and test data, and why the paid tier, which does not use them, is required before any real customer data and for any user in the EEA, Switzerland, or the UK (R18). The client itself has no dependencies beyond the AI SDK's own and pins one model id (R1) |
 | `remark-gfm`            | runtime (via the `markdown-text` registry item) | GitHub-flavoured Markdown: tables, strikethrough, task lists, autolinks                  | A Markdown extension for `react-markdown`. Model replies use tables often, and without it they render as rows of pipes                   | One small, widely used unified plugin. It ships with the vendored registry item                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `remark-math@6.0.0`     | runtime (2026-10-12, R19)                       | Recognises `$…$` and `$$…$$` in Markdown as math                                         | A micromark syntax extension plus its mdast handling: the delimiter rules, escapes, and code spans are exactly what this package encodes | One small unified plugin from the same family as `remark-gfm`; it only parses                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| `rehype-katex@7.0.1`    | runtime (2026-10-12, R19)                       | Renders the math nodes `remark-math` produced with KaTeX, at render time                 | A rehype plugin around KaTeX's `renderToString`, with error handling for a formula the model got wrong                                   | Small, but it declares `katex ^0.16.0`; an npm override lifts it to 0.19 (below)                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `katex@^0.19.0`         | runtime (2026-10-12, R19)                       | TeX layout to HTML, and the stylesheet and fonts formulas need                           | A TeX math typesetter: not something to build                                                                                            | About 4 MB unpacked; on the chat pages only, about 82 KB more gzipped JS and 4 KB CSS, plus only the fonts a formula uses. Untrusted commands (`\href`, `\includegraphics`, `\html…`) stay off by default, so a formula fetches nothing and links nowhere (FR-024)                                                                                                                                                                                                                                        |
 
 - **Exempt**, named by the constitution: `ai`, `@ai-sdk/react`, `@assistant-ui/react`,
   `@assistant-ui/ai-sdk` (1.6.2), `@assistant-ui/react-markdown`, and every shadcn component pulled
@@ -573,3 +576,38 @@ $0.01 in output. The default daily budget of 500 000 tokens is at most about $1.
 if every token were output. Google publishes no time-to-first-token figure. Its only speed figure,
 attributed to a third party, is 350 output tokens per second. The quickstart's live check measures
 SC-002 by hand.
+
+## R19. Formulas and links in replies (2026-10-12, FR-024)
+
+**Decision**:
+
+- `markdown-text` adds `remarkMath` after `remarkGfm` and `rehypeKatex` as its one rehype plugin, and
+  imports `katex/dist/katex.min.css` where it is defined.
+- Its `preprocess` runs `normalizeMathDelimiters`, then `escapeCurrencyDollars`, both from
+  `@assistant-ui/react-markdown`. The first turns the `\(…\)`, `\[…\]` and `[/math]` forms models emit
+  into the dollar form `remark-math` reads; the second escapes a `$` that opens a price (`$120`), and
+  runs last so it judges the text `remark-math` will see. The package documents both helpers but no
+  order.
+- The `a` component gets `target="_blank"` and `rel="noopener noreferrer nofollow"`. The assistant-ui
+  markdown docs show the same override with `rel="noreferrer"`; `noopener` and `nofollow` are added for
+  model-written links.
+
+**Rationale**: Gemini writes symbols such as `$V_{oc}$` in TeX, which showed as raw text.
+`react-markdown` 10.1 already drops `javascript:` and other unsafe URLs, and without `rehype-raw` it
+never interprets HTML, so FR-024's limits hold with the new plugins.
+
+`katex` below 0.18.2 is affected by GHSA-238p-pmpm-9mq7 (low): where `Object.prototype` is already
+polluted, an inherited `trust` enables `\href` and `\includegraphics`. `rehype-katex` 7.0.1 and
+`micromark-extension-math` 3.1.0 both declare `katex ^0.16.0`, which excludes the fix, so
+`package.json` depends on `katex ^0.19.0` and overrides every copy to it (`"katex": "$katex"`). Neither
+package is tested against 0.19 by its authors; both call only `renderToString` and `ParseError`, and
+the formula tests and the chat e2e suite pass on it. Remove the override once
+[remarkjs/remark-math#121](https://github.com/remarkjs/remark-math/issues/121) widens the range. Even
+with `trust` on, FR-024 would hold: `react-markdown` passes every URL in the final tree through
+`urlTransform` after the rehype plugins (`lib/index.js:374`), and `markdown-text` renders `img` as
+nothing.
+
+**Alternatives considered**: an instruction telling the model to avoid TeX — cheaper, but the developer
+chose rendering. `@assistant-ui/react-streamdown`, which bundles KaTeX with Shiki and Mermaid — two
+heavy features the spec does not want. Mermaid diagrams, code highlighting, `remark-breaks`, and
+`rehype-raw` were presented and not taken.

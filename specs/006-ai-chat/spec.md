@@ -122,6 +122,10 @@ conversation.
   instead (FR-044). It reduces casual disclosure and self-invented rules but is not a safeguard:
   whatever the instructions hold can still be drawn out. A filter on the reply text was presented and
   not taken.
+- Q: Replies write formulas in TeX (`$V_{oc}$`), which showed as raw text. Render them, or tell the
+  model to avoid TeX? → A: Render them; a dollar amount in prose stays text. Links in a reply open in a
+  new tab, so following one does not leave the chat (FR-024). Diagrams, code highlighting, and HTML in
+  replies were presented and not taken.
 
 ## User Scenarios & Testing _(mandatory)_
 
@@ -150,8 +154,8 @@ the address changes to the conversation's own; reload and confirm the same two m
 4. **Given** a reply has finished, **When** the user reloads the page or opens the conversation's
    address later, **Then** every message is shown in the same order with the same content.
 5. **Given** a reply containing Markdown, **When** it is shown, **Then** it is rendered as formatted
-   text (emphasis, lists, headings, code, links), while the user's own messages are shown as plain text
-   exactly as typed.
+   text (emphasis, lists, headings, code, links, formulas), while the user's own messages are shown as
+   plain text exactly as typed.
 6. **Given** a finished reply, **When** the user activates its Copy action, **Then** its text is placed
    on the clipboard and the action visibly confirms it.
 7. **Given** an existing conversation, **When** the user sends another message, **Then** the reply
@@ -494,7 +498,10 @@ switch language on a conversation page and confirm the same conversation is show
 **Display**
 
 - **FR-024**: Replies MUST be rendered as Markdown. Raw HTML in a reply MUST NOT be interpreted, no
-  script in it may run, and no embedded content (such as an image) may be fetched.
+  script in it may run, and no embedded content (such as an image) may be fetched. _Amended
+  2026-10-12:_ mathematical notation between dollar signs (`$…$`, `$$…$$`) MUST be rendered as a
+  formula, while a dollar amount in prose (such as $120) MUST stay text; a link in a reply MUST open in
+  a new tab, and the opened page MUST get neither a handle on the chat nor its address.
 - **FR-025**: The user's own messages MUST be shown as plain text exactly as typed, line breaks kept.
 - **FR-026**: Each reply MUST offer a Copy action that puts its text — not its reasoning — on the
   clipboard and visibly confirms it.

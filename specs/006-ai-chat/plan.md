@@ -46,7 +46,8 @@ agent's instructions are model input, not copy.
   `@assistant-ui/react@0.15.23`, `@assistant-ui/ai-sdk@0.0.9`, `@assistant-ui/react-markdown@0.14.18`.
 - **New, justified** ([research R17](./research.md#r17-dependency-justifications-constitution-technology-constraints)):
   `@ai-sdk/google@4.0.87`, a provider and a new recipient of customer data; `remark-gfm`, which arrives
-  with the registry's `markdown-text`.
+  with the registry's `markdown-text`. Added 2026-10-12 for formulas (FR-024, R19): `remark-math@6.0.0`,
+  `rehype-katex@7.0.1`, and `katex@^0.19.0`, the last through an npm override (R19).
 - Via the shadcn CLI:
   - assistant-ui registry items `markdown-text` and `reasoning`, Base UI style;
   - shadcn `tooltip` and `collapsible`.

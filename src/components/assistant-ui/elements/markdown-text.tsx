@@ -1,14 +1,19 @@
 "use client";
 
 import "@assistant-ui/react-markdown/styles/dot.css";
+import "katex/dist/katex.min.css";
 
 import {
   type CodeHeaderProps,
+  escapeCurrencyDollars,
   MarkdownTextPrimitive,
+  normalizeMathDelimiters,
   unstable_memoizeMarkdownComponents as memoizeMarkdownComponents,
   useIsMarkdownCodeBlock,
 } from "@assistant-ui/react-markdown";
+import rehypeKatex from "rehype-katex";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
 import {
   createContext,
   type FC,
@@ -44,6 +49,9 @@ const useShallowStable = <T extends Record<string, unknown> | undefined>(
   return value;
 };
 
+const preprocess = (text: string) =>
+  escapeCurrencyDollars(normalizeMathDelimiters(text));
+
 const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components }) => {
   const stableComponents = useShallowStable(components);
   const markdownComponents = useMemo(() => {
@@ -56,7 +64,9 @@ const MarkdownTextImpl: FC<MarkdownTextProps> = ({ components }) => {
 
   return (
     <MarkdownTextPrimitive
-      remarkPlugins={[remarkGfm]}
+      remarkPlugins={[remarkGfm, remarkMath]}
+      rehypePlugins={[rehypeKatex]}
+      preprocess={preprocess}
       className="aui-md"
       components={markdownComponents}
       defer
@@ -177,6 +187,8 @@ const defaultComponents = memoizeMarkdownComponents({
         className,
       )}
       {...props}
+      target="_blank"
+      rel="noopener noreferrer nofollow"
     />
   ),
   blockquote: ({ className, ...props }) => (

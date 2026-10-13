@@ -107,6 +107,81 @@ describe("ChatThread", () => {
     expect(document.querySelector("b")).toBeNull();
   });
 
+  it("renders inline and display formulas (FR-024)", async () => {
+    render(
+      <Harness
+        messages={[
+          question("Hi"),
+          reply([
+            {
+              type: "text",
+              text: "Keep $V_{oc}$ below the limit.\n\n$$\nP = U \\cdot I\n$$",
+            },
+          ]),
+        ]}
+      />,
+    );
+
+    const paragraph = await screen.findByText(/below the limit/);
+    expect(document.querySelectorAll(".katex")).toHaveLength(2);
+    expect(document.querySelector(".katex-display")).not.toBeNull();
+    expect(paragraph.textContent).not.toContain("$");
+  });
+
+  it("keeps dollar amounts as text (FR-024)", async () => {
+    render(
+      <Harness
+        messages={[
+          question("Hi"),
+          reply([
+            { type: "text", text: "A panel costs $120 and an inverter $800." },
+          ]),
+        ]}
+      />,
+    );
+
+    expect(
+      await screen.findByText("A panel costs $120 and an inverter $800."),
+    ).toBeInTheDocument();
+    expect(document.querySelector(".katex")).toBeNull();
+  });
+
+  it("renders no link from inside a formula (FR-024)", async () => {
+    render(
+      <Harness
+        messages={[
+          question("Hi"),
+          reply([
+            {
+              type: "text",
+              text: "See $\\href{https://example.com}{x}$ here.",
+            },
+          ]),
+        ]}
+      />,
+    );
+
+    await screen.findByText(/here/);
+    expect(document.querySelector("a")).toBeNull();
+  });
+
+  it("opens a link in a new tab, giving the page no handle on the chat (FR-024)", async () => {
+    render(
+      <Harness
+        messages={[
+          question("Hi"),
+          reply([
+            { type: "text", text: "Read [the guide](https://example.com)." },
+          ]),
+        ]}
+      />,
+    );
+
+    const link = await screen.findByRole("link", { name: "the guide" });
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer nofollow");
+  });
+
   it("collapses the reasoning of an ended reply under its label (FR-028, FR-053)", async () => {
     render(
       <Harness

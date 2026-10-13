@@ -528,6 +528,15 @@ a conversation and on the new-chat page and stay there (spec US7).
 
 ---
 
+## Phase 11: Formulas and links in replies (2026-10-12, FR-024 amended)
+
+- [x] T089 Write failing tests in `src/components/chat/chat-thread/chat-thread.test.tsx`: a reply with inline `$V_{oc}$` and a display `$$` block on its own lines renders KaTeX output; `$120 and $800` stays text; a `\href{https://example.com}{x}` formula renders no link; a Markdown link opens in a new tab with `rel="noopener noreferrer nofollow"` (R19)
+- [x] T090 Install `remark-math@6.0.0`, `rehype-katex@7.0.1`, and `katex@^0.19.0` with an npm override past the `^0.16.0` both math packages declare; confirm `npm ls katex` shows one copy and `npm audit` reports no KaTeX advisory (R17, R19)
+- [x] T091 In `src/components/assistant-ui/elements/markdown-text.tsx`: add `remarkMath` and `rehypeKatex`, the `preprocess` of `normalizeMathDelimiters` then `escapeCurrencyDollars`, the KaTeX stylesheet, and the link's `target` and `rel` (R19)
+- [x] T092 Ask the live model a question that draws formulas (open-circuit voltage against the inverter's limit) and one with prices in dollars; confirm formulas render, prices stay text, and a link opens in a new tab — 2026-10-13: formulas and dollar prices checked on the live model; no reply carried a link, so the new tab rests on T089's component test
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies
