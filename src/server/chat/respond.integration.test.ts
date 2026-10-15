@@ -17,7 +17,10 @@ vi.mock("@/server/chat/agent", async (importOriginal) => {
   const original = await importOriginal<typeof import("@/server/chat/agent")>();
   return {
     ...original,
-    getChatAgent: async () => agentModule.current,
+    getChatAgent: async () => {
+      if (agentModule.current instanceof Error) throw agentModule.current;
+      return agentModule.current;
+    },
   };
 });
 
@@ -473,5 +476,52 @@ describe("respondToChat — limits (SC-008)", () => {
       respondToChat(actorOf(user), send, new AbortController().signal, now),
     ).rejects.toMatchObject({ code: "rate_limited" });
     expect(model.doStreamCalls).toEqual([]);
+  });
+});
+
+describe("respondToChat — failures around the turn (review findings 1 and 3)", () => {
+  it("stores nothing when the agent cannot be built", async () => {
+    agentModule.current = new Error("cannot build the agent");
+    const user = await createUserRow();
+
+    await expect(
+      respondToChat(actorOf(user), send, new AbortController().signal),
+    ).rejects.toThrow("cannot build the agent");
+
+    expect(await db.conversation.count()).toBe(0);
+    expect(await db.message.count()).toBe(0);
+  });
+
+  it("answers a stream that fails to start after the turn is stored with a failed reply, not a 500", async () => {
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => {});
+    const model = useModel(answer());
+    const user = await createUserRow();
+
+    // A locale the agent's own call options refuse makes the stream fail to start.
+    const response = await respondToChat(
+      actorOf(user),
+      { ...send, locale: "de" as never },
+      new AbortController().signal,
+    );
+    const chunks = await chunksOf(response);
+
+    expect(response.status).toBe(200);
+    const reply = await db.message.findFirstOrThrow({
+      where: { role: "ASSISTANT" },
+    });
+    expect(chunks[0]).toMatchObject({
+      type: "start",
+      messageId: reply.id,
+      messageMetadata: { conversationId: reply.conversationId },
+    });
+    expect(chunks).toContainEqual(
+      expect.objectContaining({ type: "error", errorText: "model_failed" }),
+    );
+    expect(reply.finishReason).toBe("FAILED");
+    expect(await db.message.count({ where: { role: "USER" } })).toBe(1);
+    expect(model.doStreamCalls).toEqual([]);
+    consoleError.mockRestore();
   });
 });

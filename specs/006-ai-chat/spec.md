@@ -701,6 +701,11 @@ Accepted limitations, recorded so they are found here rather than discovered lat
 - **Reasoning is a summary.** The provider returns a summary of the model's reasoning, not all of it;
   its language is the model's choice, and it is not checked for accuracy. Thinking also costs tokens
   and delays the reply's first words.
+- **Replies that end early carry no token count.** The provider reports a reply's tokens only when it
+  finishes, so a reply ended by Stop, a closed page, the timeout, or a provider error is stored without
+  them and counts as 0 toward the daily budget, although the model used tokens on it. The per-minute
+  limit still counts every such request. Accepted for staff; the customer-facing chat needs the same
+  usage record as the deletion boundary above. _Added after review._
 - **Daily budget under concurrency.** A reply's tokens are known only when it ends, so replies being
   written at the same moment in different conversations can all pass the daily check and together
   exceed the budget by their size. The per-minute limit has no such gap, since a reply is stored when it

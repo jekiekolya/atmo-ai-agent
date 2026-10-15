@@ -7,6 +7,7 @@ import {
   effectiveOutcome,
   foldFailedReplies,
   REPLY_TIMEOUT_MS,
+  STALE_REPLY_MS,
 } from "@/lib/chat/messages";
 
 const now = new Date("2026-10-04T12:00:00.000Z");
@@ -46,26 +47,33 @@ describe("effectiveOutcome", () => {
     );
   });
 
-  it("reads a reply being written as in progress within the timeout", () => {
-    expect(
-      effectiveOutcome(
-        { finishReason: "IN_PROGRESS", createdAt: ago(59_999) },
-        now,
-      ),
-    ).toBe("in_progress");
-  });
-
-  it("reads a reply left in progress past the timeout as failed (FR-015)", () => {
+  it("reads a reply just past the timeout as still in progress, as it may yet end and be written", () => {
     expect(
       effectiveOutcome(
         { finishReason: "IN_PROGRESS", createdAt: ago(60_001) },
         now,
       ),
+    ).toBe("in_progress");
+    expect(
+      effectiveOutcome(
+        { finishReason: "IN_PROGRESS", createdAt: ago(STALE_REPLY_MS - 1) },
+        now,
+      ),
+    ).toBe("in_progress");
+  });
+
+  it("reads a reply left in progress past the timeout and its grace as failed (FR-015)", () => {
+    expect(
+      effectiveOutcome(
+        { finishReason: "IN_PROGRESS", createdAt: ago(STALE_REPLY_MS + 1) },
+        now,
+      ),
     ).toBe("failed");
   });
 
-  it("times out after one minute", () => {
+  it("times out after one minute, and counts a reply stale 15 s later", () => {
     expect(REPLY_TIMEOUT_MS).toBe(60_000);
+    expect(STALE_REPLY_MS).toBe(75_000);
   });
 });
 

@@ -235,7 +235,8 @@
       "tooLong": "This message is too long. Use at most {max} characters.",
       "rateLimited": "You are sending messages too quickly. Wait a moment and try again.",
       "dailyLimitHours": "{hours, plural, one {You have reached today's chat limit. The chat will be available again in about # hour.} other {You have reached today's chat limit. The chat will be available again in about # hours.}}",
-      "dailyLimitUnderHour": "You have reached today's chat limit. The chat will be available again in less than an hour."
+      "dailyLimitUnderHour": "You have reached today's chat limit. The chat will be available again in less than an hour.",
+      "network": "Could not reach the server. Check your connection and try again."
     },
     "metaTitle": "Chat",
     "greeting": "Hello! Ask me anything about solar energy: panels, inverters, batteries, installation, maintenance, or savings.",

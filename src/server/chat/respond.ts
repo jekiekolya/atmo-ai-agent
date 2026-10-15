@@ -1,6 +1,8 @@
 import {
   consumeStream,
   createAgentUIStreamResponse,
+  createUIMessageStream,
+  createUIMessageStreamResponse,
   type FinishReason,
   type LanguageModelUsage,
 } from "ai";
@@ -8,6 +10,7 @@ import {
 import {
   type ChatMessageMetadata,
   type ChatPart,
+  type ChatUIMessage,
   OUTCOME_OF,
   REPLY_TIMEOUT_MS,
 } from "@/lib/chat/messages";
@@ -38,8 +41,9 @@ export async function respondToChat(
   now: Date = new Date(),
   timeoutMs: number = REPLY_TIMEOUT_MS,
 ): Promise<Response> {
-  const turn = await startChatTurn(actor, input, now);
+  // Before the turn: a build failure must leave nothing stored.
   const { agent, modelId } = await getChatAgent();
+  const turn = await startChatTurn(actor, input, now);
 
   let errored = false;
   let finishReason: FinishReason | undefined;
@@ -98,12 +102,25 @@ export async function respondToChat(
       consumeSseStream: consumeStream,
     });
   } catch (error) {
+    console.error(error);
     await record(turn.replyId, {
       outcome: "FAILED",
       parts: [],
       usage: { inputTokens: undefined, outputTokens: undefined },
       model: modelId,
     });
-    throw error;
+    // The question is stored, so the browser gets a failed reply it can try again, not a 500.
+    return createUIMessageStreamResponse({
+      stream: createUIMessageStream<ChatUIMessage>({
+        execute: ({ writer }) => {
+          writer.write({
+            type: "start",
+            messageId: turn.replyId,
+            messageMetadata: { conversationId: turn.conversationId },
+          });
+          writer.write({ type: "error", errorText: "model_failed" });
+        },
+      }),
+    });
   }
 }

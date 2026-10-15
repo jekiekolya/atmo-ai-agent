@@ -78,7 +78,7 @@ Created in the same transaction as its first user message and that message's rep
             startChatTurn
 (none) ───────────────────▶ IN_PROGRESS ──finishReply──▶ COMPLETED | STOPPED | CUT | FAILED
                                 │
-                                └── older than 60 s at the next turn, or when read ──▶ FAILED
+                                └── older than 75 s (timeout + grace) at the next turn, or when read ──▶ FAILED
 ```
 
 `finishReply` updates only `WHERE id = … AND finishReason = 'IN_PROGRESS'`: a reply whose conversation
@@ -92,12 +92,12 @@ A question has zero or more `FAILED` replies, followed by at most one reply that
 
 ## Derived values (no storage)
 
-| Value                       | Computed from                                                                                    | Where                          |
-| --------------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------ |
-| Requests in the last minute | count of the user's `ASSISTANT` rows with `createdAt > now − 60 s`                               | `limits` query (R5)            |
-| Tokens in the last 24 h     | sum of `inputTokens + outputTokens` of the user's `ASSISTANT` rows with `createdAt > now − 24 h` | `limits` query (R5)            |
-| Seconds until budget frees  | the same rows, oldest first                                                                      | `secondsUntilBudgetFrees` (R5) |
-| Effective outcome           | `finishReason`, with `IN_PROGRESS` older than 60 s read as `FAILED`                              | `effectiveOutcome` (R10)       |
+| Value                       | Computed from                                                                                            | Where                          |
+| --------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| Requests in the last minute | count of the user's `ASSISTANT` rows with `createdAt > now − 60 s`                                       | `limits` query (R5)            |
+| Tokens in the last 24 h     | sum of `inputTokens + outputTokens` of the user's `ASSISTANT` rows with `createdAt > now − 24 h`         | `limits` query (R5)            |
+| Seconds until budget frees  | the same rows, oldest first                                                                              | `secondsUntilBudgetFrees` (R5) |
+| Effective outcome           | `finishReason`, with `IN_PROGRESS` older than 75 s (the 60 s timeout plus a 15 s grace) read as `FAILED` | `effectiveOutcome` (R10)       |
 
 ## Browser-side message shape (`src/lib/chat/messages.ts`)
 

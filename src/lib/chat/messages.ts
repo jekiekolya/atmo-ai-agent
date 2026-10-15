@@ -4,6 +4,9 @@ import { z } from "zod";
 /** After this long a reply still being written counts as failed (FR-015, FR-017). */
 export const REPLY_TIMEOUT_MS = 60_000;
 
+/** A reply still in progress this long after its row was created has failed; the grace covers the stream starting after the row and its end being written. */
+export const STALE_REPLY_MS = REPLY_TIMEOUT_MS + 15_000;
+
 export const CHAT_OUTCOMES = [
   "in_progress",
   "completed",
@@ -50,7 +53,7 @@ export function effectiveOutcome(
     return OUTCOME_OF[reply.finishReason];
   }
   const age = now.getTime() - reply.createdAt.getTime();
-  return age > REPLY_TIMEOUT_MS ? "failed" : "in_progress";
+  return age > STALE_REPLY_MS ? "failed" : "in_progress";
 }
 
 /** Failed replies that a later reply answered move under their question, as on screen before a reload (R10). */

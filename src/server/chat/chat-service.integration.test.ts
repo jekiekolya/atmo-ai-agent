@@ -244,14 +244,33 @@ describe("startChatTurn — turn state", () => {
     expect(await rowsOf(turn.conversationId)).toHaveLength(2);
   });
 
-  it("fails a reply left in progress past the timeout and accepts the question (FR-015)", async () => {
+  it("leaves a reply just past the timeout in progress, as it may yet end and be written", async () => {
+    const user = await createUserRow();
+    const turn = await startChatTurn(actorOf(user), send("Hi"), at(0), limits);
+
+    await expect(
+      startChatTurn(
+        actorOf(user),
+        send("Again", turn.conversationId),
+        at(61),
+        limits,
+      ),
+    ).rejects.toThrow(new ConflictError("reply_in_progress"));
+
+    const reply = await db.message.findUniqueOrThrow({
+      where: { id: turn.replyId },
+    });
+    expect(reply.finishReason).toBe("IN_PROGRESS");
+  });
+
+  it("fails a reply left in progress past the timeout and its grace, and accepts the question (FR-015)", async () => {
     const user = await createUserRow();
     const stale = await startChatTurn(actorOf(user), send("Hi"), at(0), limits);
 
     await startChatTurn(
       actorOf(user),
       send("Again", stale.conversationId),
-      at(60.001),
+      at(75.001),
       limits,
     );
 
@@ -404,7 +423,7 @@ describe("getOwnConversation", () => {
     const conversation = await getOwnConversation(
       actorOf(user),
       turn.conversationId,
-      at(61),
+      at(76),
     );
 
     expect(conversation.messages[1].metadata?.outcome).toBe("failed");

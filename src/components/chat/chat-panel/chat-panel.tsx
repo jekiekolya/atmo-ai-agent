@@ -47,6 +47,7 @@ const REFUSAL_KEYS: Partial<Record<string, string>> = {
   not_found: "chat.errors.notFound",
   reply_in_progress: "chat.errors.inProgress",
   nothing_to_retry: "chat.errors.nothingToRetry",
+  network: "chat.errors.network",
 };
 
 /** The failed reply moves under its question before Try again, as the reloaded page shows it (R10). */
@@ -100,18 +101,25 @@ export function ChatPanel({
   const [chatId] = useState(() => conversationId ?? crypto.randomUUID());
   const idRef = useRef(conversationId);
   const pendingRef = useRef<PendingRequest | null>(null);
+  const answeredRef = useRef(false);
   const beforeRetryRef = useRef<ChatUIMessage[] | null>(null);
   const handlersRef = useRef<{
     refused: (refusal: Refusal) => void;
+    unreached: () => void;
     finished: (message: ChatUIMessage) => void;
-  }>({ refused: () => {}, finished: () => {} });
+  }>({ refused: () => {}, unreached: () => {}, finished: () => {} });
 
   const [transport] = useState(
     // eslint-disable-next-line react-hooks/refs -- the transport reads the refs when a request is sent, never during render
     () =>
       new DefaultChatTransport<ChatUIMessage>({
         api: API_ROUTES.chat,
-        fetch: chatFetch,
+        fetch: async (input, init) => {
+          answeredRef.current = false;
+          const response = await chatFetch(input, init);
+          answeredRef.current = true;
+          return response;
+        },
         prepareSendMessagesRequest: ({ messages, trigger }) => {
           const text =
             trigger === "submit-message" ? textOf(messages.at(-1)) : undefined;
@@ -135,9 +143,13 @@ export function ChatPanel({
     messageMetadataSchema: chatMessageMetadataSchema,
     transport,
     onError: (error) => {
-      const refusal = refusalOf(error);
       // The SDK records the error only after this callback; clearing it must come later.
-      if (refusal) queueMicrotask(() => handlersRef.current.refused(refusal));
+      const refusal = refusalOf(error);
+      if (refusal) {
+        queueMicrotask(() => handlersRef.current.refused(refusal));
+      } else {
+        queueMicrotask(() => handlersRef.current.unreached());
+      }
     },
     onFinish: ({ message, isAbort }) =>
       // After Stop the server learns of the abort only when the connection closes; give it time to store the reply.
@@ -207,6 +219,12 @@ export function ChatPanel({
             : `errors.codes.${refusal.code}`);
         // Keys known only at runtime; the catalog tests prove each exists.
         setAlert(t(key as Parameters<typeof t>[0], { max: maxLength }));
+      },
+      // No response came back at all: as with a refusal, the question goes back into the box. A drop mid-stream is onFinish's.
+      unreached: () => {
+        if (!answeredRef.current) {
+          handlersRef.current.refused({ code: "network" });
+        }
       },
       finished: (message) => {
         // onFinish can run before the effect above has seen the start chunk.

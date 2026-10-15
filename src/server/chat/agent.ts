@@ -62,6 +62,10 @@ let cached: Promise<{ agent: ChatAgent; modelId: string }> | undefined;
 
 /** One agent per process, built on first use so the test model loads only when enabled (R2, R13). */
 export function getChatAgent(): Promise<{ agent: ChatAgent; modelId: string }> {
-  cached ??= buildAgent();
+  // A failed build is not kept: the next request tries again.
+  cached ??= buildAgent().catch((error: unknown) => {
+    cached = undefined;
+    throw error;
+  });
   return cached;
 }

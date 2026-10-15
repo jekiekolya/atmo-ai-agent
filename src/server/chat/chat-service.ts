@@ -7,7 +7,7 @@ import {
   type ChatUIMessage,
   effectiveOutcome,
   foldFailedReplies,
-  REPLY_TIMEOUT_MS,
+  STALE_REPLY_MS,
   type StoredFinish,
 } from "@/lib/chat/messages";
 import type { ChatRequest } from "@/lib/schemas/chat";
@@ -130,7 +130,7 @@ export async function startChatTurn(
 
       await repository.failStaleReplies(
         actor.id,
-        new Date(now.getTime() - REPLY_TIMEOUT_MS),
+        new Date(now.getTime() - STALE_REPLY_MS),
         tx,
       );
 

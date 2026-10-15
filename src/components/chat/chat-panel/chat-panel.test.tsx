@@ -267,6 +267,38 @@ describe("ChatPanel", () => {
     ).toBeInTheDocument();
   });
 
+  it("gives the text back when the server cannot be reached (review finding 6)", async () => {
+    chatFetch.mockRejectedValue(new TypeError("Failed to fetch"));
+    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+
+    const input = await send("Offline question");
+
+    expect(await screen.findByText("chat.errors.network")).toBeInTheDocument();
+    await waitFor(() => expect(input).toHaveValue("Offline question"));
+    expect(screen.getByText("chat.greeting")).toBeInTheDocument();
+  });
+
+  it("puts the failed reply back when Try again cannot reach the server", async () => {
+    chatFetch.mockRejectedValue(new TypeError("Failed to fetch"));
+    const user = userEvent.setup();
+    render(
+      <ChatPanel
+        conversationId={CONVERSATION}
+        initialMessages={failedConversation}
+        maxLength={100}
+      />,
+    );
+
+    await user.click(
+      await screen.findByRole("button", { name: "chat.actions.tryAgain" }),
+    );
+
+    expect(await screen.findByText("chat.errors.network")).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "chat.actions.tryAgain" }),
+    ).toBeInTheDocument();
+  });
+
   it.each([
     [7_260, "chat.errors.dailyLimitHours"],
     [1_200, "chat.errors.dailyLimitUnderHour"],
