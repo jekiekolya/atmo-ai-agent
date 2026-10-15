@@ -102,12 +102,20 @@ export function ChatPanel({
   const idRef = useRef(conversationId);
   const pendingRef = useRef<PendingRequest | null>(null);
   const answeredRef = useRef(false);
+  const mountedRef = useRef(false);
+  const [settling, setSettling] = useState(false);
   const beforeRetryRef = useRef<ChatUIMessage[] | null>(null);
   const handlersRef = useRef<{
     refused: (refusal: Refusal) => void;
     unreached: () => void;
+    settle: (disconnected: boolean) => void;
     finished: (message: ChatUIMessage) => void;
-  }>({ refused: () => {}, unreached: () => {}, finished: () => {} });
+  }>({
+    refused: () => {},
+    unreached: () => {},
+    settle: () => {},
+    finished: () => {},
+  });
 
   const [transport] = useState(
     // eslint-disable-next-line react-hooks/refs -- the transport reads the refs when a request is sent, never during render
@@ -151,22 +159,21 @@ export function ChatPanel({
         queueMicrotask(() => handlersRef.current.unreached());
       }
     },
-    onFinish: ({ message, isAbort }) =>
-      // After Stop the server learns of the abort only when the connection closes; give it time to store the reply.
-      setTimeout(
-        () => handlersRef.current.finished(message),
-        isAbort ? STOP_SETTLE_MS : 0,
-      ),
+    onFinish: ({ message, isAbort, isDisconnect }) => {
+      if (!isAbort && !isDisconnect) {
+        handlersRef.current.finished(message);
+        return;
+      }
+      // The server learns of a Stop or a lost connection only when the connection closes; give it time to store the reply.
+      handlersRef.current.settle(isDisconnect);
+      setTimeout(() => handlersRef.current.finished(message), STOP_SETTLE_MS);
+    },
   });
 
-  const lastMessage = chat.messages.at(-1);
   const isRunning = chat.status === "submitted" || chat.status === "streaming";
   const runtime = useAISDKRuntime(chat, {
-    // Another tab's reply is still being written: a question now would be refused (FR-012).
-    isSendDisabled:
-      isRunning ||
-      (lastMessage?.role === "assistant" &&
-        lastMessage.metadata?.outcome === "in_progress"),
+    // A reply another tab is writing is the server's to refuse (FR-012): this tab's copy of it never updates.
+    isSendDisabled: isRunning || settling,
   });
 
   const conversationPath = (id: string) =>
@@ -226,15 +233,42 @@ export function ChatPanel({
           handlersRef.current.refused({ code: "network" });
         }
       },
+      // A lost connection ends the reply as Stop does, and the server stores it so (FR-016).
+      settle: (disconnected) => {
+        setSettling(true);
+        if (!disconnected) return;
+        chat.clearError();
+        chat.setMessages((messages) =>
+          messages.map((message, index) =>
+            index === messages.length - 1 && message.role === "assistant"
+              ? {
+                  ...message,
+                  metadata: { ...message.metadata, outcome: "stopped" },
+                }
+              : message,
+          ),
+        );
+      },
       finished: (message) => {
+        // Gone, e.g. the user left for another page: nothing to show or move to.
+        if (!mountedRef.current) return;
         // onFinish can run before the effect above has seen the start chunk.
         const id = idRef.current ?? message.metadata?.conversationId;
         // A navigation keeps the shared layout as it was; the refresh re-renders the sidebar (FR-031).
+        // A new conversation's page replaces this panel, so Send stays held until it does.
         if (id && !conversationId) router.replace(conversationPath(id));
+        else setSettling(false);
         router.refresh();
       },
     };
   });
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
 
   function tryAgain() {
     beforeRetryRef.current = chat.messages;
@@ -250,6 +284,8 @@ export function ChatPanel({
     <AssistantRuntimeProvider runtime={runtime}>
       <ChatThread
         maxLength={maxLength}
+        // Before the first chunk the conversation's id is unknown, so a Stop then would leave it behind.
+        stopDisabled={chat.status === "submitted"}
         alert={<FormAlert message={alert} />}
         onTryAgain={tryAgain}
       />

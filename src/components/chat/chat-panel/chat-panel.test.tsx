@@ -320,6 +320,197 @@ describe("ChatPanel", () => {
   );
 });
 
+/** A response whose stream the test feeds, ends, or breaks chunk by chunk. */
+function openStream() {
+  let controller!: ReadableStreamDefaultController<Uint8Array>;
+  const encoder = new TextEncoder();
+  const body = new ReadableStream<Uint8Array>({
+    start(c) {
+      controller = c;
+    },
+  });
+  return {
+    response: new Response(body, {
+      status: 200,
+      headers: { "content-type": "text/event-stream" },
+    }),
+    push: (chunk: object) =>
+      controller.enqueue(encoder.encode(`data: ${JSON.stringify(chunk)}\n\n`)),
+    fail: (error: Error) => controller.error(error),
+  };
+}
+
+const started = (conversationId = CONVERSATION) => [
+  { type: "start", messageId: "reply-1", messageMetadata: { conversationId } },
+  { type: "text-start", id: "t" },
+  { type: "text-delta", id: "t", delta: "Partial reply" },
+];
+
+const settled = () => new Promise((resolve) => setTimeout(resolve, 1_200));
+
+describe("ChatPanel after the second review", () => {
+  it("does not take the user back to the conversation once the panel is gone (finding 5)", async () => {
+    const live = openStream();
+    chatFetch.mockResolvedValue(live.response);
+    const { unmount } = render(
+      <ChatPanel initialMessages={[]} maxLength={100} />,
+    );
+
+    await send("Leaving soon");
+    for (const chunk of started()) live.push(chunk);
+    await screen.findByText("Partial reply");
+    unmount();
+    await settled();
+
+    expect(router.replace).not.toHaveBeenCalled();
+    expect(router.refresh).not.toHaveBeenCalled();
+  });
+
+  it("shows a reply cut off by a lost connection as stopped, with no Try again (finding 4, FR-016)", async () => {
+    const live = openStream();
+    chatFetch.mockResolvedValue(live.response);
+    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+
+    await send("Unstable network");
+    for (const chunk of started()) live.push(chunk);
+    await screen.findByText("Partial reply");
+    live.fail(new TypeError("network error"));
+
+    expect(
+      await screen.findByText("chat.markers.stopped", {}, { timeout: 3_000 }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("chat.errors.modelFailed")).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: "chat.actions.tryAgain" }),
+    ).toBeNull();
+  });
+
+  it("lets the user send under a reply another tab was writing; the server decides (finding 3)", async () => {
+    const user = userEvent.setup();
+    render(
+      <ChatPanel
+        conversationId={CONVERSATION}
+        initialMessages={[
+          { id: "q1", role: "user", parts: [{ type: "text", text: "Hi" }] },
+          {
+            id: "r1",
+            role: "assistant",
+            parts: [],
+            metadata: { outcome: "in_progress" },
+          },
+        ]}
+        maxLength={100}
+      />,
+    );
+
+    await user.type(
+      await screen.findByRole("textbox", { name: "chat.composer.label" }),
+      "Next",
+    );
+
+    expect(
+      screen.getByRole("button", { name: "chat.composer.send" }),
+    ).toBeEnabled();
+  });
+
+  it("holds Send for a moment after Stop, until the server has stored the stopped reply (finding 2)", async () => {
+    const user = userEvent.setup();
+    const live = openStream();
+    chatFetch.mockResolvedValue(live.response);
+    render(
+      <ChatPanel
+        conversationId={CONVERSATION}
+        initialMessages={[
+          { id: "q0", role: "user", parts: [{ type: "text", text: "Before" }] },
+          {
+            id: "r0",
+            role: "assistant",
+            parts: [{ type: "text", text: "Earlier" }],
+            metadata: { outcome: "completed" },
+          },
+        ]}
+        maxLength={100}
+      />,
+    );
+
+    await send("Long answer, please");
+    for (const chunk of started()) live.push(chunk);
+    await screen.findByText("Partial reply");
+    await user.click(
+      screen.getByRole("button", { name: "chat.composer.stop" }),
+    );
+    await user.type(
+      screen.getByRole("textbox", { name: "chat.composer.label" }),
+      "Shorter",
+    );
+
+    expect(
+      screen.getByRole("button", { name: "chat.composer.send" }),
+    ).toBeDisabled();
+    await waitFor(
+      () =>
+        expect(
+          screen.getByRole("button", { name: "chat.composer.send" }),
+        ).toBeEnabled(),
+      { timeout: 3_000 },
+    );
+    expect(router.replace).not.toHaveBeenCalled();
+  });
+
+  it("keeps Send held after Stop in a new chat until its own page replaces the panel", async () => {
+    const user = userEvent.setup();
+    const live = openStream();
+    chatFetch.mockResolvedValue(live.response);
+    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+
+    await send("Long answer, please");
+    for (const chunk of started()) live.push(chunk);
+    await screen.findByText("Partial reply");
+    await user.click(
+      screen.getByRole("button", { name: "chat.composer.stop" }),
+    );
+
+    await waitFor(
+      () =>
+        expect(router.replace).toHaveBeenCalledWith(
+          `/dashboard/chat/${CONVERSATION}`,
+        ),
+      { timeout: 3_000 },
+    );
+    await user.type(
+      screen.getByRole("textbox", { name: "chat.composer.label" }),
+      "Shorter",
+    );
+    expect(
+      screen.getByRole("button", { name: "chat.composer.send" }),
+    ).toBeDisabled();
+  });
+
+  it("offers Stop only once the reply has started (finding 1)", async () => {
+    let respond!: (response: Response) => void;
+    chatFetch.mockReturnValue(
+      new Promise<Response>((resolve) => {
+        respond = resolve;
+      }),
+    );
+    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+
+    await send("Quick question");
+
+    expect(
+      await screen.findByRole("button", { name: "chat.composer.stop" }),
+    ).toBeDisabled();
+    const live = openStream();
+    respond(live.response);
+    for (const chunk of started()) live.push(chunk);
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "chat.composer.stop" }),
+      ).toBeEnabled(),
+    );
+  });
+});
+
 describe("the daily-limit message's plural (FR-055)", () => {
   it.each([
     ["en", 1, "about 1 hour."],

@@ -180,7 +180,13 @@ function ChatMessage() {
   return role === "user" ? <UserMessage /> : <AssistantMessage />;
 }
 
-function Composer({ maxLength }: { maxLength: number }) {
+function Composer({
+  maxLength,
+  stopDisabled,
+}: {
+  maxLength: number;
+  stopDisabled?: boolean;
+}) {
   const t = useTranslations("chat");
   const tooLongId = useId();
   // No native maxLength: it would silently cut a pasted text (R12).
@@ -229,6 +235,7 @@ function Composer({ maxLength }: { maxLength: number }) {
               tooltip={t("composer.stop")}
               variant="default"
               className="size-8 rounded-full"
+              {...(stopDisabled && { disabled: true })}
             >
               <SquareIcon aria-hidden className="fill-current" />
             </TooltipIconButton>
@@ -242,10 +249,12 @@ function Composer({ maxLength }: { maxLength: number }) {
 /** The conversation and its composer, composed from assistant-ui primitives (R9). */
 export function ChatThread({
   maxLength,
+  stopDisabled,
   alert,
   onTryAgain,
 }: {
   maxLength: number;
+  stopDisabled?: boolean;
   alert?: ReactNode;
   onTryAgain?: () => void;
 }) {
@@ -265,7 +274,7 @@ export function ChatThread({
               </ThreadPrimitive.Messages>
               <ThreadPrimitive.ViewportFooter className="sticky bottom-0 mt-auto flex flex-col gap-2 bg-background pb-4">
                 {alert}
-                <Composer maxLength={maxLength} />
+                <Composer maxLength={maxLength} stopDisabled={stopDisabled} />
               </ThreadPrimitive.ViewportFooter>
             </div>
           </ThreadPrimitive.Viewport>

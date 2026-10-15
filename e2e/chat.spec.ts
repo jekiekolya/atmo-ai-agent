@@ -489,3 +489,33 @@ test("switching language on the new-chat page stays there and stores nothing (FR
   await expect(page.getByText(/^Вітаю! Запитайте мене/)).toBeVisible();
   await expect(page.getByText("Розмов ще немає.")).toBeAttached();
 });
+
+test("leaving a new chat while its reply streams does not pull the user back (review finding 5)", async ({
+  browser,
+}) => {
+  const page = await signedInAdmin(browser);
+  await page.goto("/en/dashboard/chat");
+
+  await send(page, "Explain [slow]");
+  await expect(lastReply(page)).toContainText("Test reply, slowly.");
+  await page.getByRole("link", { name: "Account" }).click();
+  await expect(page).toHaveURL(/\/en\/dashboard\/account$/);
+
+  await page.waitForTimeout(2_000);
+  await expect(page).toHaveURL(/\/en\/dashboard\/account$/);
+});
+
+test("a question sent right after Stop is answered, not refused (review finding 2)", async ({
+  browser,
+}) => {
+  const page = await signedInAdmin(browser);
+  await page.goto("/en/dashboard/chat");
+
+  await send(page, "Explain [slow]");
+  await expect(lastReply(page)).toContainText("Test reply, slowly.");
+  await page.getByRole("button", { name: "Stop" }).click();
+  await send(page, "Right after Stop");
+
+  await expect(lastReply(page)).toContainText('you wrote "Right after Stop".');
+  await expect(page.getByText("A reply is still being written")).toHaveCount(0);
+});
