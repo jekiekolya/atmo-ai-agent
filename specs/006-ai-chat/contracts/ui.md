@@ -53,8 +53,8 @@ markdown-text.tsx` (images off), `reasoning.tsx` + `reasoning.aui.tsx` (labels a
   shows), while a reply runs in this tab, and for one second after a Stop or a lost connection, while
   the server stores the reply (FR-013, FR-036, FR-037). A reply another tab is writing does not disable
   Send: the server refuses the question with `reply_in_progress` (FR-012).
-- `ComposerPrimitive.Cancel` = Stop while running, disabled until the reply's first chunk, which names
-  a new conversation (FR-013, FR-018).
+- `ComposerPrimitive.Cancel` = Stop while running; it, and Escape in the message box, are disabled until
+  the reply's first chunk, which names a new conversation (FR-013, FR-018).
 - A lost connection ends the reply as Stop does: shown as stopped, no error, no Try again (FR-016).
 - Refusals render in a `FormAlert` above the composer, the typed text restored (FR-041):
   `chat.errors.tooLong`, `chat.errors.rateLimited`, `chat.errors.dailyLimit` (with

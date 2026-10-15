@@ -349,7 +349,7 @@ const started = (conversationId = CONVERSATION) => [
 const settled = () => new Promise((resolve) => setTimeout(resolve, 1_200));
 
 describe("ChatPanel after the second review", () => {
-  it("does not take the user back to the conversation once the panel is gone (finding 5)", async () => {
+  it("does not take the user back to the conversation once the panel is gone, but refreshes the list (finding 5)", async () => {
     const live = openStream();
     chatFetch.mockResolvedValue(live.response);
     const { unmount } = render(
@@ -363,7 +363,8 @@ describe("ChatPanel after the second review", () => {
     await settled();
 
     expect(router.replace).not.toHaveBeenCalled();
-    expect(router.refresh).not.toHaveBeenCalled();
+    // The conversation still exists, so the list beside whatever page the user went to must show it.
+    expect(router.refresh).toHaveBeenCalled();
   });
 
   it("shows a reply cut off by a lost connection as stopped, with no Try again (finding 4, FR-016)", async () => {
@@ -384,6 +385,31 @@ describe("ChatPanel after the second review", () => {
       screen.queryByRole("button", { name: "chat.actions.tryAgain" }),
     ).toBeNull();
   });
+
+  it.each([
+    ["Safari", new TypeError("Load failed")],
+    ["Firefox", new Error("Error in input stream")],
+  ])(
+    "shows a reply cut off by a lost connection in %s as stopped too",
+    async (_, error) => {
+      const live = openStream();
+      chatFetch.mockResolvedValue(live.response);
+      render(<ChatPanel initialMessages={[]} maxLength={100} />);
+
+      await send("Unstable network");
+      for (const chunk of started()) live.push(chunk);
+      await screen.findByText("Partial reply");
+      live.fail(error);
+
+      expect(
+        await screen.findByText("chat.markers.stopped", {}, { timeout: 3_000 }),
+      ).toBeInTheDocument();
+      expect(screen.queryByText("chat.errors.modelFailed")).toBeNull();
+      expect(
+        screen.queryByRole("button", { name: "chat.actions.tryAgain" }),
+      ).toBeNull();
+    },
+  );
 
   it("lets the user send under a reply another tab was writing; the server decides (finding 3)", async () => {
     const user = userEvent.setup();

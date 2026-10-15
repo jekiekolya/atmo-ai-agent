@@ -212,6 +212,7 @@ function Composer({
         rows={1}
         autoFocus
         submitMode={tooLong ? "none" : "enter"}
+        cancelOnEscape={!stopDisabled}
         className="max-h-48 min-h-10 w-full resize-none bg-transparent px-2 py-1 text-base outline-none placeholder:text-muted-foreground"
       />
       {tooLong && (

@@ -102,6 +102,7 @@ export function ChatPanel({
   const idRef = useRef(conversationId);
   const pendingRef = useRef<PendingRequest | null>(null);
   const answeredRef = useRef(false);
+  const lostRef = useRef(false);
   const mountedRef = useRef(false);
   const [settling, setSettling] = useState(false);
   const beforeRetryRef = useRef<ChatUIMessage[] | null>(null);
@@ -124,6 +125,7 @@ export function ChatPanel({
         api: API_ROUTES.chat,
         fetch: async (input, init) => {
           answeredRef.current = false;
+          lostRef.current = false;
           const response = await chatFetch(input, init);
           answeredRef.current = true;
           return response;
@@ -155,17 +157,21 @@ export function ChatPanel({
       const refusal = refusalOf(error);
       if (refusal) {
         queueMicrotask(() => handlersRef.current.refused(refusal));
-      } else {
+      } else if (!answeredRef.current) {
         queueMicrotask(() => handlersRef.current.unreached());
+      } else if (error.message !== "model_failed") {
+        // The SDK spots a lost connection only by Chrome's wording; Safari and Firefox say otherwise.
+        lostRef.current = true;
       }
     },
     onFinish: ({ message, isAbort, isDisconnect }) => {
-      if (!isAbort && !isDisconnect) {
+      const lost = isDisconnect || lostRef.current;
+      if (!isAbort && !lost) {
         handlersRef.current.finished(message);
         return;
       }
       // The server learns of a Stop or a lost connection only when the connection closes; give it time to store the reply.
-      handlersRef.current.settle(isDisconnect);
+      handlersRef.current.settle(lost);
       setTimeout(() => handlersRef.current.finished(message), STOP_SETTLE_MS);
     },
   });
@@ -228,11 +234,7 @@ export function ChatPanel({
         setAlert(t(key as Parameters<typeof t>[0], { max: maxLength }));
       },
       // No response came back at all: as with a refusal, the question goes back into the box. A drop mid-stream is onFinish's.
-      unreached: () => {
-        if (!answeredRef.current) {
-          handlersRef.current.refused({ code: "network" });
-        }
-      },
+      unreached: () => handlersRef.current.refused({ code: "network" }),
       // A lost connection ends the reply as Stop does, and the server stores it so (FR-016).
       settle: (disconnected) => {
         setSettling(true);
@@ -250,8 +252,11 @@ export function ChatPanel({
         );
       },
       finished: (message) => {
-        // Gone, e.g. the user left for another page: nothing to show or move to.
-        if (!mountedRef.current) return;
+        // Gone, e.g. the user left for another page: no move back, but the list there must show the conversation.
+        if (!mountedRef.current) {
+          router.refresh();
+          return;
+        }
         // onFinish can run before the effect above has seen the start chunk.
         const id = idRef.current ?? message.metadata?.conversationId;
         // A navigation keeps the shared layout as it was; the refresh re-renders the sidebar (FR-031).

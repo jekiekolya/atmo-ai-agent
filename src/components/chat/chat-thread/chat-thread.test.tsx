@@ -30,6 +30,7 @@ function Harness({
   alert,
   onTryAgain,
   maxLength = 100,
+  stopDisabled,
 }: {
   messages: ThreadMessageLike[];
   isRunning?: boolean;
@@ -38,6 +39,7 @@ function Harness({
   alert?: string;
   onTryAgain?: () => void;
   maxLength?: number;
+  stopDisabled?: boolean;
 }) {
   const runtime = useExternalStoreRuntime({
     messages,
@@ -48,7 +50,12 @@ function Harness({
   });
   return (
     <AssistantRuntimeProvider runtime={runtime}>
-      <ChatThread maxLength={maxLength} alert={alert} onTryAgain={onTryAgain} />
+      <ChatThread
+        maxLength={maxLength}
+        stopDisabled={stopDisabled}
+        alert={alert}
+        onTryAgain={onTryAgain}
+      />
     </AssistantRuntimeProvider>
   );
 }
@@ -507,6 +514,35 @@ describe("ChatThread", () => {
     await user.type(input, "{Enter}");
     expect(onNew).not.toHaveBeenCalled();
   });
+
+  it.each([
+    [false, 1],
+    [true, 0],
+  ])(
+    "lets Escape stop a running reply only when Stop is offered (stopDisabled %s)",
+    async (stopDisabled, calls) => {
+      const user = userEvent.setup();
+      const onCancel = vi.fn(async () => {});
+      render(
+        <Harness
+          isRunning
+          stopDisabled={stopDisabled}
+          onCancel={onCancel}
+          messages={[
+            question("Hi"),
+            { id: "r1", role: "assistant", content: [] },
+          ]}
+        />,
+      );
+
+      await user.click(
+        screen.getByRole("textbox", { name: "chat.composer.label" }),
+      );
+      await user.keyboard("{Escape}");
+
+      expect(onCancel).toHaveBeenCalledTimes(calls);
+    },
+  );
 
   it("shows the alert it is given above the composer", () => {
     render(<Harness messages={[]} alert="Refused." />);
