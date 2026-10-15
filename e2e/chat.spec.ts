@@ -122,6 +122,57 @@ test("a conversation reads the same after a reload (FR-010, SC-003)", async ({
   );
 });
 
+test("a reloaded conversation is never painted scrolled anywhere but its end (FR-010)", async ({
+  browser,
+}) => {
+  const page = await signedInAdmin(browser);
+  await page.setViewportSize({ width: 1280, height: 600 });
+  const question = Array.from(
+    { length: 40 },
+    (_, index) => `Line ${index + 1}`,
+  ).join("\n");
+  await newConversation(page, question);
+
+  await page.addInitScript(() => {
+    const gaps: number[] = [];
+    (window as unknown as { gaps: number[] }).gaps = gaps;
+    const sample = () => {
+      const message = document.querySelector('[data-role="user"]');
+      if (message?.checkVisibility()) {
+        let viewport = message.parentElement;
+        while (viewport && getComputedStyle(viewport).overflowY !== "auto") {
+          viewport = viewport.parentElement;
+        }
+        if (viewport) {
+          gaps.push(
+            viewport.scrollHeight - viewport.clientHeight - viewport.scrollTop,
+          );
+        }
+      }
+    };
+    // A new observer reports in this frame after every animation-frame callback, just before the paint.
+    const eachFrame = () =>
+      requestAnimationFrame(() => {
+        const observer = new ResizeObserver(() => {
+          observer.disconnect();
+          sample();
+          eachFrame();
+        });
+        observer.observe(document.documentElement);
+      });
+    eachFrame();
+  });
+  await page.reload();
+  await replyEnded(page);
+  await page.waitForTimeout(500);
+
+  const gaps = await page.evaluate(
+    () => (window as unknown as { gaps: number[] }).gaps,
+  );
+  expect(gaps.length).toBeGreaterThan(0);
+  expect(Math.max(...gaps)).toBeLessThanOrEqual(1);
+});
+
 test("a reply that reached the token cap is marked cut, also after a reload (FR-052)", async ({
   browser,
 }) => {
