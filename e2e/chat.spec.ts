@@ -56,6 +56,15 @@ async function send(page: Page, text: string) {
   await box.press("Enter");
 }
 
+async function expectChatNotFound(page: Page) {
+  await expect(
+    page.getByRole("heading", { name: "Conversation not found" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("navigation", { name: "Conversations" }),
+  ).toBeVisible();
+}
+
 const lastReply = (page: Page) =>
   page.locator('[data-role="assistant"]').last();
 
@@ -205,11 +214,13 @@ test("another user's conversation is a real 404, exactly like one that does not 
   ]) {
     const response = await stranger.goto(path);
     expect(response?.status(), path).toBe(404);
-    await expect(
-      stranger.getByRole("heading", { name: "Page not found" }),
-    ).toBeVisible();
+    await expectChatNotFound(stranger);
     await expect(stranger.getByText("Private question")).toHaveCount(0);
   }
+
+  await stranger.getByRole("link", { name: "Start a new chat" }).click();
+  await expect(stranger).toHaveURL(/\/en\/dashboard\/chat$/);
+  await expect(stranger.getByText(/^Hello! Ask me anything/)).toBeVisible();
 });
 
 const conversationLinks = (page: Page) =>
@@ -285,9 +296,8 @@ test("deleting a conversation asks first, then removes it for good (US3, FR-032,
 
   const response = await page.goto(doomed);
   expect(response?.status()).toBe(404);
-  await expect(
-    page.getByRole("heading", { name: "Page not found" }),
-  ).toBeVisible();
+  await expectChatNotFound(page);
+  await expect(conversationLinks(page)).toHaveText(["Keep this one"]);
   expect((await page.goto(kept))?.status()).toBe(200);
 });
 

@@ -239,6 +239,11 @@
     },
     "metaTitle": "Chat",
     "greeting": "Hello! Ask me anything about solar energy: panels, inverters, batteries, installation, maintenance, or savings.",
+    "notFound": {
+      "title": "Conversation not found",
+      "description": "This conversation does not exist. The link may be out of date.",
+      "newChat": "Start a new chat"
+    },
     "composer": {
       "label": "Message",
       "placeholder": "Ask a question about solar energy…",
