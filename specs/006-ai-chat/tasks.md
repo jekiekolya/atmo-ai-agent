@@ -537,6 +537,13 @@ a conversation and on the new-chat page and stay there (spec US7).
 
 ---
 
+## Phase 12: The chat's own not-found page (2026-10-15, FR-004 amended)
+
+- [x] T093 Change the e2e tests in `e2e/chat.spec.ts` that open a missing, another user's, a malformed, and a deleted conversation's address: each answers 404 and shows the chat's not-found page beside the conversation list, whose Start a new chat link opens the new-conversation page (FR-004, R7)
+- [x] T094 Add `src/app/[locale]/(private)/dashboard/chat/not-found.tsx` and its `chat.notFound` keys in `en` and `uk` (FR-004, R7)
+
+---
+
 ## Dependencies & Execution Order
 
 ### Phase Dependencies

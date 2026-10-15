@@ -277,8 +277,10 @@ both happen.
 streaming when a Suspense fallback such as `loading.tsx` renders. "If you need a 404 status … ensure the
 resource exists before the response body is streamed" (`03-api-reference/03-file-conventions/
 not-found.md:13`, `loading.md:101-120`). Today `dashboard/loading.tsx` would wrap the new page, so its
-`notFound()` would answer 200. Indistinguishable still, but not FR-004's 404. The user chose the real 404. `notFound()` in the `[id]` layout renders `src/app/[locale]/not-found.tsx`, the product's only
-not-found page.
+`notFound()` would answer 200. Indistinguishable still, but not FR-004's 404. The user chose the real 404. Revisited 2026-10-15: `notFound()` in the `[id]` layout renders `chat/not-found.tsx`, the nearest
+boundary above it, inside `chat/layout.tsx` and so beside the conversation list. It sits outside every
+`loading.tsx` as the check does, so the status stays 404. Until then it rendered
+`src/app/[locale]/not-found.tsx`, the product's general not-found page.
 
 **Alternatives considered**:
 

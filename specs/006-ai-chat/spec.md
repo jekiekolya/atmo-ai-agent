@@ -127,6 +127,15 @@ conversation.
   new tab, so following one does not leave the chat (FR-024). Diagrams, code highlighting, and HTML in
   replies were presented and not taken.
 
+### Session 2026-10-15
+
+- Q: An unknown conversation address showed the product's general not-found page, under the public
+  header, linking to the landing page. Keep it? → A: No — the chat's own not-found page, inside the
+  chat with its conversation list, saying the conversation was not found and offering to start a new
+  one (FR-004). Status and content stay the same for a missing, another user's, and a malformed
+  conversation. A redirect to the new-conversation page was presented and not taken: it would give up
+  the 404.
+
 ## User Scenarios & Testing _(mandatory)_
 
 ### User Story 1 - Ask a question and watch the answer arrive (Priority: P1)
@@ -186,7 +195,7 @@ confirm the same not-found response as for a random identifier.
 **Acceptance Scenarios**:
 
 1. **Given** user B and a conversation owned by user A, **When** B opens its address, **Then** B sees
-   the product's not-found page, identical to the one for an address that never existed.
+   the chat's not-found page, identical to the one for an address that never existed.
 2. **Given** user B, **When** B sends a message, tries again, or deletes, naming A's conversation,
    **Then** the response is a not-found response identical in status and body to the one for a
    non-existent conversation, nothing is stored or deleted, and the model is not called.
@@ -227,7 +236,7 @@ gone from the list and its address is not found.
    cancel, **Then** nothing changes.
 6. **Given** the confirmation dialog, **When** they confirm, **Then** the conversation and all its
    messages are permanently removed, it disappears from the sidebar, and its address shows the
-   not-found page.
+   chat's not-found page.
 7. **Given** the conversation being deleted is the one open, **When** the deletion completes, **Then**
    the user is taken to the new-conversation page.
 8. **Given** a narrow screen, **When** a chat page is shown, **Then** the conversation list is still
@@ -424,9 +433,10 @@ switch language on a conversation page and confirm the same conversation is show
 - **FR-003**: A conversation MUST belong to the user who started it. Only that user can see, list,
   continue, try again in, or delete it; no role grants access to another user's conversation.
 - **FR-004**: A conversation that does not exist, belongs to another user, or is named by a malformed
-  identifier MUST produce one and the same not-found result: the product's not-found page with a 404
-  status for a page, and a 404 response with an identical body for an endpoint. The product MUST never
-  answer 403 for a conversation, nor reveal by content or status whether it exists.
+  identifier MUST produce one and the same not-found result: for a page, the chat's not-found page with
+  a 404 status — inside the chat, beside the conversation list, saying the conversation was not found
+  and offering to start a new one; for an endpoint, a 404 response with an identical body. The product
+  MUST never answer 403 for a conversation, nor reveal by content or status whether it exists.
 - **FR-005**: Ownership MUST be enforced wherever conversation data is read, written, or deleted —
   every endpoint called directly, not only through the interface.
 
