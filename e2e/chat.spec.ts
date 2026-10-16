@@ -131,6 +131,37 @@ test("a conversation reads the same after a reload (FR-010, SC-003)", async ({
   );
 });
 
+test("the conversation stays on screen while its own page takes over from the new chat (FR-007)", async ({
+  browser,
+}) => {
+  const page = await signedInAdmin(browser);
+  await page.goto("/en/dashboard/chat");
+  await expect(page.getByText(/^Hello! Ask me anything/)).toBeVisible();
+
+  await page.evaluate(() => {
+    const counts: number[] = [];
+    (window as unknown as { counts: number[] }).counts = counts;
+    new MutationObserver(() =>
+      counts.push(document.querySelectorAll("[data-role]").length),
+    ).observe(document.body, { subtree: true, childList: true });
+  });
+  await send(page, "Do panels work in winter?");
+  await replyEnded(page);
+  // The list beside the page changes in the same render that brings in the conversation's own page.
+  await expect(
+    page
+      .getByRole("navigation", { name: "Conversations" })
+      .getByRole("link", { name: "Do panels work in winter?" }),
+  ).toBeVisible();
+
+  const counts = await page.evaluate(
+    () => (window as unknown as { counts: number[] }).counts,
+  );
+  const shown = counts.findIndex((count) => count > 0);
+  expect(shown).toBeGreaterThanOrEqual(0);
+  expect(Math.min(...counts.slice(shown))).toBeGreaterThan(0);
+});
+
 test("a reloaded conversation is never painted scrolled anywhere but its end (FR-010)", async ({
   browser,
 }) => {

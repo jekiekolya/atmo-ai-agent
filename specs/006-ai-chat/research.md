@@ -309,7 +309,12 @@ boundary above it, inside `chat/layout.tsx` and so beside the conversation list.
   therefore puts the real `[id]` tree into history before anyone can press Back.
 - Navigating between `/chat` and `/chat/[id]` always remounts the page, whether through two routes or
   one optional catch-all (`layout-router.js:547-549, 666-688`). That is harmless once the reply has ended
-  and the `[id]` page shows the same stored messages.
+  and the `[id]` page shows the same stored messages, as long as `[id]` has no `loading.tsx`. A navigation
+  into a segment shows "the prefetched loading state" first (`01-getting-started/04-linking-and-navigating.md:159`),
+  so with one the thread went blank until the server answered; without one, the old page stays until the
+  new one replaces it in a single render. Revisited 2026-10-16: the `[id]` `loading.tsx` is removed,
+  FR-007 now requires the conversation to stay on screen, and spec 005 FR-030 exempts the page.
+  `router.refresh()` alone does not avoid the remount: after `replaceState` it renders the `[id]` tree too.
 
 **Alternatives considered**:
 
