@@ -14,6 +14,11 @@ export const ERROR_CODES = [
   "invite_used",
   "invite_expired",
   "account_locked",
+  "reply_in_progress",
+  "nothing_to_retry",
+  "rate_limited",
+  "daily_limit_reached",
+  "model_failed",
 ] as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[number];
@@ -64,6 +69,8 @@ export class ConflictError extends DomainError {
       | "invite_issued_concurrently"
       | "no_outstanding_invite"
       | "invite_used"
+      | "reply_in_progress"
+      | "nothing_to_retry"
     >,
     detail?: string,
   ) {
@@ -86,5 +93,17 @@ export class GoneError extends DomainError {
 export class LockedError extends DomainError {
   constructor() {
     super("account_locked");
+  }
+}
+
+export class RateLimitError extends DomainError {
+  readonly retryAfterSeconds: number;
+
+  constructor(
+    code: Extract<ErrorCode, "rate_limited" | "daily_limit_reached">,
+    retryAfterSeconds: number,
+  ) {
+    super(code);
+    this.retryAfterSeconds = retryAfterSeconds;
   }
 }

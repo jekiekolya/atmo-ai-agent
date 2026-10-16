@@ -7,6 +7,7 @@ import { BrandLogo } from "@/components/shell/brand-logo/brand-logo";
 import { SessionKeepAlive } from "@/components/account/session-keep-alive/session-keep-alive";
 import { Link } from "@/i18n/navigation";
 import { PAGES } from "@/lib/routes";
+import { canUseChat } from "@/server/chat/access";
 
 // Layouts don't re-render, so every page re-checks; no Suspense above this check (R8, R17).
 export default async function PrivateLayout({
@@ -34,6 +35,9 @@ export default async function PrivateLayout({
             className="flex gap-4 text-sm whitespace-nowrap"
           >
             <Link href={PAGES.dashboard}>{t("shell.home")}</Link>
+            {canUseChat(user.role) && (
+              <Link href={PAGES.chat}>{t("shell.chat")}</Link>
+            )}
             <Link href={PAGES.account}>{t("shell.account")}</Link>
             {user.role === "SUPER_ADMIN" && (
               <Link href={PAGES.users}>{t("shell.users")}</Link>

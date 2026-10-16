@@ -38,7 +38,12 @@
       "invite_invalid": "This invitation link is not valid. Ask your administrator for a new one.",
       "invite_used": "This invitation link has already been used. You can sign in instead.",
       "invite_expired": "This invitation link has expired. Ask your administrator for a new one.",
-      "account_locked": "Too many failed attempts. Please try again in a few minutes."
+      "account_locked": "Too many failed attempts. Please try again in a few minutes.",
+      "reply_in_progress": "A reply is still being written in this conversation. Wait for it to finish.",
+      "nothing_to_retry": "There is no failed reply to try again.",
+      "rate_limited": "You are sending messages too quickly. Wait a moment and try again.",
+      "daily_limit_reached": "You have reached today's chat limit. Try again later.",
+      "model_failed": "The assistant could not answer. Please try again."
     },
     "details": {
       "email_in_use_deactivated": "This email address belongs to a deactivated account. Reactivate it from the user list instead.",
@@ -77,6 +82,10 @@
     },
     "newPassword": {
       "sameAsCurrent": "Choose a password different from your current one."
+    },
+    "chat": {
+      "tooLong": "This message is too long. Use at most {max} characters.",
+      "empty": "Write a message first."
     }
   },
   "auth": {
@@ -103,7 +112,8 @@
     "signingOut": "Signing out…",
     "home": "Home",
     "account": "Account",
-    "users": "Users"
+    "users": "Users",
+    "chat": "Chat"
   },
   "dashboard": {
     "metaTitle": "Home",
@@ -214,5 +224,61 @@
   },
   "loader": {
     "label": "Loading…"
+  },
+  "chat": {
+    "errors": {
+      "invalidLocale": "This language is not supported. Reload the page and try again.",
+      "notFound": "This conversation no longer exists.",
+      "modelFailed": "The assistant could not answer this time.",
+      "inProgress": "A reply is still being written. Wait for it to finish.",
+      "nothingToRetry": "There is no failed reply to try again.",
+      "tooLong": "This message is too long. Use at most {max} characters.",
+      "rateLimited": "You are sending messages too quickly. Wait a moment and try again.",
+      "dailyLimitHours": "{hours, plural, one {You have reached today's chat limit. The chat will be available again in about # hour.} other {You have reached today's chat limit. The chat will be available again in about # hours.}}",
+      "dailyLimitUnderHour": "You have reached today's chat limit. The chat will be available again in less than an hour.",
+      "network": "Could not reach the server. Check your connection and try again."
+    },
+    "metaTitle": "Chat",
+    "greeting": "Hello! Ask me anything about solar energy: panels, inverters, batteries, installation, maintenance, or savings.",
+    "notFound": {
+      "title": "Conversation not found",
+      "description": "This conversation does not exist. The link may be out of date.",
+      "newChat": "Start a new chat"
+    },
+    "composer": {
+      "label": "Message",
+      "placeholder": "Ask a question about solar energy…",
+      "send": "Send",
+      "stop": "Stop"
+    },
+    "actions": {
+      "copy": "Copy",
+      "copied": "Copied",
+      "tryAgain": "Try again"
+    },
+    "markers": {
+      "stopped": "Stopped",
+      "cut": "Reply cut short",
+      "failed": "Failed",
+      "inProgress": "Being written…"
+    },
+    "reasoning": {
+      "thinking": "Thinking…",
+      "label": "Reasoning"
+    },
+    "list": {
+      "label": "Conversations",
+      "newChat": "New chat",
+      "delete": "Delete “{title}”",
+      "toggle": "Conversations",
+      "empty": "No conversations yet."
+    },
+    "delete": {
+      "title": "Delete this conversation?",
+      "description": "“{title}” and all its messages will be deleted permanently. This cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "done": "Conversation deleted."
+    }
   }
 }

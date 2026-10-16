@@ -9,10 +9,15 @@ export type ApiResult<T> =
 
 type Method = "POST" | "PUT" | "DELETE";
 
-function redirectToSignIn(): Promise<never> {
+export function redirectToSignIn(): Promise<never> {
   hardNavigate(signInUrlFor(window.location));
   // The page is going away; nothing should react to this request any more.
   return new Promise<never>(() => {});
+}
+
+// A route handler's auth() cannot write the renewed cookie, so the client asks for it (research R3).
+export function renewSession(): void {
+  void fetch(API_ROUTES.session, { cache: "no-store" }).catch(() => undefined);
 }
 
 /** The forms' only way to call our API. Never throws for an HTTP error. */
@@ -33,8 +38,7 @@ export async function apiRequest<T = undefined>(
   }
 
   if (response.status === 401) return redirectToSignIn();
-  // A route handler's auth() cannot write the renewed cookie, so the client asks for it (research R3).
-  void fetch(API_ROUTES.session, { cache: "no-store" }).catch(() => undefined);
+  renewSession();
   if (response.status >= 500) return { ok: false, code: "unexpected" };
   if (response.status === 204) return { ok: true, data: undefined as T };
 

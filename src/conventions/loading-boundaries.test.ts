@@ -23,8 +23,16 @@ describe("loading boundaries", () => {
     expect(missing).toEqual([]);
   });
 
-  it("never sit above a check that can redirect (FR-036, FR-038)", () => {
-    const above = ["", "(private)", "(public)", "(public)/sign-in"]
+  // Spec 006, FR-004: a loading.tsx above the conversation's ownership check would turn its 404 into a 200 (R7).
+  it("never sit above a check that can redirect or answer not found (FR-036, FR-038; spec 006, FR-004)", () => {
+    const above = [
+      "",
+      "(private)",
+      "(public)",
+      "(public)/sign-in",
+      "(private)/dashboard",
+      "(private)/dashboard/chat",
+    ]
       .map((dir) => join(APP, dir, "loading.tsx"))
       .filter((path) => existsSync(path))
       .map((path) => relative(process.cwd(), path));

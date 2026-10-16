@@ -17,7 +17,10 @@ npm run dev
 Open http://localhost:3000.
 
 Configuration comes from environment variables. Copy `.env.example` to `.env` and fill it in —
-the app fails fast at startup on a missing or malformed required variable.
+the app fails fast at startup on a missing or malformed required variable. The chat needs
+`GOOGLE_GENERATIVE_AI_API_KEY`, or `AI_FAKE_MODEL=true` to answer with a deterministic test model
+instead; `CHAT_MAX_MESSAGE_LENGTH`, `CHAT_RATE_LIMIT_PER_MINUTE`, `CHAT_DAILY_TOKEN_BUDGET` and
+`CHAT_HISTORY_LIMIT` are optional limits. See [AI chat](#ai-chat).
 
 Before your first `npm run e2e`, install the browser Playwright drives:
 `npx playwright install chromium`.
@@ -111,7 +114,17 @@ Tests run on Vitest (unit/integration, colocated with the code) and Playwright (
 `E2E_PORT=<port> npm run e2e` reuses a server you already have running instead — it must be a
 production server (`next start`) on the `atmo_e2e` database; the suite stops if it cannot sign in.
 
-Planned per the project constitution: the Vercel AI SDK, with assistant-ui for the chat interface.
+The AI chat runs on the Vercel AI SDK with the `@ai-sdk/google` provider (Gemini), and its interface
+is built with assistant-ui.
+
+## AI chat
+
+Signed-in staff chat with an AI support assistant at `/{locale}/dashboard/chat`.
+[specs/006-ai-chat/quickstart.md](specs/006-ai-chat/quickstart.md) covers getting a Gemini key, running
+the chat without one (`AI_FAKE_MODEL=true`), and checking it by hand.
+
+A key on a Google project without billing is the free tier: Google may use, and human reviewers may
+read, everything sent to it. Use it with test data only — never real customer data.
 
 ## How we work
 

@@ -24,6 +24,8 @@ export default defineConfig({
       APP_ENV: "development",
       DATABASE_URL: E2E_DATABASE_URL,
       AUTH_SECRET: E2E_AUTH_SECRET,
+      AI_FAKE_MODEL: "true",
+      CHAT_RATE_LIMIT_PER_MINUTE: "5",
     },
     url: baseURL,
     // A cold production build runs well past Playwright's 60s default.

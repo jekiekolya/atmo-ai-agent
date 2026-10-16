@@ -47,6 +47,13 @@ export function signedInAsOwner(browser: Browser, locale: Locale = "en") {
 }
 
 export async function signOut(page: Page) {
-  await page.getByRole("button", { name: /^Account menu/ }).click();
-  await page.getByRole("menuitem", { name: "Sign out" }).click();
+  const signOutItem = page.getByRole("menuitem", { name: "Sign out" });
+  // A click before hydration focuses the trigger but opens nothing; click again until the menu shows.
+  await expect(async () => {
+    if (!(await signOutItem.isVisible())) {
+      await page.getByRole("button", { name: /^Account menu/ }).click();
+    }
+    await expect(signOutItem).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await signOutItem.click();
 }

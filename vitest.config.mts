@@ -34,6 +34,7 @@ const exclude = ["e2e/**", "node_modules/**", ".next/**"];
 const testEnv = {
   APP_ENV: "development",
   AUTH_SECRET: "test-secret-at-least-32-characters-long",
+  AI_FAKE_MODEL: "true",
 };
 
 export default defineConfig({

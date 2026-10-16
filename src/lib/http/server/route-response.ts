@@ -8,6 +8,7 @@ import {
   InvalidInviteError,
   LockedError,
   NotFoundError,
+  RateLimitError,
   ValidationError,
 } from "@/server/errors";
 
@@ -20,6 +21,7 @@ function statusOf(error: DomainError): number {
   if (error instanceof ConflictError) return 409;
   if (error instanceof GoneError) return 410;
   if (error instanceof LockedError) return 423;
+  if (error instanceof RateLimitError) return 429;
   return 500;
 }
 
@@ -41,9 +43,17 @@ export function errorResponse(
         code: error.code,
         ...(error.detail !== undefined && { detail: error.detail }),
         ...(error instanceof ValidationError && { fields: error.fields }),
+        ...(error instanceof RateLimitError && {
+          retryAfterSeconds: error.retryAfterSeconds,
+        }),
       },
     },
-    { status: statusOf(error) },
+    {
+      status: statusOf(error),
+      ...(error instanceof RateLimitError && {
+        headers: { "Retry-After": String(error.retryAfterSeconds) },
+      }),
+    },
   );
 }
 

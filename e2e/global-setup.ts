@@ -11,6 +11,7 @@ export default async function globalSetup(config: FullConfig) {
     DATABASE_URL: E2E_DATABASE_URL,
     APP_ENV: "development",
     AUTH_SECRET: E2E_AUTH_SECRET,
+    AI_FAKE_MODEL: "true",
   };
 
   execFileSync("npx", ["prisma", "migrate", "deploy"], {

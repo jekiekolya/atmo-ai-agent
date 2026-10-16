@@ -7,7 +7,12 @@ import { DomainError, ValidationError } from "@/server/errors";
 
 type Params = Record<string, string | string[]>;
 
-type HandlerInput<Body, Actor> = { body: Body; actor: Actor; params: Params };
+type HandlerInput<Body, Actor> = {
+  body: Body;
+  actor: Actor;
+  params: Params;
+  request: Request;
+};
 
 type RouteOptions<Schema extends z.ZodType | undefined, Actor> = {
   schema?: Schema;
@@ -78,6 +83,7 @@ export function defineRoute(options: {
         body,
         actor,
         params: await context.params,
+        request,
       });
     } catch (error) {
       if (error instanceof DomainError) return errorResponse(error);
