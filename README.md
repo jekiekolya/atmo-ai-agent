@@ -5,7 +5,7 @@ chat agent as the primary support channel.
 
 ## Getting started
 
-Node 22 (see `.nvmrc`) and a running Docker Desktop.
+Node 24 (see `.nvmrc`) and a running Docker Desktop.
 
 ```bash
 npm ci
