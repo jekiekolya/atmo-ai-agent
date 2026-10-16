@@ -6,7 +6,7 @@ import { loadConfig } from "@/config/schema";
 // exactly one place (Constitution, Principle V), tests included.
 const valid = {
   NODE_ENV: "test",
-  APP_ENV: "development",
+  APP_ENV: "local",
   DATABASE_URL: "postgresql://user:password@localhost:5432/atmo_dev",
   AUTH_SECRET: "a".repeat(32),
   GOOGLE_GENERATIVE_AI_API_KEY: "test-google-key",
@@ -20,7 +20,7 @@ describe("loadConfig", () => {
     },
   );
 
-  it.each(["development", "staging", "production"] as const)(
+  it.each(["local", "dev", "staging", "production"] as const)(
     "accepts APP_ENV=%s",
     (value) => {
       expect(loadConfig({ ...valid, APP_ENV: value }).appEnv).toBe(value);
@@ -86,7 +86,13 @@ describe("loadConfig", () => {
 
   it("fails naming APP_ENV and its allowed values when it is unknown", () => {
     expect(() => loadConfig({ ...valid, APP_ENV: "prod" })).toThrow(
-      /APP_ENV.*development.*staging.*production/,
+      /APP_ENV.*local.*dev.*staging.*production/,
+    );
+  });
+
+  it("rejects APP_ENV=development, the former name of local", () => {
+    expect(() => loadConfig({ ...valid, APP_ENV: "development" })).toThrow(
+      /APP_ENV/,
     );
   });
 
