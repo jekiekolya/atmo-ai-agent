@@ -343,8 +343,11 @@ without reduced motion, in both themes, with a screen reader; repeat with a fast
 
 - **FR-030**: While a page under the signed-in layout or the public layout is waiting on the server,
   the content area under the header MUST show the "a" mark being drawn by an animated stroke in a loop
-  of about 1.4 seconds. The header MUST stay visible and usable. The sign-in page is the one exception:
-  all it waits on is the session check that may redirect, so it has no loader (FR-038).
+  of about 1.4 seconds. The header MUST stay visible and usable. The sign-in page is one exception:
+  all it waits on is the session check that may redirect, so it has no loader (FR-038). A chat
+  conversation's page is the other: it takes over from the new-chat page once the first reply ends, and
+  a loader there would blank the conversation (feature 006, FR-007). Opening a conversation keeps the
+  current page on screen until it is ready.
 - **FR-031**: The loader MUST NOT be painted until the wait has lasted about 300ms. A wait shorter than
   that MUST NOT paint it at all.
 - **FR-032**: The loader MUST be exposed to assistive technology as a loading status, with a label

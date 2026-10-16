@@ -194,7 +194,7 @@ src/
 │           └── chat/
 │               ├── layout.tsx             # NEW — sidebar
 │               ├── (new)/page.tsx, loading.tsx
-│               └── [id]/layout.tsx, page.tsx, loading.tsx
+│               └── [id]/layout.tsx, page.tsx      # no loading.tsx (R8)
 ├── components/
 │   ├── chat/                              # NEW group — one folder per component, test beside
 │   │   ├── chat-panel/  chat-thread/  reply-marker/
@@ -202,7 +202,7 @@ src/
 │   ├── assistant-ui/elements/             # NEW via CLI (flat) — markdown-text, reasoning(.aui), tooltip-icon-button
 │   └── ui/tooltip.tsx, collapsible.tsx    # NEW via CLI
 ├── hooks/use-copy-to-clipboard.ts         # NEW via CLI
-├── conventions/loading-boundaries.test.ts # UPDATED — no loading.tsx in dashboard/ or dashboard/chat/
+├── conventions/loading-boundaries.test.ts # UPDATED — no loading.tsx in dashboard/, dashboard/chat/ or chat/[id]/
 └── messages/en.json, uk.json              # UPDATED — chat, shell.chat, errors.codes.*
 
 e2e/chat.spec.ts                           # NEW
