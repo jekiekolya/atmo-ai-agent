@@ -17,11 +17,11 @@ export default defineConfig({
   webServer: {
     command: "npm run build && npm run start",
     // APP_ENV and DATABASE_URL have no defaults and CI has no .env file.
-    // Never staging or production: the suite must not resolve to real
+    // Never dev, staging or production: the suite must not resolve to real
     // infrastructure.
     env: {
       PORT: String(port),
-      APP_ENV: "development",
+      APP_ENV: "local",
       DATABASE_URL: E2E_DATABASE_URL,
       AUTH_SECRET: E2E_AUTH_SECRET,
       AI_FAKE_MODEL: "true",

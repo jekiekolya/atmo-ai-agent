@@ -32,7 +32,7 @@ const exclude = ["e2e/**", "node_modules/**", ".next/**"];
 
 // Config fails fast without these, and CI has no .env file.
 const testEnv = {
-  APP_ENV: "development",
+  APP_ENV: "local",
   AUTH_SECRET: "test-secret-at-least-32-characters-long",
   AI_FAKE_MODEL: "true",
 };

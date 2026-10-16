@@ -9,7 +9,7 @@ export default async function globalSetup(config: FullConfig) {
   const env = {
     ...process.env,
     DATABASE_URL: E2E_DATABASE_URL,
-    APP_ENV: "development",
+    APP_ENV: "local",
     AUTH_SECRET: E2E_AUTH_SECRET,
     AI_FAKE_MODEL: "true",
   };

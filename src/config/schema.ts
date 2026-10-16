@@ -13,7 +13,7 @@ const schema = z
 
     // Deployment target, orthogonal to NODE_ENV. No default: a deploy that forgets
     // it must fail at boot, not quietly behave like a developer's laptop.
-    APP_ENV: z.enum(["development", "staging", "production"]),
+    APP_ENV: z.enum(["local", "dev", "staging", "production"]),
 
     // Prisma speaks only PostgreSQL here, so a connection string for another
     // engine is a misconfiguration worth catching at boot rather than on the
