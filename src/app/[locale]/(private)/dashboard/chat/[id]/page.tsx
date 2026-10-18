@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { requireChatAccess } from "@/auth/dal";
-import { ChatPanel } from "@/components/chat/chat-panel/chat-panel";
+import { ChatPanelSlot } from "@/components/chat/chat-panel-slot/chat-panel-slot";
 import { NotPermitted } from "@/components/shell/not-permitted/not-permitted";
-import { config } from "@/config";
 import { conversationIdFrom } from "@/lib/http/server/params";
 import {
   findOwnConversation,
@@ -42,11 +41,9 @@ export default async function ConversationPage({ params }: Props) {
   );
 
   return (
-    <ChatPanel
-      key={conversation.id}
+    <ChatPanelSlot
       conversationId={conversation.id}
       initialMessages={conversation.messages}
-      maxLength={config.chat.maxMessageLength}
     />
   );
 }

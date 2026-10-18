@@ -1,6 +1,8 @@
 import { requireChatAccess } from "@/auth/dal";
+import { ChatPanelHost } from "@/components/chat/chat-panel-host/chat-panel-host";
 import { ConversationList } from "@/components/chat/conversation-list/conversation-list";
 import { NotPermitted } from "@/components/shell/not-permitted/not-permitted";
+import { config } from "@/config";
 import { listConversations } from "@/server/chat/chat-service";
 
 // No loading.tsx here or above: the conversation's ownership check must answer before streaming starts (R7).
@@ -17,7 +19,11 @@ export default async function ChatLayout({
       <aside className="flex max-h-[45dvh] shrink-0 flex-col border-b md:max-h-none md:w-72 md:border-e md:border-b-0">
         <ConversationList conversations={conversations} />
       </aside>
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</div>
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <ChatPanelHost maxLength={config.chat.maxMessageLength}>
+          {children}
+        </ChatPanelHost>
+      </div>
     </div>
   );
 }
