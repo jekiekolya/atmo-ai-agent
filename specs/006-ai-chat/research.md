@@ -298,6 +298,9 @@ boundary above it, inside `chat/layout.tsx` and so beside the conversation list.
   database, and the sidebar lists the new conversation (FR-031).
 - When a reply ends in an existing conversation, the client calls `router.refresh()`, which reorders the
   sidebar.
+- The panel lives in `chat/layout.tsx`, inside `ChatPanelHost`. The pages render a `ChatPanelSlot` that
+  hands the host their conversation and its stored messages. The host keeps the panel it has while the
+  slot names the conversation that panel holds, and replaces it otherwise.
 
 **Rationale**:
 
@@ -315,10 +318,19 @@ boundary above it, inside `chat/layout.tsx` and so beside the conversation list.
   new one replaces it in a single render. Revisited 2026-10-16: the `[id]` `loading.tsx` is removed,
   FR-007 now requires the conversation to stay on screen, and spec 005 FR-030 exempts the page.
   `router.refresh()` alone does not avoid the remount: after `replaceState` it renders the `[id]` tree too.
+- Revisited 2026-10-17: the remount itself showed. assistant-ui reveals a reply's text gradually, so the
+  reveal was still running when the reply ended; the new panel paused while it rendered, then showed the
+  rest at once, and dropped whatever was typed in the message box. A `key` cannot keep the panel, as the
+  router keys each segment by its param value (`create-router-cache-key.js`). The panel therefore sits
+  above the segments that change, and a page only says which conversation it shows.
 
 **Alternatives considered**:
 
 - `router.replace` at the first chunk. It would remount mid-stream and abort the reply.
+- Each page keeps its panel, which reuses the `useChat` `Chat` instance from a store in the layout. The
+  thread's elements still remount, so the reveal restarts complete and the message box empties.
+- The host loads the messages itself through a `GET` endpoint. It adds an endpoint and a second round
+  trip, while the pages already load them with the ownership check.
 - `[[...id]]`. It gives the same remounts, needs an optional-segment entry the routes module cannot
   express today, and leaves no place for a layout check that only applies with an id (R7).
 

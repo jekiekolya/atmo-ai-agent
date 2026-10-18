@@ -448,7 +448,8 @@ switch language on a conversation page and confirm the same conversation is show
 - **FR-007**: Once the first message of a new conversation is accepted, the address MUST change to that
   conversation's own without leaving the page or interrupting the reply; reloading it opens the
   conversation. When the conversation's own page takes over after that reply, the conversation MUST
-  stay on screen throughout.
+  stay on screen throughout, as it was: a reply still being revealed goes on being revealed, and text
+  typed in the message box stays there.
 - **FR-008**: A conversation's title MUST be its first message with runs of whitespace collapsed to one
   space and ends trimmed, cut at 80 characters and marked as shortened when longer. It never changes.
 - **FR-009**: History MUST be append-only: a sent message cannot be edited; a reply cannot be

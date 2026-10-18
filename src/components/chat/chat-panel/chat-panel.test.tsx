@@ -4,6 +4,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 const chatFetch = vi.hoisted(() => vi.fn());
 const router = vi.hoisted(() => ({ replace: vi.fn(), refresh: vi.fn() }));
+const conversationStarted = vi.fn();
 
 vi.mock("next-intl", () => import("@/testing/next-intl-mock"));
 vi.mock("@/lib/http/client/chat-fetch", () => ({ chatFetch }));
@@ -34,6 +35,7 @@ beforeEach(() => {
   chatFetch.mockReset();
   router.replace.mockReset();
   router.refresh.mockReset();
+  conversationStarted.mockReset();
   vi.spyOn(window.history, "replaceState");
 });
 
@@ -73,7 +75,13 @@ async function send(text: string) {
 describe("ChatPanel", () => {
   it("sends only the new text, the locale, and the trigger for a new conversation", async () => {
     chatFetch.mockResolvedValue(answer());
-    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+    render(
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
+    );
 
     await send("How does an inverter work?");
 
@@ -102,6 +110,7 @@ describe("ChatPanel", () => {
         conversationId={CONVERSATION}
         initialMessages={messages}
         maxLength={100}
+        onConversationStarted={conversationStarted}
       />,
     );
 
@@ -120,7 +129,13 @@ describe("ChatPanel", () => {
 
   it("moves a new conversation to its own address at the start, then to its page at the end (FR-007)", async () => {
     chatFetch.mockResolvedValue(answer());
-    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+    render(
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
+    );
 
     await send("Hi");
 
@@ -137,6 +152,7 @@ describe("ChatPanel", () => {
       ),
     );
     expect(router.refresh).toHaveBeenCalled();
+    expect(conversationStarted).toHaveBeenCalledWith(CONVERSATION);
     expect(await screen.findByText("Test reply")).toBeInTheDocument();
   });
 
@@ -147,7 +163,13 @@ describe("ChatPanel", () => {
         { status: 429 },
       ),
     );
-    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+    render(
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
+    );
 
     const input = await send("Too soon");
 
@@ -173,7 +195,13 @@ describe("ChatPanel", () => {
         { status: 400 },
       ),
     );
-    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+    render(
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
+    );
 
     await send("x");
 
@@ -188,7 +216,13 @@ describe("ChatPanel", () => {
         Response.json({ error: { code: "rate_limited" } }, { status: 429 }),
       )
       .mockResolvedValueOnce(answer());
-    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+    render(
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
+    );
 
     await send("Once");
     await screen.findByText("chat.errors.rateLimited");
@@ -223,6 +257,7 @@ describe("ChatPanel", () => {
         conversationId={CONVERSATION}
         initialMessages={failedConversation}
         maxLength={100}
+        onConversationStarted={conversationStarted}
       />,
     );
 
@@ -252,6 +287,7 @@ describe("ChatPanel", () => {
         conversationId={CONVERSATION}
         initialMessages={failedConversation}
         maxLength={100}
+        onConversationStarted={conversationStarted}
       />,
     );
 
@@ -269,7 +305,13 @@ describe("ChatPanel", () => {
 
   it("gives the text back when the server cannot be reached (review finding 6)", async () => {
     chatFetch.mockRejectedValue(new TypeError("Failed to fetch"));
-    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+    render(
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
+    );
 
     const input = await send("Offline question");
 
@@ -286,6 +328,7 @@ describe("ChatPanel", () => {
         conversationId={CONVERSATION}
         initialMessages={failedConversation}
         maxLength={100}
+        onConversationStarted={conversationStarted}
       />,
     );
 
@@ -311,7 +354,13 @@ describe("ChatPanel", () => {
           { status: 429 },
         ),
       );
-      render(<ChatPanel initialMessages={[]} maxLength={100} />);
+      render(
+        <ChatPanel
+          initialMessages={[]}
+          maxLength={100}
+          onConversationStarted={conversationStarted}
+        />,
+      );
 
       await send("Over budget");
 
@@ -353,7 +402,11 @@ describe("ChatPanel after the second review", () => {
     const live = openStream();
     chatFetch.mockResolvedValue(live.response);
     const { unmount } = render(
-      <ChatPanel initialMessages={[]} maxLength={100} />,
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
     );
 
     await send("Leaving soon");
@@ -370,7 +423,13 @@ describe("ChatPanel after the second review", () => {
   it("shows a reply cut off by a lost connection as stopped, with no Try again (finding 4, FR-016)", async () => {
     const live = openStream();
     chatFetch.mockResolvedValue(live.response);
-    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+    render(
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
+    );
 
     await send("Unstable network");
     for (const chunk of started()) live.push(chunk);
@@ -394,7 +453,13 @@ describe("ChatPanel after the second review", () => {
     async (_, error) => {
       const live = openStream();
       chatFetch.mockResolvedValue(live.response);
-      render(<ChatPanel initialMessages={[]} maxLength={100} />);
+      render(
+        <ChatPanel
+          initialMessages={[]}
+          maxLength={100}
+          onConversationStarted={conversationStarted}
+        />,
+      );
 
       await send("Unstable network");
       for (const chunk of started()) live.push(chunk);
@@ -426,6 +491,7 @@ describe("ChatPanel after the second review", () => {
           },
         ]}
         maxLength={100}
+        onConversationStarted={conversationStarted}
       />,
     );
 
@@ -456,6 +522,7 @@ describe("ChatPanel after the second review", () => {
           },
         ]}
         maxLength={100}
+        onConversationStarted={conversationStarted}
       />,
     );
 
@@ -483,11 +550,17 @@ describe("ChatPanel after the second review", () => {
     expect(router.replace).not.toHaveBeenCalled();
   });
 
-  it("keeps Send held after Stop in a new chat until its own page replaces the panel", async () => {
+  it("lets the user send again after Stop in a new chat once the stopped reply is stored (finding 2)", async () => {
     const user = userEvent.setup();
     const live = openStream();
     chatFetch.mockResolvedValue(live.response);
-    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+    render(
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
+    );
 
     await send("Long answer, please");
     for (const chunk of started()) live.push(chunk);
@@ -509,7 +582,8 @@ describe("ChatPanel after the second review", () => {
     );
     expect(
       screen.getByRole("button", { name: "chat.composer.send" }),
-    ).toBeDisabled();
+    ).toBeEnabled();
+    expect(conversationStarted).toHaveBeenCalledWith(CONVERSATION);
   });
 
   it("offers Stop only once the reply has started (finding 1)", async () => {
@@ -519,7 +593,13 @@ describe("ChatPanel after the second review", () => {
         respond = resolve;
       }),
     );
-    render(<ChatPanel initialMessages={[]} maxLength={100} />);
+    render(
+      <ChatPanel
+        initialMessages={[]}
+        maxLength={100}
+        onConversationStarted={conversationStarted}
+      />,
+    );
 
     await send("Quick question");
 

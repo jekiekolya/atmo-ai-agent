@@ -162,6 +162,40 @@ test("the conversation stays on screen while its own page takes over from the ne
   expect(Math.min(...counts.slice(shown))).toBeGreaterThan(0);
 });
 
+test("the conversation's own page keeps the reply and the typed text as they were (FR-007)", async ({
+  browser,
+}) => {
+  const page = await signedInAdmin(browser);
+  await page.goto("/en/dashboard/chat");
+  await expect(page.getByText(/^Hello! Ask me anything/)).toBeVisible();
+
+  await send(page, "Explain the seasons [slow]");
+  await expect(lastReply(page)).toContainText("Test reply, slowly.");
+  await page.evaluate(() => {
+    (window as unknown as { reply: Element | null }).reply =
+      document.querySelector('[data-role="assistant"]');
+  });
+  const box = page.getByRole("textbox", { name: "Message" });
+  await box.fill("And in spring?");
+
+  await expect(page).toHaveTitle(/^Explain the seasons \[slow\]/, {
+    timeout: 15_000,
+  });
+  await expect(
+    page
+      .getByRole("navigation", { name: "Conversations" })
+      .getByRole("link", { name: "Explain the seasons [slow]" }),
+  ).toBeVisible();
+
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { reply: Element | null }).reply?.isConnected,
+    ),
+  ).toBe(true);
+  await expect(box).toHaveValue("And in spring?");
+  await expect(page.getByRole("button", { name: "Send" })).toBeEnabled();
+});
+
 test("a reloaded conversation is never painted scrolled anywhere but its end (FR-010)", async ({
   browser,
 }) => {

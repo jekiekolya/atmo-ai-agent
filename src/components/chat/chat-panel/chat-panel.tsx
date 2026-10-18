@@ -5,11 +5,10 @@ import { useAISDKRuntime } from "@assistant-ui/ai-sdk";
 import { AssistantRuntimeProvider } from "@assistant-ui/react";
 import { APICallError, DefaultChatTransport } from "ai";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ChatThread } from "@/components/chat/chat-thread/chat-thread";
 import { FormAlert } from "@/components/form-kit/form-alert/form-alert";
-import { PageLoader } from "@/components/shell/page-loader/page-loader";
 import { getPathname, useRouter } from "@/i18n/navigation";
 import { chatFetch } from "@/lib/http/client/chat-fetch";
 import {
@@ -28,8 +27,6 @@ type Refusal = {
 type PendingRequest = { trigger: string; text: string | undefined };
 
 const STOP_SETTLE_MS = 1_000;
-
-const neverChanges = () => () => {};
 
 function refusalOf(error: Error): Refusal | null {
   if (!APICallError.isInstance(error)) return null;
@@ -83,18 +80,15 @@ export function ChatPanel({
   conversationId,
   initialMessages,
   maxLength,
+  onConversationStarted,
 }: {
   conversationId?: string;
   initialMessages: ChatUIMessage[];
   maxLength: number;
+  onConversationStarted: (id: string) => void;
 }) {
   const t = useTranslations();
   const locale = useLocale();
-  const hydrated = useSyncExternalStore(
-    neverChanges,
-    () => true,
-    () => false,
-  );
   const localeRef = useRef(locale);
   const router = useRouter();
   const [alert, setAlert] = useState<string | null>(null);
@@ -191,13 +185,14 @@ export function ChatPanel({
     )?.metadata?.conversationId;
     if (id && !idRef.current) {
       idRef.current = id;
+      onConversationStarted(id);
       window.history.replaceState(
         null,
         "",
         getPathname({ href: conversationPath(id), locale }),
       );
     }
-  }, [chat.messages, locale]);
+  }, [chat.messages, locale, onConversationStarted]);
 
   useEffect(() => {
     localeRef.current = locale;
@@ -260,9 +255,11 @@ export function ChatPanel({
         // onFinish can run before the effect above has seen the start chunk.
         const id = idRef.current ?? message.metadata?.conversationId;
         // A navigation keeps the shared layout as it was; the refresh re-renders the sidebar (FR-031).
-        // A new conversation's page replaces this panel, so Send stays held until it does.
-        if (id && !conversationId) router.replace(conversationPath(id));
-        else setSettling(false);
+        if (id && !conversationId) {
+          onConversationStarted(id);
+          router.replace(conversationPath(id));
+        }
+        setSettling(false);
         router.refresh();
       },
     };
@@ -281,9 +278,6 @@ export function ChatPanel({
     chat.clearError();
     void chat.regenerate();
   }
-
-  // Server HTML paints at the top; only the client can open the thread at its end.
-  if (!hydrated) return <PageLoader />;
 
   return (
     <AssistantRuntimeProvider runtime={runtime}>
