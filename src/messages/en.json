@@ -139,7 +139,8 @@
     "expired": "This invitation link has expired. Ask your administrator for a new one.",
     "used": "This invitation link has already been used.",
     "invalid": "This invitation link is not valid. Ask your administrator for a new one.",
-    "toSignIn": "Go to sign in"
+    "toSignIn": "Go to sign in",
+    "signedIn": "You're signed in as {email}. Sign out to set the password for this invitation."
   },
   "notPermitted": {
     "title": "Not permitted",

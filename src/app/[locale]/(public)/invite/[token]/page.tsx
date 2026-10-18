@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
+import { getSessionUser } from "@/auth/dal";
 import { BrandLogo } from "@/components/shell/brand-logo/brand-logo";
+import { InviteSignOut } from "@/components/account/invite-sign-out/invite-sign-out";
 import { SetPasswordForm } from "@/components/account/set-password-form/set-password-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
@@ -26,6 +28,8 @@ export default async function InvitePage({
 }: PageProps<"/[locale]/invite/[token]">) {
   const { token } = await params;
   const outcome = await inspectInvite(token);
+  // The full check, not the cookie: a revoked session must see the form.
+  const signedIn = await getSessionUser();
   const t = await getTranslations("invite");
 
   return (
@@ -43,7 +47,16 @@ export default async function InvitePage({
           )}
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          {outcome.status === "valid" ? (
+          {outcome.status === "valid" && signedIn ? (
+            <>
+              <Alert>
+                <AlertDescription className="break-all">
+                  {t("signedIn", { email: signedIn.email })}
+                </AlertDescription>
+              </Alert>
+              <InviteSignOut />
+            </>
+          ) : outcome.status === "valid" ? (
             <SetPasswordForm token={token} />
           ) : (
             <Alert variant="destructive">
