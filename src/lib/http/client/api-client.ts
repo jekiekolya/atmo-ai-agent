@@ -25,6 +25,7 @@ export async function apiRequest<T = undefined>(
   method: Method,
   path: string,
   body?: unknown,
+  options: { unauthenticated?: "redirect" | "resolve" } = {},
 ): Promise<ApiResult<T>> {
   let response: Response;
   try {
@@ -37,7 +38,11 @@ export async function apiRequest<T = undefined>(
     return { ok: false, code: "network" };
   }
 
-  if (response.status === 401) return redirectToSignIn();
+  if (response.status === 401) {
+    return options.unauthenticated === "resolve"
+      ? { ok: false, code: "unauthenticated" }
+      : redirectToSignIn();
+  }
   renewSession();
   if (response.status >= 500) return { ok: false, code: "unexpected" };
   if (response.status === 204) return { ok: true, data: undefined as T };

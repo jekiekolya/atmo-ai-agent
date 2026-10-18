@@ -1,6 +1,6 @@
 import { expect, type Page, test } from "@playwright/test";
 
-import { createAdmin } from "./support/db";
+import { createAdmin, sql } from "./support/db";
 import { signedInAsOwner, signedInPage, submitSignIn } from "./support/sign-in";
 import { createUserViaUi } from "./support/users";
 
@@ -115,6 +115,36 @@ test("a signed-in user who opens an invite link is asked to sign out first", asy
 
   await expect(page).toHaveURL(/\/en\/sign-in\?notice=password-set$/);
   await expect(page.getByText("Your password is set.")).toBeVisible();
+});
+
+test("Sign out on an invite page whose session already ended reloads the invite, not sign-in", async ({
+  browser,
+}) => {
+  const email = `invitee-session-ended-${Date.now()}@e2e.test`;
+  const owner = await signedInAsOwner(browser);
+
+  const linkField = await createUserViaUi(owner, {
+    email,
+    firstName: "Olha",
+    lastName: "Kobylianska",
+  });
+  const link = new URL(await linkField.inputValue());
+
+  const admin = await createAdmin();
+  const page = await signedInPage(browser, admin.email, admin.password);
+  await page.goto(`/en${link.pathname}`);
+  await expect(
+    page.getByText(`You're signed in as ${admin.email}.`),
+  ).toBeVisible();
+
+  // As if signed out in another tab: the sign-out request now gets a 401.
+  await sql(`UPDATE users SET "signedOutAt" = now() WHERE email = $1`, [
+    admin.email,
+  ]);
+
+  await signOutOnInvitePage(page);
+  // The token must not end up in a sign-in callbackUrl (FR-043).
+  await expect(page).toHaveURL(new RegExp(`/en${link.pathname}$`));
 });
 
 test("the invite page does not leak its address to other sites (FR-043)", async ({

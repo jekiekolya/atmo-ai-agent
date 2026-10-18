@@ -96,6 +96,18 @@ describe("apiRequest", () => {
     expect(settled).not.toHaveBeenCalled();
   });
 
+  it("resolves a 401 as the unauthenticated code when asked to, without leaving the page or renewing", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 401 }));
+
+    expect(
+      await apiRequest("POST", "/api/session/sign-out", undefined, {
+        unauthenticated: "resolve",
+      }),
+    ).toEqual({ ok: false, code: "unauthenticated" });
+    expect(assign).not.toHaveBeenCalled();
+    expect(renewals()).toHaveLength(0);
+  });
+
   it("resolves a network failure as the network code", async () => {
     fetchMock.mockRejectedValue(new TypeError("Failed to fetch"));
 

@@ -16,9 +16,12 @@ export function InviteSignOut() {
 
   async function signOut() {
     setPending(true);
-    const result = await apiRequest("POST", API_ROUTES.signOut);
+    // A 401 means the session already ended; the sign-in redirect would put the token in its callbackUrl.
+    const result = await apiRequest("POST", API_ROUTES.signOut, undefined, {
+      unauthenticated: "resolve",
+    });
 
-    if (result.ok) {
+    if (result.ok || result.code === "unauthenticated") {
       hardNavigate(window.location.pathname);
       return;
     }

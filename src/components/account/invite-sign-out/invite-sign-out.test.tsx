@@ -33,7 +33,26 @@ describe("InviteSignOut", () => {
     await waitFor(() =>
       expect(hardNavigate).toHaveBeenCalledWith("/uk/invite/a-token"),
     );
-    expect(apiRequest).toHaveBeenCalledWith("POST", "/api/session/sign-out");
+    expect(apiRequest).toHaveBeenCalledWith(
+      "POST",
+      "/api/session/sign-out",
+      undefined,
+      { unauthenticated: "resolve" },
+    );
+  });
+
+  it("reloads the same invite page when the session had already ended", async () => {
+    window.history.replaceState(null, "", "/uk/invite/a-token");
+    apiRequest.mockResolvedValue({ ok: false, code: "unauthenticated" });
+    const user = userEvent.setup();
+    render(<InviteSignOut />);
+
+    await user.click(screen.getByRole("button", { name: "shell.signOut" }));
+
+    await waitFor(() =>
+      expect(hardNavigate).toHaveBeenCalledWith("/uk/invite/a-token"),
+    );
+    expect(toastAdd).not.toHaveBeenCalled();
   });
 
   it("stays put and says so when the server fails", async () => {
