@@ -216,6 +216,10 @@ it, set a password, and sign in with it.
    shown.
 9. **Given** the link carries no language segment, **When** the invitee opens it, **Then** it opens in
    the language the invitee's own browser resolves to under feature 001, with the link intact.
+10. **Given** a valid link, **When** someone who is already signed in opens it, **Then** they are told
+    which account they are signed in as and offered a way to sign out, and no form is offered; once
+    they sign out, the same page offers the form, and accepting it reaches sign-in with the
+    confirmation from scenario 4.
 
 ---
 
@@ -531,7 +535,9 @@ succeeds.
   confirm a password. Submitting a password that satisfies FR-040 and matches its confirmation MUST, in
   one indivisible step: set the password, record the moment it changed, make the account active if it
   was invited, clear any lock and failure count, and consume the link. Opening the link alone MUST
-  change nothing.
+  change nothing. A signed-in visitor MUST NOT be offered the form; they are told which account they
+  are signed in as and offered a way to sign out first, because FR-031 would otherwise take them past
+  FR-046's confirmation into their own protected area.
 - **FR-045**: Link outcomes MUST be defined as follows, both when the page opens and when the form is
   submitted:
   - _Expired_: an "expired, ask your administrator for a new link" message, no form.
