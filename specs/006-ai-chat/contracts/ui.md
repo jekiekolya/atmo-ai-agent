@@ -4,15 +4,15 @@
 
 ## Pages and layouts (`src/app/[locale]/(private)/dashboard/`)
 
-| File                                 | Renders                                                                                      | Awaits before streaming        |
-| ------------------------------------ | -------------------------------------------------------------------------------------------- | ------------------------------ |
-| `(home)/page.tsx`, `loading.tsx`     | the dashboard home — **moved** from `dashboard/` unchanged (R7)                              | —                              |
-| `chat/layout.tsx`                    | sidebar (`ConversationList`) + main column; `verifySession()`, `listConversations`           | session, list                  |
-| `chat/(new)/page.tsx`, `loading.tsx` | `ChatPanel` with no conversation and no messages                                             | —                              |
-| `chat/[id]/layout.tsx`               | children; `conversationIdFrom(params)` and `findOwnConversation` → `notFound()` (FR-004, R7) | ownership check — **real 404** |
-| `chat/[id]/page.tsx`, `loading.tsx`  | `ChatPanel` keyed by id, with the stored messages folded (R10)                               | history                        |
+| File                                 | Renders                                                                                                      | Awaits before streaming        |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------ | ------------------------------ |
+| `(home)/page.tsx`, `loading.tsx`     | the dashboard home — **moved** from `dashboard/` unchanged (R7)                                              | —                              |
+| `chat/layout.tsx`                    | sidebar (`ConversationList`) + main column with `ChatPanelHost` (R8); `verifySession()`, `listConversations` | session, list                  |
+| `chat/(new)/page.tsx`, `loading.tsx` | `ChatPanelSlot` with no conversation and no messages                                                         | —                              |
+| `chat/[id]/layout.tsx`               | children; `conversationIdFrom(params)` and `findOwnConversation` → `notFound()` (FR-004, R7)                 | ownership check — **real 404** |
+| `chat/[id]/page.tsx`                 | `ChatPanelSlot` with the conversation and its stored messages folded (R10)                                   | history                        |
 
-No `loading.tsx` in `dashboard/` or `dashboard/chat/` — enforced by
+No `loading.tsx` in `dashboard/`, `dashboard/chat/` or `chat/[id]/` — enforced by
 `src/conventions/loading-boundaries.test.ts`. Page titles: `chat.metaTitle` (new), the conversation's
 title (existing).
 
@@ -24,6 +24,8 @@ Header (`(private)/layout.tsx`): `Home`, **`Chat`** (`shell.chat`, `PAGES.chat`)
 | Component                    | Kind   | Responsibility                                                                                                                                                                         |
 | ---------------------------- | ------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `chat-panel`                 | client | `useChat` + `DefaultChatTransport` (`chatFetch`, last-message body) + `useAISDKRuntime` + `AssistantRuntimeProvider`; URL change (R8); refusal handling (R11); Try again folding (R10) |
+| `chat-panel-host`            | client | renders the panel in `chat/layout.tsx`; keeps it while the slot names the conversation it holds, replaces it otherwise (R8)                                                            |
+| `chat-panel-slot`            | client | rendered by each chat page; hands the host its conversation and messages; the loader until hydrated                                                                                    |
 | `chat-thread`                | client | composed from assistant-ui primitives (R9): messages, greeting, composer, Stop, Copy, Try again, markers, reasoning                                                                    |
 | `reply-marker`               | client | localized marker for `stopped` / `cut` / `failed` / `in_progress`, from status or metadata                                                                                             |
 | `conversation-list`          | client | links to `PAGES.chatConversation`, active by `usePathname`, New chat, Delete; collapsible on narrow screens (FR-034)                                                                   |

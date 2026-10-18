@@ -192,12 +192,13 @@ src/
 │       └── dashboard/
 │           ├── (home)/page.tsx, loading.tsx   # MOVED from dashboard/ (R7)
 │           └── chat/
-│               ├── layout.tsx             # NEW — sidebar
-│               ├── (new)/page.tsx, loading.tsx
-│               └── [id]/layout.tsx, page.tsx      # no loading.tsx (R8)
+│               ├── layout.tsx             # NEW — sidebar, panel host (R8)
+│               ├── (new)/page.tsx, loading.tsx    # panel slot
+│               └── [id]/layout.tsx, page.tsx      # panel slot; no loading.tsx (R8)
 ├── components/
 │   ├── chat/                              # NEW group — one folder per component, test beside
-│   │   ├── chat-panel/  chat-thread/  reply-marker/
+│   │   ├── chat-panel/  chat-panel-host/  chat-panel-slot/
+│   │   ├── chat-thread/  reply-marker/
 │   │   └── conversation-list/  delete-conversation-dialog/
 │   ├── assistant-ui/elements/             # NEW via CLI (flat) — markdown-text, reasoning(.aui), tooltip-icon-button
 │   └── ui/tooltip.tsx, collapsible.tsx    # NEW via CLI
@@ -229,7 +230,8 @@ follow from the research:
 3. **Route groups shape the loading boundaries**, not the URLs (R7). `(home)` and `(new)` exist only to
    keep `loading.tsx` from wrapping the ownership check.
 4. **The sidebar lives in `chat/layout.tsx`**, so it persists across conversations. It is refreshed
-   explicitly after each reply (R8).
+   explicitly after each reply (R8). The panel lives there too, so a new conversation's own page does
+   not replace it; a page tells it which conversation to show (R8).
 
 ## Complexity Tracking
 
@@ -267,8 +269,9 @@ Recorded here because Principle III forbids the code being the only record of in
 | A19 | —                                                                                                  | The panel does not navigate once it is unmounted; it still refreshes, so the list beside the page the user went to shows the new conversation                                                                                                                                  | Found in review: `useChat` stops the reply on unmount, so leaving a new chat while it streamed brought the user back to it a second later                                                                                                                                                                                                            |
 | A20 | A lost connection shows as the SDK reports it, an error                                            | It is shown as stopped, with no error and no Try again, after the same one-second settle as Stop. A lost connection is any error after the response began that is not `model_failed`: the SDK's own `isDisconnect` recognises only Chrome's wording, not Safari's or Firefox's | Found in review: FR-016 makes a lost connection end the reply as Stop does; the server stored `STOPPED` and refused the Try again the browser offered                                                                                                                                                                                                |
 | A21 | Send disabled while the latest reply is in progress                                                | Disabled only while this tab's reply runs, and during the settle after Stop                                                                                                                                                                                                    | Found in review: a reply another tab was writing kept Send disabled until a reload, as this tab's copy never updates; the server's `reply_in_progress` refusal enforces FR-012                                                                                                                                                                       |
-| A22 | Send enabled as soon as Stop is pressed                                                            | Disabled for `STOP_SETTLE_MS` after a Stop or a lost connection; in a new conversation, until its own page replaces the panel                                                                                                                                                  | Found in review: the server stores `STOPPED` only once it notices the closed connection, so a question sent at once was refused as `reply_in_progress`                                                                                                                                                                                               |
+| A22 | Send enabled as soon as Stop is pressed                                                            | Disabled for `STOP_SETTLE_MS` after a Stop or a lost connection; until A24, in a new conversation also until its own page replaced the panel                                                                                                                                   | Found in review: the server stores `STOPPED` only once it notices the closed connection, so a question sent at once was refused as `reply_in_progress`                                                                                                                                                                                               |
 | A23 | Stop offered as soon as a question is sent                                                         | Stop, and Escape in the message box, disabled until the reply's first chunk, which carries the conversation's id                                                                                                                                                               | Found in review: a Stop before it left the browser without the new conversation's id, so the next question opened a second conversation                                                                                                                                                                                                              |
+| A24 | `ChatPanel` rendered by each page, keyed by conversation                                           | `ChatPanelHost` in `chat/layout.tsx` renders it; each page renders a `ChatPanelSlot` with its conversation and messages                                                                                                                                                        | Found after PR #20: the `[id]` page replacing the new chat's panel cut off the reveal of the reply's text and emptied the message box (R8, FR-007)                                                                                                                                                                                                   |
 
 ### Live model check (T087, 2026-10-04, free-tier key, test questions only)
 
