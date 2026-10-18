@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 import { createAdmin } from "./support/db";
 import { signedInAsOwner, signedInPage, submitSignIn } from "./support/sign-in";
@@ -7,6 +7,17 @@ import { createUserViaUi } from "./support/users";
 // US3 / FR-064: create a user, accept the invite, sign in with the new password.
 
 const NEW_PASSWORD = "an invitee's own password";
+
+async function signOutOnInvitePage(page: Page) {
+  const signOut = page.getByRole("button", { name: "Sign out" });
+  // A click before hydration does nothing; click again until the reload shows the form.
+  await expect(async () => {
+    if (await signOut.isVisible()) await signOut.click({ timeout: 1_000 });
+    await expect(page.getByLabel("New password")).toBeVisible({
+      timeout: 1_000,
+    });
+  }).toPass();
+}
 
 test("an invited person sets their own password and signs in with it", async ({
   browser,
@@ -96,7 +107,7 @@ test("a signed-in user who opens an invite link is asked to sign out first", asy
   ).toBeVisible();
   await expect(page.getByLabel("New password")).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Sign out" }).click();
+  await signOutOnInvitePage(page);
   await expect(page).toHaveURL(new RegExp(`/en${link.pathname}$`));
   await page.getByLabel("New password").fill(NEW_PASSWORD);
   await page.getByLabel("Repeat the password").fill(NEW_PASSWORD);
