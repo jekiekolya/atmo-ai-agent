@@ -1,11 +1,23 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
-import { signedInAsOwner, submitSignIn } from "./support/sign-in";
+import { createAdmin, sql } from "./support/db";
+import { signedInAsOwner, signedInPage, submitSignIn } from "./support/sign-in";
 import { createUserViaUi } from "./support/users";
 
 // US3 / FR-064: create a user, accept the invite, sign in with the new password.
 
 const NEW_PASSWORD = "an invitee's own password";
+
+async function signOutOnInvitePage(page: Page) {
+  const signOut = page.getByRole("button", { name: "Sign out" });
+  // A click before hydration does nothing; click again until the reload shows the form.
+  await expect(async () => {
+    if (await signOut.isVisible()) await signOut.click({ timeout: 1_000 });
+    await expect(page.getByLabel("New password")).toBeVisible({
+      timeout: 1_000,
+    });
+  }).toPass();
+}
 
 test("an invited person sets their own password and signs in with it", async ({
   browser,
@@ -70,6 +82,69 @@ test("an invited person sets their own password and signs in with it", async ({
     invitee.getByText("Це посилання-запрошення вже використано."),
   ).toBeVisible();
   await expect(invitee.getByLabel("Новий пароль")).toHaveCount(0);
+});
+
+test("a signed-in user who opens an invite link is asked to sign out first", async ({
+  browser,
+}) => {
+  const email = `invitee-signed-in-${Date.now()}@e2e.test`;
+  const owner = await signedInAsOwner(browser);
+
+  const linkField = await createUserViaUi(owner, {
+    email,
+    firstName: "Ivan",
+    lastName: "Franko",
+  });
+  const link = new URL(await linkField.inputValue());
+
+  // Its own account: signing out ends every session of that user, and other specs share the owner (FR-066).
+  const admin = await createAdmin();
+  const page = await signedInPage(browser, admin.email, admin.password);
+
+  await page.goto(`/en${link.pathname}`);
+  await expect(
+    page.getByText(`You're signed in as ${admin.email}.`),
+  ).toBeVisible();
+  await expect(page.getByLabel("New password")).toHaveCount(0);
+
+  await signOutOnInvitePage(page);
+  await expect(page).toHaveURL(new RegExp(`/en${link.pathname}$`));
+  await page.getByLabel("New password").fill(NEW_PASSWORD);
+  await page.getByLabel("Repeat the password").fill(NEW_PASSWORD);
+  await page.getByRole("button", { name: "Set password" }).click();
+
+  await expect(page).toHaveURL(/\/en\/sign-in\?notice=password-set$/);
+  await expect(page.getByText("Your password is set.")).toBeVisible();
+});
+
+test("Sign out on an invite page whose session already ended reloads the invite, not sign-in", async ({
+  browser,
+}) => {
+  const email = `invitee-session-ended-${Date.now()}@e2e.test`;
+  const owner = await signedInAsOwner(browser);
+
+  const linkField = await createUserViaUi(owner, {
+    email,
+    firstName: "Olha",
+    lastName: "Kobylianska",
+  });
+  const link = new URL(await linkField.inputValue());
+
+  const admin = await createAdmin();
+  const page = await signedInPage(browser, admin.email, admin.password);
+  await page.goto(`/en${link.pathname}`);
+  await expect(
+    page.getByText(`You're signed in as ${admin.email}.`),
+  ).toBeVisible();
+
+  // As if signed out in another tab: the sign-out request now gets a 401.
+  await sql(`UPDATE users SET "signedOutAt" = now() WHERE email = $1`, [
+    admin.email,
+  ]);
+
+  await signOutOnInvitePage(page);
+  // The token must not end up in a sign-in callbackUrl (FR-043).
+  await expect(page).toHaveURL(new RegExp(`/en${link.pathname}$`));
 });
 
 test("the invite page does not leak its address to other sites (FR-043)", async ({
