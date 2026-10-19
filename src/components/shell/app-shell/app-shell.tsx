@@ -7,11 +7,13 @@ export function AppShell({
   logo,
   nav,
   account,
+  footer,
   children,
 }: {
   logo?: ReactNode;
   nav?: ReactNode;
   account?: ReactNode;
+  footer?: ReactNode;
   children: ReactNode;
 }) {
   return (
@@ -30,6 +32,11 @@ export function AppShell({
         </div>
       </header>
       <main className="flex-1">{children}</main>
+      {footer && (
+        <footer className="border-t px-4 py-6 text-sm text-muted-foreground">
+          {footer}
+        </footer>
+      )}
     </>
   );
 }

@@ -40,6 +40,28 @@ describe("AppShell", () => {
     ).toBeInTheDocument();
   });
 
+  it("renders a footer as the contentinfo landmark right after the main content", () => {
+    render(
+      <AppShell footer="the footer">
+        <p>content</p>
+      </AppShell>,
+    );
+
+    const footer = screen.getByRole("contentinfo");
+    expect(footer).toHaveTextContent("the footer");
+    expect(screen.getByRole("main").nextElementSibling).toBe(footer);
+  });
+
+  it("renders no footer when none is given", () => {
+    render(
+      <AppShell>
+        <p>content</p>
+      </AppShell>,
+    );
+
+    expect(screen.queryByRole("contentinfo")).not.toBeInTheDocument();
+  });
+
   it("renders only the preferences when there is no logo, nav or account", () => {
     render(
       <AppShell>
