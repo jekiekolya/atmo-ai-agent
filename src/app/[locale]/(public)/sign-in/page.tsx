@@ -13,7 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { resolveLocale } from "@/i18n/locales";
-import { redirect } from "@/i18n/navigation";
+import { Link, redirect } from "@/i18n/navigation";
 import { safeCallbackUrl } from "@/lib/http/callback-url";
 import { PAGES } from "@/lib/routes";
 
@@ -53,7 +53,9 @@ export default async function SignInPage({
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-4 p-4 sm:p-8">
-      <BrandLogo className="mx-auto h-10 w-auto" />
+      <Link href={PAGES.home} className="self-center rounded-sm">
+        <BrandLogo className="h-10 w-auto" />
+      </Link>
       {notice && (
         <Alert>
           <AlertDescription>{t(`notice.${notice}`)}</AlertDescription>
