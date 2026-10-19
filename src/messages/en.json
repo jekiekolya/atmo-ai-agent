@@ -6,9 +6,37 @@
     "metaDescription": "Support for the customers of our solar-energy partners.",
     "fullName": "{firstName} {lastName}"
   },
-  "home": {
-    "title": "How can we help?",
-    "intro": "Ask about your solar system, your contract, or a recent visit. We answer in your language."
+  "landing": {
+    "metaTitle": "AI support for your solar system",
+    "metaDescription": "An AI support agent that answers your questions about your solar system around the clock, in your language.",
+    "headline": "AI support for your solar system",
+    "subheading": "Atmo AI answers your questions at any hour, in the language you write in, and keeps every conversation.",
+    "signIn": "Sign in",
+    "example": {
+      "caption": "Example conversation",
+      "customer": "Customer",
+      "speaker": "{name}:",
+      "question": "Why is my solar system producing less this week?",
+      "answer": "Output usually drops when there is more cloud, when panels are dusty or shaded, or as days get shorter. If the weather has been clear and the panels are clean, check the inverter for a warning light."
+    },
+    "benefits": {
+      "allHours": {
+        "title": "Around the clock",
+        "body": "You get an answer at any hour, weekends and holidays included."
+      },
+      "language": {
+        "title": "In your language",
+        "body": "The agent replies in the language you write in."
+      },
+      "history": {
+        "title": "Conversation history",
+        "body": "Every conversation is kept, so you can pick it up where you left off."
+      },
+      "solar": {
+        "title": "Built for solar energy",
+        "body": "Knows what owners of solar systems ask about."
+      }
+    }
   },
   "switcher": {
     "label": "Language"

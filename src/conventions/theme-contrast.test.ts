@@ -85,6 +85,14 @@ const PAIRS: Pair[] = [
   ]),
   { fg: "destructive/90", surface: "card", min: TEXT },
   { fg: "brand-mark", surface: "background", min: GRAPHIC },
+  {
+    fg: "foreground",
+    surface: "brand-mark/10",
+    over: "background",
+    min: TEXT,
+  },
+  { fg: "ring", surface: "brand-mark/10", over: "background", min: GRAPHIC },
+  { fg: "brand-mark", surface: "card", min: GRAPHIC },
 ];
 
 function label({ fg, surface, over: base, min }: Pair) {
@@ -123,6 +131,24 @@ describe.each(["button", "badge", "dropdown-menu"])("ui/%s.tsx", (name) => {
     );
     const tooStrong = [...source.matchAll(/[^\s"'`]*bg-destructive\/(\d+)/g)]
       .filter(([, percent]) => Number(percent) > 15)
+      .map(([cls]) => cls);
+
+    expect(tooStrong).toEqual([]);
+  });
+});
+
+// data-model.md § Contrast pairs: the brand-mark/10 pairs above hold only if the hero's glow is no stronger.
+describe("landing-hero.tsx", () => {
+  it("draws no brand-mark tint stronger than /10", () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/landing/landing-hero/landing-hero.tsx",
+      ),
+      "utf8",
+    );
+    const tooStrong = [...source.matchAll(/[^\s"'`]*brand-mark\/(\d+)/g)]
+      .filter(([, percent]) => Number(percent) > 10)
       .map(([cls]) => cls);
 
     expect(tooStrong).toEqual([]);

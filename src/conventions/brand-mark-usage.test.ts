@@ -4,11 +4,14 @@ import { join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 
 // Spec 005, FR-011 / FR-012: brand red belongs to brand marks, never to a control or an error.
+// Spec 007, FR-026: the hero glow and the benefit icons.
 const ALLOWED = new Set([
   "src/app/globals.css",
   "src/app/icon.svg",
   "src/components/shell/brand-logo/atmo-ai-logo.svg",
   "src/components/shell/page-loader/page-loader.tsx",
+  "src/components/landing/landing-hero/landing-hero.tsx",
+  "src/components/landing/benefit-cards/benefit-cards.tsx",
 ]);
 
 const SCANNED = /\.(ts|tsx|css|svg|json)$/;
