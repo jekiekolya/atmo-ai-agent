@@ -1,10 +1,10 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 
 // Console errors that come from the environment rather than from a defect.
 // The list starts empty on purpose; every entry added needs its reason here.
 const IGNORED_CONSOLE_ERRORS: RegExp[] = [];
 
-test("the home page renders without errors", async ({ page }) => {
+function collectErrors(page: Page) {
   const errors: string[] = [];
 
   page.on("console", (message) => {
@@ -14,6 +14,12 @@ test("the home page renders without errors", async ({ page }) => {
     errors.push(text);
   });
   page.on("pageerror", (error) => errors.push(error.message));
+
+  return errors;
+}
+
+test("the home page renders without errors", async ({ page }) => {
+  const errors = collectErrors(page);
 
   // "/" carries no locale, so it negotiates and redirects; the assertion is on
   // where the visitor lands, not on the redirect itself.
@@ -27,3 +33,17 @@ test("the home page renders without errors", async ({ page }) => {
 
   expect(errors).toEqual([]);
 });
+
+for (const locale of ["en", "uk"]) {
+  test(`the ${locale} landing page renders without errors`, async ({
+    page,
+  }) => {
+    const errors = collectErrors(page);
+
+    const response = await page.goto(`/${locale}`);
+    expect(response?.status()).toBe(200);
+    await page.waitForLoadState("networkidle");
+
+    expect(errors).toEqual([]);
+  });
+}

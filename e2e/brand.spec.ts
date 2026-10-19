@@ -71,7 +71,7 @@ test.describe("logo and name (US2)", () => {
   });
 
   for (const path of ["/en/sign-in", `/en/invite/${"A".repeat(43)}`]) {
-    test(`${path.slice(0, 11)}… shows the logo above the card, not in the header (FR-023, FR-024)`, async ({
+    test(`${path.slice(0, 11)}… shows the logo above the card as a link to the landing page, not in the header (spec 005 FR-023, spec 007 FR-022)`, async ({
       page,
     }) => {
       await page.goto(path);
@@ -81,8 +81,10 @@ test.describe("logo and name (US2)", () => {
       ).toHaveCount(0);
       const logo = page.getByRole("img", { name: "Atmo AI" });
       await expect(logo).toHaveCount(1);
-      await expect(page.getByRole("link").filter({ has: logo })).toHaveCount(0);
-      await expect(logo).not.toHaveAttribute("tabindex");
+      const link = page.getByRole("link", { name: "Atmo AI" });
+      await expect(link).toHaveCount(1);
+      await expect(link.getByRole("img", { name: "Atmo AI" })).toHaveCount(1);
+      await expect(link).toHaveAttribute("href", "/en");
 
       const logoBox = await logo.boundingBox();
       const headingBox = await page
@@ -92,14 +94,23 @@ test.describe("logo and name (US2)", () => {
 
       for (let press = 0; press < 8; press++) {
         await page.keyboard.press("Tab");
-        expect(
-          await page.evaluate(
-            () => document.activeElement?.closest("svg[role=img]") != null,
-          ),
-        ).toBe(false);
+        if (await link.evaluate((el) => el === document.activeElement)) break;
       }
+      await expect(link).toBeFocused();
+
+      await page.keyboard.press("Enter");
+      await expect(page).toHaveURL(/\/en$/);
     });
   }
+
+  test("the Ukrainian sign-in logo leads to the Ukrainian landing page", async ({
+    page,
+  }) => {
+    await page.goto("/uk/sign-in");
+    await page.getByRole("link", { name: "Atmo AI" }).click();
+
+    await expect(page).toHaveURL(/\/uk$/);
+  });
 
   test("every title names the product Atmo AI (FR-025)", async ({ page }) => {
     await page.goto("/en/sign-in");

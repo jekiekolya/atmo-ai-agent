@@ -15,7 +15,7 @@ test("switching keeps the visitor on the same page, in the other language", asyn
 }) => {
   await page.goto("/uk");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "Чим можемо допомогти?",
+    "ШІ-підтримка для вашої сонячної станції",
   );
 
   await switchTo(page, "English");
@@ -23,7 +23,7 @@ test("switching keeps the visitor on the same page, in the other language", asyn
   await expect(page).toHaveURL(/\/en$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "How can we help?",
+    "AI support for your solar system",
   );
 });
 
@@ -36,7 +36,7 @@ test("the choice survives a reload", async ({ page }) => {
 
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-    "How can we help?",
+    "AI support for your solar system",
   );
 });
 
