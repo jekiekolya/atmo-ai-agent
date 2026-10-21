@@ -135,6 +135,7 @@ check where the logo appears, its size, whether it links, its accessible name, a
 3. **Given** the sign-in page or the invite / set-password page, **When** it renders, **Then** a larger
    logo is centred above the card, is not a link and not focusable, and is announced once with the
    localized product name.
+   Superseded by spec 007, FR-022: the logo is a link to the landing page.
 4. **Given** a page under the public layout, **When** its header renders, **Then** the header contains
    the theme and language controls only, with no logo.
 5. **Given** the light theme, **When** the logo is shown, **Then** the "atmo" wordmark is #C02444 and
@@ -284,6 +285,7 @@ without reduced motion, in both themes, with a screen reader; repeat with a fast
   carry it in their own image files.
 - **FR-011**: The brand red MUST appear only in the logo, the favicon, the Apple touch icon, and the
   page loader.
+  Superseded on the landing page only for the hero glow and benefit icons by spec 007, FR-026.
 - **FR-012**: The brand red MUST NOT be used for any button, link, focus indicator, selected or hover
   state, error, validation message, badge, or text.
 - **FR-013**: The destructive colour MUST be a separate theme value from the brand red and MUST keep
@@ -319,9 +321,11 @@ without reduced motion, in both themes, with a screen reader; repeat with a fast
   catalogs of every supported locale.
 - **FR-023**: The header of the public layout MUST NOT show a logo; it keeps only the theme and
   language controls.
+  Superseded for the landing page only by spec 007, FR-007.
 - **FR-024**: The sign-in page and the invite / set-password page MUST show a larger logo, centred above
   their card. It MUST NOT be a link or receive focus, and MUST be announced once with the localized
   product name.
+  Superseded by spec 007, FR-022: the logo is a link to the landing page.
 
 **Product name**
 

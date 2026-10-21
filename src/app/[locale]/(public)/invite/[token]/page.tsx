@@ -34,7 +34,9 @@ export default async function InvitePage({
 
   return (
     <div className="mx-auto flex w-full max-w-sm flex-col gap-4 p-4 sm:p-8">
-      <BrandLogo className="mx-auto h-10 w-auto" />
+      <Link href={PAGES.home} className="self-center rounded-sm">
+        <BrandLogo className="h-10 w-auto" />
+      </Link>
       <Card>
         <CardHeader>
           <CardTitle>

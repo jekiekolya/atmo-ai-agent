@@ -16,7 +16,7 @@ test.describe("with a Ukrainian browser", () => {
     await expect(page).toHaveURL(/\/uk$/);
     await expect(page.locator("html")).toHaveAttribute("lang", "uk");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Чим можемо допомогти?",
+      "ШІ-підтримка для вашої сонячної станції",
     );
   });
 
@@ -27,7 +27,7 @@ test.describe("with a Ukrainian browser", () => {
 
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "How can we help?",
+      "AI support for your solar system",
     );
   });
 });

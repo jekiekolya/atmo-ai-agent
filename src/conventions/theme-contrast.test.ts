@@ -85,6 +85,14 @@ const PAIRS: Pair[] = [
   ]),
   { fg: "destructive/90", surface: "card", min: TEXT },
   { fg: "brand-mark", surface: "background", min: GRAPHIC },
+  {
+    fg: "foreground",
+    surface: "brand-mark/10",
+    over: "background",
+    min: TEXT,
+  },
+  { fg: "ring", surface: "brand-mark/10", over: "background", min: GRAPHIC },
+  { fg: "brand-mark", surface: "card", min: GRAPHIC },
 ];
 
 function label({ fg, surface, over: base, min }: Pair) {
@@ -126,5 +134,26 @@ describe.each(["button", "badge", "dropdown-menu"])("ui/%s.tsx", (name) => {
       .map(([cls]) => cls);
 
     expect(tooStrong).toEqual([]);
+  });
+});
+
+// data-model.md § Contrast pairs: the brand-mark/10 pairs above hold only if the hero's glow is no stronger.
+describe("landing-hero.tsx", () => {
+  it("draws brand red only as a background tint of /10 or less", () => {
+    const source = readFileSync(
+      join(
+        process.cwd(),
+        "src/components/landing/landing-hero/landing-hero.tsx",
+      ),
+      "utf8",
+    );
+    const notFaint = (
+      source.match(/[^\s"'`]*brand-mark[^\s"'`]*/g) ?? []
+    ).filter((cls) => {
+      const percent = cls.match(/^bg-brand-mark\/(\d+)$/)?.[1];
+      return percent === undefined || Number(percent) > 10;
+    });
+
+    expect(notFaint).toEqual([]);
   });
 });

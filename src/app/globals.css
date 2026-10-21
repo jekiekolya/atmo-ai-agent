@@ -7,6 +7,8 @@
 @theme {
   --animate-loader-outer: loader-outer 1.4s linear infinite;
   --animate-loader-inner: loader-inner 1.4s linear infinite;
+  --animate-typing-indicator: typing-indicator 1.8s linear both;
+  --animate-typing-dot: typing-dot 0.5s ease-in-out 2;
 
   @keyframes loader-outer {
     0% {
@@ -29,6 +31,30 @@
     }
     100% {
       stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes typing-indicator {
+    0%,
+    44% {
+      opacity: 0;
+    }
+    50%,
+    94% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes typing-dot {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-0.25rem);
     }
   }
 }

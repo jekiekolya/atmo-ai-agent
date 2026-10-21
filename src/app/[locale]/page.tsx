@@ -1,16 +1,49 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
+import { BenefitCards } from "@/components/landing/benefit-cards/benefit-cards";
+import { LandingHero } from "@/components/landing/landing-hero/landing-hero";
 import { AppShell } from "@/components/shell/app-shell/app-shell";
+import { BrandLogo } from "@/components/shell/brand-logo/brand-logo";
+import { buttonVariants } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
+import { PAGES } from "@/lib/routes";
 
-export default async function Home() {
-  const t = await getTranslations("home");
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("landing");
+  const common = await getTranslations("common");
+  return {
+    // The layout's title template skips the page of its own segment.
+    title: {
+      absolute: common("titleTemplate").replace("%s", t("metaTitle")),
+    },
+    description: t("metaDescription"),
+  };
+}
+
+export default async function LandingPage() {
+  const t = await getTranslations("landing");
+  const common = await getTranslations("common");
 
   return (
-    <AppShell>
-      <div className="mx-auto flex max-w-2xl flex-col gap-4 p-4 sm:p-8">
-        <h1 className="text-2xl font-medium">{t("title")}</h1>
-        <p className="text-muted-foreground">{t("intro")}</p>
-      </div>
+    <AppShell
+      logo={
+        <Link href={PAGES.home} className="rounded-sm">
+          <BrandLogo className="h-6 w-auto" />
+        </Link>
+      }
+      account={
+        <Link
+          href={PAGES.signIn}
+          className={buttonVariants({ variant: "outline", size: "sm" })}
+        >
+          {t("signIn")}
+        </Link>
+      }
+      footer={common("appName")}
+    >
+      <LandingHero />
+      <BenefitCards />
     </AppShell>
   );
 }
