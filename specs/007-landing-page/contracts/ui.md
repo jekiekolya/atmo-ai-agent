@@ -42,7 +42,8 @@ A server component with no props.
   `name: common.appName`, then `landing.example.answer`. It occupies its layout space from the first
   paint.
 - **No literal text**: no text, punctuation included, is written in the markup.
-- **Typing indicator**: `aria-hidden="true"`, positioned over the agent bubble's space, `motion-reduce:hidden`.
+- **Typing indicator**: `aria-hidden="true"`, positioned over the agent bubble's space, `motion-reduce:hidden`,
+  `pointer-events-none` so the answer beneath it stays selectable.
 - **Not interactive**: no element inside is focusable or interactive — no link, button, input, or
   `tabindex`. There is no live region and no `role` beyond the figure's.
 - **Motion**: every animation is finite and carries `motion-reduce:animate-none`. The delayed bubbles use

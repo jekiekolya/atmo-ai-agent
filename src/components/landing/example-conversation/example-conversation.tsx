@@ -24,7 +24,7 @@ export function ExampleConversation() {
       <div className="relative max-w-[85%] self-start">
         <div
           aria-hidden="true"
-          className="absolute top-0 left-0 flex animate-typing-indicator gap-1 rounded-lg bg-muted px-3 py-3 motion-reduce:hidden"
+          className="pointer-events-none absolute top-0 left-0 flex animate-typing-indicator gap-1 rounded-lg bg-muted px-3 py-3 motion-reduce:hidden"
         >
           {DOT_DELAYS.map((delay) => (
             <span

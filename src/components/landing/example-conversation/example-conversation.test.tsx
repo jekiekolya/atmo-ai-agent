@@ -55,6 +55,14 @@ describe("ExampleConversation", () => {
     expect(indicator).toHaveClass("motion-reduce:hidden");
   });
 
+  it("lets the pointer through the typing indicator to the answer beneath it", () => {
+    const { container } = render(<ExampleConversation />);
+
+    expect(container.querySelector(".animate-typing-indicator")).toHaveClass(
+      "pointer-events-none",
+    );
+  });
+
   it("stills every animated element under reduced motion", () => {
     const { container } = render(<ExampleConversation />);
     const indicator = container.querySelector(".animate-typing-indicator")!;
