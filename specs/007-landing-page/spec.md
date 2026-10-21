@@ -11,16 +11,14 @@
 ## Overview
 
 The page at each language's root address is the first thing anyone sees who types the product's
-address. Today it is a placeholder: a heading and a paragraph written to an end customer ("How can we
-help?"), no logo, and no way to go anywhere. End customers cannot use the product yet, so it speaks to
-nobody who arrives there.
+address. Today it is a placeholder: a heading and a paragraph ("How can we help?"), no logo, and no way
+to go anywhere. It says nothing about the product.
 
-The people who do arrive are partner companies in the solar-energy field and our own staff showing the
-product to them. This feature replaces the placeholder with a short product landing page addressed to a
-partner: Atmo AI is an AI support agent for **your** customers. It says what the product is and what it
-does today — around the clock, in the customer's language, with the conversation kept, built for solar
-energy — and nothing it does not yet do. An example conversation plays once beside the headline to show
-the idea at a glance, and Sign in leads into the product.
+This feature replaces the placeholder with a short product landing page addressed to the user of our
+platform: Atmo AI answers **your** questions. It says what the product is and what it does today —
+around the clock, in the user's language, with the conversation kept, built for solar energy — and
+nothing it does not yet do. An example conversation plays once beside the headline to show the idea at
+a glance, and Sign in leads into the product.
 
 The page is informational. It looks the same to every visitor, signed in or not, and decides nothing
 about them: Sign in always goes to the sign-in page, which already sends a signed-in visitor on to the
@@ -37,15 +35,19 @@ becomes a link to the landing page.
   back-forward cache, after the visitor left with a full navigation, shows its final state instead;
   accepted rather than adding a script to restart the motion.
 
+### Session 2026-10-21
+
+- Q: Who does the page's copy address? → A: The user of our platform, not partner companies. The copy
+  was rewritten this way after implementation; FR-002, FR-003, User Story 1 and its scenario 3 follow it.
+
 ## User Scenarios & Testing _(mandatory)_
 
-### User Story 1 - A partner learns what the product is (Priority: P1)
+### User Story 1 - A visitor learns what the product is (Priority: P1)
 
-A sales contact at a solar-installation company opens the product's address. Under a header with the
-"atmo AI" logo, theme and language controls and a Sign in button, a headline and one sentence tell them
-it is an AI support agent for their customers. Four short cards name what it does: it is available
-around the clock, answers in the customer's language, keeps the conversation history, and is built for
-solar energy. A short footer carries the product name. Nothing on the page promises a figure, a
+A user of our platform opens the product's address. Under a header with the "atmo AI" logo, theme and
+language controls and a Sign in button, a headline and one sentence tell them it is an AI support agent
+that answers their questions. Four short cards name what it does: it is available around the clock,
+answers in their language, keeps the conversation history, and is built for solar energy. A short footer carries the product name. Nothing on the page promises a figure, a
 customer, a price, or a capability the product does not have. The page reads equally well in Ukrainian,
 in the dark theme, and on a phone.
 
@@ -64,9 +66,9 @@ absence of horizontal scrolling.
    four benefit cards, and a footer naming the product.
 2. **Given** the header, **When** it renders, **Then** its first item is the compact "atmo AI" logo,
    followed by the theme control, the language control, and a Sign in button.
-3. **Given** the page in either language, **When** its copy is read, **Then** it addresses a partner
-   about support for the partner's customers, names the product "Atmo AI", and describes only round-
-   the-clock availability, answering in the customer's language, keeping the conversation history, and
+3. **Given** the page in either language, **When** its copy is read, **Then** it addresses the user of
+   our platform, names the product "Atmo AI", and describes only round-the-clock availability,
+   answering in the user's language, keeping the conversation history, and
    a focus on solar energy.
 4. **Given** the page in either language, **When** it is checked against the excluded claims, **Then**
    it contains no figures, testimonials, customer logos, prices, and no mention of integration with
@@ -83,7 +85,7 @@ absence of horizontal scrolling.
 
 ### User Story 2 - Sign in from the landing page (Priority: P1)
 
-The partner's contact has been given an account. From the landing page they press Sign in — in the
+A user has been given an account. From the landing page they press Sign in — in the
 header or in the hero — and reach the sign-in form. A staff member who is already signed in presses the
 same button and lands straight on the dashboard, as they would by opening the sign-in page directly.
 
@@ -204,10 +206,10 @@ unchanged.
 
 - **FR-001**: Each supported language's root address MUST show the landing page, replacing today's
   placeholder heading and paragraph; the placeholder's copy MUST be removed from every catalog.
-- **FR-002**: The page's copy MUST address partner companies about AI support for their customers and
-  MUST name the product "Atmo AI".
-- **FR-003**: The page MUST describe only what the product does today: an AI support agent for the
-  partner's end customers that is available around the clock, answers in the customer's language,
+- **FR-002**: The page's copy MUST address the user of our platform and MUST name the product
+  "Atmo AI".
+- **FR-003**: The page MUST describe only what the product does today: an AI support agent that is
+  available around the clock, answers in the user's language,
   keeps the conversation history, and is built for solar energy.
 - **FR-004**: The page MUST NOT contain figures or statistics, testimonials, customer or partner logos,
   prices, or any mention of integration with partner data, handoff to a human, analytics, or
@@ -376,8 +378,9 @@ the plan.
   the agent, and never changes per visitor.
 - **The landing page is not a page of the public or signed-in layouts' flows**: it has no page loader
   (feature 005's assumption for pages outside both layouts) and no session check.
-- **The current product is staff-only** (feature 006). The page speaks to partners about the product's
-  purpose; it does not claim that their customers can use it today, and does not say they cannot.
+- **The current product is staff-only** (feature 006). The page speaks to the user of our platform about
+  the product's purpose; it does not claim that anyone outside our staff can use it today, and does not
+  say they cannot.
 
 ## Out of Scope
 

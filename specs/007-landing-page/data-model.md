@@ -12,7 +12,7 @@ AppShell
 │   ├── ThemeToggle, LocaleSwitcher                                  (unchanged)
 │   └── account slot ── Link → PAGES.signIn (outline, sm)            landing.signIn
 ├── main
-│   ├── LandingHero (section, overflow clipped)
+│   ├── LandingHero (section, clipped horizontally)
 │   │   ├── glow (aria-hidden, brand-mark/10, blurred)
 │   │   ├── h1 landing.headline · p landing.subheading               foreground text
 │   │   ├── Link → PAGES.signIn (primary, lg)                        landing.signIn

@@ -117,6 +117,10 @@ region, a screen reader announces nothing on its own as the sequence plays.
 - **Text over the glow**: the headline and subheading use `foreground`, never `muted-foreground`.
 - **Benefit icons**: `text-brand-mark` directly on the card surface, with no tinted tile behind them.
 
+**Amendment (implementation)**: the hero clips only horizontally (`overflow-x-clip`). The glow can reach
+below the hero, under the benefit cards, which sit above it on their own card surface; a horizontal
+clip still keeps it from causing a sideways scroll.
+
 **Rationale**: These are the measured pairs against today's theme values.
 
 | Pair                                         | Light | Dark  | Needs |

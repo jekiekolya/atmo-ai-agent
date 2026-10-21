@@ -14,7 +14,7 @@ module here is test-together (plan.md § Test regime): a test ships in the same 
 
 **Organization**: Tasks are grouped by the spec's user stories:
 
-- US1 — a partner learns what the product is (P1): the page, its copy, header, cards, and footer;
+- US1 — a visitor learns what the product is (P1): the page, its copy, header, cards, and footer;
 - US2 — Sign in from the landing page (P1);
 - US3 — the example conversation plays once (P2);
 - US4 — back to the landing page through the logo (P2).
@@ -58,7 +58,7 @@ indicator on top of it.
 
 ---
 
-## Phase 3: User Story 1 — A partner learns what the product is (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 — A visitor learns what the product is (Priority: P1) 🎯 MVP
 
 **Goal**: `/en` and `/uk` show the header (logo, theme, language, Sign in), the hero with the still example
 conversation, four benefit cards, and a footer, in both themes and down to 320px.
