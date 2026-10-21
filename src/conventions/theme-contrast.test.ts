@@ -139,7 +139,7 @@ describe.each(["button", "badge", "dropdown-menu"])("ui/%s.tsx", (name) => {
 
 // data-model.md § Contrast pairs: the brand-mark/10 pairs above hold only if the hero's glow is no stronger.
 describe("landing-hero.tsx", () => {
-  it("draws no brand-mark tint stronger than /10", () => {
+  it("draws brand red only as a background tint of /10 or less", () => {
     const source = readFileSync(
       join(
         process.cwd(),
@@ -147,10 +147,13 @@ describe("landing-hero.tsx", () => {
       ),
       "utf8",
     );
-    const tooStrong = [...source.matchAll(/[^\s"'`]*brand-mark\/(\d+)/g)]
-      .filter(([, percent]) => Number(percent) > 10)
-      .map(([cls]) => cls);
+    const notFaint = (
+      source.match(/[^\s"'`]*brand-mark[^\s"'`]*/g) ?? []
+    ).filter((cls) => {
+      const percent = cls.match(/^bg-brand-mark\/(\d+)$/)?.[1];
+      return percent === undefined || Number(percent) > 10;
+    });
 
-    expect(tooStrong).toEqual([]);
+    expect(notFaint).toEqual([]);
   });
 });
