@@ -16,8 +16,8 @@ export async function submitSignIn(
   locale: Locale = "en",
 ) {
   const labels = LABELS[locale];
-  await page.getByLabel(labels.email).fill(email);
-  await page.getByLabel(labels.password).fill(password);
+  await page.getByLabel(labels.email, { exact: true }).fill(email);
+  await page.getByLabel(labels.password, { exact: true }).fill(password);
   // Wait for the answer, so repeated attempts are each counted (US5).
   await Promise.all([
     page.waitForResponse((r) =>
