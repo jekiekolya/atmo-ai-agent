@@ -22,6 +22,32 @@ test("a successful sign-in reaches the protected home and shows the full name", 
   ).toHaveText("Taras Shevchenko");
 });
 
+test("revealing the password on sign-in still signs in (spec 008)", async ({
+  page,
+}) => {
+  const admin = await createAdmin();
+
+  await page.goto("/en/sign-in");
+  await page.getByLabel("Email", { exact: true }).fill(admin.email);
+  const password = page.getByLabel("Password", { exact: true });
+  await password.fill(admin.password);
+
+  // A click before hydration does nothing; click again until the field is revealed.
+  await expect(async () => {
+    if ((await password.getAttribute("type")) === "password") {
+      await page.getByRole("button", { name: "Show password" }).click();
+    }
+    await expect(password).toHaveAttribute("type", "text", { timeout: 1_000 });
+  }).toPass();
+  await expect(password).toHaveValue(admin.password);
+  await expect(
+    page.getByRole("button", { name: "Hide password" }),
+  ).toBeVisible();
+
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await expect(page).toHaveURL(/\/en\/dashboard$/);
+});
+
 test("a failed sign-in shows one uniform message, whatever the cause (FR-015)", async ({
   page,
 }) => {

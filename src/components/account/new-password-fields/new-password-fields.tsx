@@ -3,13 +3,13 @@
 import type { Field as FieldPrimitive } from "@base-ui/react/field";
 import { type ReactNode, useRef } from "react";
 
+import { PasswordInput } from "@/components/form-kit/password-input/password-input";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldLabel,
 } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { useTranslateKey } from "@/i18n/use-translate-key";
 import { validatePair, validateWith } from "@/lib/http/client/form-errors";
 import {
@@ -52,8 +52,7 @@ export function NewPasswordFields({
         }
       >
         <FieldLabel>{label}</FieldLabel>
-        <Input
-          type="password"
+        <PasswordInput
           autoComplete="new-password"
           onChange={() => {
             if (confirmChecked.current) confirm.current?.validate();
@@ -72,7 +71,7 @@ export function NewPasswordFields({
         }}
       >
         <FieldLabel>{confirmLabel}</FieldLabel>
-        <Input type="password" autoComplete="new-password" />
+        <PasswordInput autoComplete="new-password" />
         <FieldError />
       </Field>
     </>

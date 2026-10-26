@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { FormAlert } from "@/components/form-kit/form-alert/form-alert";
+import { PasswordInput } from "@/components/form-kit/password-input/password-input";
 import { SubmitButton } from "@/components/form-kit/submit-button/submit-button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
@@ -80,7 +81,7 @@ export function SignInForm({ callbackUrl }: { callbackUrl: string }) {
         validate={validateWith(signInSchema.shape.password, translateKey)}
       >
         <FieldLabel>{t("password")}</FieldLabel>
-        <Input type="password" autoComplete="current-password" />
+        <PasswordInput autoComplete="current-password" />
         <FieldError />
       </Field>
 

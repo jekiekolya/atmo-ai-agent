@@ -155,6 +155,10 @@
   "dialog": {
     "close": "Close"
   },
+  "passwordInput": {
+    "show": "Show password",
+    "hide": "Hide password"
+  },
   "invite": {
     "metaTitle": "Set your password",
     "title": "Set your password",

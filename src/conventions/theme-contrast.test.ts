@@ -82,6 +82,12 @@ const PAIRS: Pair[] = [
     { fg: "destructive", surface: "destructive/10", over: surface, min: TEXT },
     { fg: "destructive", surface: "destructive/15", over: surface, min: TEXT },
     { fg: "ring", surface, min: GRAPHIC },
+    {
+      fg: "muted-foreground",
+      surface: "input/30",
+      over: surface,
+      min: GRAPHIC,
+    },
   ]),
   { fg: "destructive/90", surface: "card", min: TEXT },
   { fg: "brand-mark", surface: "background", min: GRAPHIC },

@@ -7,9 +7,9 @@ import { useState } from "react";
 import { FormAlert } from "@/components/form-kit/form-alert/form-alert";
 import { useFormFailure } from "@/components/form-kit/form-alert/use-form-failure";
 import { NewPasswordFields } from "@/components/account/new-password-fields/new-password-fields";
+import { PasswordInput } from "@/components/form-kit/password-input/password-input";
 import { SubmitButton } from "@/components/form-kit/submit-button/submit-button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
 import { useTranslateKey } from "@/i18n/use-translate-key";
 import { apiRequest } from "@/lib/http/client/api-client";
 import { validateWith } from "@/lib/http/client/form-errors";
@@ -65,7 +65,7 @@ export function ChangePasswordForm() {
         )}
       >
         <FieldLabel>{t("currentPassword")}</FieldLabel>
-        <Input type="password" autoComplete="current-password" />
+        <PasswordInput autoComplete="current-password" />
         <FieldError />
       </Field>
 
